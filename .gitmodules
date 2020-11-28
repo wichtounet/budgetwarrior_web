@@ -1,0 +1,3 @@
+[submodule "budgetwarrior"]
+	path = budgetwarrior
+	url = https://github.com/wichtounet/budgetwarrior.git
