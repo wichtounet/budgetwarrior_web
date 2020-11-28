@@ -553,15 +553,58 @@ void budget::year_breakdown_expenses_page(const httplib::Request& req, httplib::
     page_end(w, req, res);
 }
 
+namespace {
+
+void add_quick_expense_action(budget::html_writer & w, size_t i, budget::expense & expense) {
+    w << "<script>";
+    w << "function quickAction" << i << "() {";
+    w << "  $(\"#input_name\").val(\"" << expense.name << "\");";
+    w << "  $(\"#input_amount\").val(" << budget::to_string(expense.amount) << ");";
+    w << "  $(\"#input_account\").val(" << expense.account << ");";
+    w << "}";
+    w << "</script>";
+    w << "<button class=\"btn btn-secondary\" onclick=\"quickAction" << i << "();\">" << expense.name << "</button>&nbsp;";
+}
+
+} // end of anonymous namespace
+
 void budget::add_expenses_page(const httplib::Request& req, httplib::Response& res) {
     std::stringstream content_stream;
     if (!page_start(req, res, content_stream, "New Expense")) {
         return;
     }
 
+    data_cache cache;
+
     budget::html_writer w(content_stream);
 
     w << title_begin << "New Expense" << title_end;
+
+    static constexpr size_t quick_actions = 3;
+
+    if (cache.expenses().size() > quick_actions) {
+        std::map<std::string, size_t> counts;
+        std::unordered_map<std::string, budget::expense> last_expenses;
+        std::vector<std::pair<std::string, size_t>> order;
+
+        for (auto& expense : cache.sorted_expenses()) {
+            ++counts[expense.name];
+            last_expenses[expense.name] = expense;
+        }
+
+        for (auto & [key, value] : counts) {
+            order.emplace_back(key, value);
+        }
+
+        std::sort(order.begin(), order.end(), [] (auto & a, auto & b) { return a.second > b.second; });
+
+        w << "<div>";
+        w << "Quick Fill: ";
+        for (size_t i = 0; i < quick_actions && i < order.size(); ++i) {
+            add_quick_expense_action(w, i, last_expenses[order[i].first]);
+        }
+        w << "</div>";
+    }
 
     form_begin(w, "/api/expenses/add/", "/expenses/add/");
 
