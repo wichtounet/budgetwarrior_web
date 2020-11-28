@@ -12,7 +12,6 @@
 
 #include "cpp_utils/assert.hpp"
 
-#include "server.hpp"
 #include "expenses.hpp"
 #include "earnings.hpp"
 #include "accounts.hpp"
