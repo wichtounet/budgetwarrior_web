@@ -273,15 +273,58 @@ void budget::time_graph_earnings_page(const httplib::Request& req, httplib::Resp
     page_end(w, req, res);
 }
 
+namespace {
+
+void add_quick_earning_action(budget::html_writer & w, size_t i, budget::earning & earning) {
+    w << "<script>";
+    w << "function quickAction" << i << "() {";
+    w << "  $(\"#input_name\").val(\"" << earning.name << "\");";
+    w << "  $(\"#input_amount\").val(" << budget::to_string(earning.amount) << ");";
+    w << "  $(\"#input_account\").val(" << earning.account << ");";
+    w << "}";
+    w << "</script>";
+    w << "<button class=\"btn btn-secondary\" onclick=\"quickAction" << i << "();\">" << earning.name << "</button>&nbsp;";
+}
+
+} // end of anonymous namespace
+
 void budget::add_earnings_page(const httplib::Request& req, httplib::Response& res) {
     std::stringstream content_stream;
     if (!page_start(req, res, content_stream, "New earning")) {
         return;
     }
 
+    data_cache cache;
+
     budget::html_writer w(content_stream);
 
     w << title_begin << "New earning" << title_end;
+
+    static constexpr size_t quick_actions = 3;
+
+    if (cache.earnings().size() > quick_actions) {
+        std::map<std::string, size_t> counts;
+        std::unordered_map<std::string, budget::earning> last_earnings;
+        std::vector<std::pair<std::string, size_t>> order;
+
+        for (auto& earning : cache.sorted_earnings()) {
+            ++counts[earning.name];
+            last_earnings[earning.name] = earning;
+        }
+
+        for (auto & [key, value] : counts) {
+            order.emplace_back(key, value);
+        }
+
+        std::sort(order.begin(), order.end(), [] (auto & a, auto & b) { return a.second > b.second; });
+
+        w << "<div>";
+        w << "Quick Fill: ";
+        for (size_t i = 0; i < quick_actions && i < order.size(); ++i) {
+            add_quick_earning_action(w, i, last_earnings[order[i].first]);
+        }
+        w << "</div>";
+    }
 
     form_begin(w, "/api/earnings/add/", "/earnings/add/");
 
