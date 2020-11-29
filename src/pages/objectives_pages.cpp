@@ -131,7 +131,7 @@ void budget::objectives_card(budget::html_writer& w){
     auto month_status = budget::compute_month_status(cache, y, m);
 
     w << R"=====(<div class="card">)=====";
-    w << R"=====(<div class="card-header card-header-primary">Objectives</div>)=====";
+    w << R"=====(<div class="card-header card-header-primary">Goals</div>)=====";
 
     w << R"=====(<div class="row card-body">)=====";
 
@@ -201,7 +201,7 @@ void budget::objectives_card(budget::html_writer& w){
 
 void budget::list_objectives_page(const httplib::Request& req, httplib::Response& res) {
     std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Objectives List")) {
+    if (!page_start(req, res, content_stream, "Goals List")) {
         return;
     }
 
@@ -215,7 +215,7 @@ void budget::list_objectives_page(const httplib::Request& req, httplib::Response
 
 void budget::status_objectives_page(const httplib::Request& req, httplib::Response& res) {
     std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Objectives Status")) {
+    if (!page_start(req, res, content_stream, "Goals Status")) {
         return;
     }
 
@@ -227,7 +227,7 @@ void budget::status_objectives_page(const httplib::Request& req, httplib::Respon
 
 void budget::add_objectives_page(const httplib::Request& req, httplib::Response& res) {
     std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New objective")) {
+    if (!page_start(req, res, content_stream, "New goal")) {
         return;
     }
 

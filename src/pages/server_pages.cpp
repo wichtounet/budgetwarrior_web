@@ -343,15 +343,15 @@ std::string header(const std::string& title, bool menu = true) {
             )=====";
         }
 
-        // Objectives
+        // Goals
 
         stream << R"=====(
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Objectives</a>
+                <a class="nav-link dropdown-toggle" href="#" id="dropdown07" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Goals</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown07">
                   <a class="dropdown-item" href="/objectives/status/">Status</a>
                   <a class="dropdown-item" href="/objectives/list/">List</a>
-                  <a class="dropdown-item" href="/objectives/add/">Add Objective</a>
+                  <a class="dropdown-item" href="/objectives/add/">Add Goal</a>
                 </div>
               </li>
         )=====";
