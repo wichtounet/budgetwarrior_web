@@ -87,6 +87,12 @@ void add_objective_source_picker(budget::writer& w, const std::string& default_v
         w << "<option value=\"earnings\">Earnings</option>";
     }
 
+    if ("income" == default_value) {
+        w << "<option selected value=\"income\">Income</option>";
+    } else {
+        w << "<option value=\"income\">Income</option>";
+    }
+
     if ("expenses" == default_value) {
         w << "<option selected value=\"expenses\">Expenses</option>";
     } else {
