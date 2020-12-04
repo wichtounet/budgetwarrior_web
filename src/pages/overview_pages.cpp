@@ -259,6 +259,10 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
        auto taxes_account = config_value("taxes_account");
 
        if (account_exists(taxes_account)) {
+           if (!page_start(req, res, content_stream, "Tax Rate Over Time")) {
+               return;
+           }
+
             budget::html_writer w(content_stream);
 
             auto ss = start_time_chart(w, "Tax rate over time", "line", "tax_time_graph", "");
