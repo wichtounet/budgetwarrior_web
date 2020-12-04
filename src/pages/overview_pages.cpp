@@ -268,7 +268,6 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
             auto ss = start_time_chart(w, "Tax rate over time", "line", "tax_time_graph", "");
 
             ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
-            ss << R"=====(yAxis: { min: 0, max: 100, title: { text: 'Tax Savings Rate' }},)=====";
             ss << R"=====(legend: { enabled: false },)=====";
 
             ss << "series: [";
@@ -280,6 +279,8 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
             std::vector<std::string> dates;
 
             auto sy = start_year();
+
+            double max = 1.0;
 
             for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
                 budget::year year = j;
@@ -304,6 +305,10 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
                     dates.push_back(date);
 
                     ss << "[" << date << " ," << 100.0 * tax_rate << "],";
+
+                    if (tax_rate > max) {
+                        max = tax_rate;
+                    }
                 }
             }
 
@@ -327,11 +332,17 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
                 }
 
                 ss << "[" << dates[i] << "," << 100.0 * average << "],";
+
+                if (average > max) {
+                    max = average;
+                }
             }
 
             ss << "]},";
 
             ss << "]";
+
+            ss << ", yAxis: { min: 0, max: " << (int) (100.0 * max) << ", title: { text: 'Tax Savings Rate' }},";
 
             end_chart(w, ss);
 
