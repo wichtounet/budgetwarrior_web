@@ -29,7 +29,8 @@ void budget::overview_page(const httplib::Request& req, httplib::Response& res) 
     if (req.matches.size() == 3) {
         display_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
-        display_month_overview(w);
+        auto today = budget::local_day();
+        display_month_overview(today.month(), today.year(), w);
     }
 
     page_end(w, req, res);
@@ -153,10 +154,15 @@ void budget::overview_year_page(const httplib::Request& req, httplib::Response& 
 
     budget::html_writer w(content_stream);
 
+    data_cache cache;
+
     if (req.matches.size() == 2) {
-        display_year_overview(to_number<size_t>(req.matches[1]), w);
+        display_year_overview_header(cache, to_number<size_t>(req.matches[1]), w);
+        display_year_overview(cache, to_number<size_t>(req.matches[1]), w);
     } else {
-        display_year_overview(w);
+        auto today = budget::local_day();
+        display_year_overview_header(cache, today.year(), w);
+        display_year_overview(cache, today.year(), w);
     }
 
     page_end(w, req, res);
@@ -371,7 +377,8 @@ void budget::side_overview_page(const httplib::Request& req, httplib::Response& 
         if (req.matches.size() == 3) {
             display_side_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
         } else {
-            display_side_month_overview(w);
+            auto today = budget::local_day();
+            display_side_month_overview(today.month(), today.year(), w);
         }
     }
 
