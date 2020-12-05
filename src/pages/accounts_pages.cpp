@@ -7,7 +7,7 @@
 
 #include "accounts.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/accounts_pages.hpp"
 #include "http.hpp"
 

@@ -15,7 +15,7 @@
 #include "overview.hpp"
 #include "summary.hpp"
 #include "version.hpp"
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "currency.hpp"
 #include "budget_exception.hpp"
 

@@ -8,7 +8,7 @@
 #include "cpp_utils/assert.hpp"
 #include "cpp_utils/string.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "console.hpp"
 #include "expenses.hpp"
 #include "earnings.hpp"

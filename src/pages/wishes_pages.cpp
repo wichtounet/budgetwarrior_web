@@ -7,7 +7,7 @@
 
 #include "wishes.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/wishes_pages.hpp"
 #include "http.hpp"
 

@@ -9,7 +9,7 @@
 
 #include "data_cache.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/asset_values_pages.hpp"
 #include "http.hpp"
 

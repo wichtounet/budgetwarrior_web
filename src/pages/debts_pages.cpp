@@ -7,7 +7,7 @@
 
 #include "debts.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/debts_pages.hpp"
 #include "http.hpp"
 

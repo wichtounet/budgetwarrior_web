@@ -8,7 +8,7 @@
 #include "fortune.hpp"
 
 #include "pages/fortunes_pages.hpp"
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "http.hpp"
 
 using namespace budget;

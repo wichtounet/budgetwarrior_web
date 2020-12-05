@@ -11,7 +11,7 @@
 
 #include "data_cache.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/net_worth_pages.hpp"
 #include "http.hpp"
 #include "currency.hpp"

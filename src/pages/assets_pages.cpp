@@ -9,7 +9,7 @@
 
 #include "assets.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/assets_pages.hpp"
 #include "http.hpp"
 

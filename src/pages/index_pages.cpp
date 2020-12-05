@@ -12,7 +12,7 @@
 #include "pages/expenses_pages.hpp"
 #include "pages/objectives_pages.hpp"
 #include "pages/net_worth_pages.hpp"
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "http.hpp"
 #include "config.hpp"
 #include "data_cache.hpp"

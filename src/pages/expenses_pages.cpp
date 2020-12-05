@@ -9,7 +9,7 @@
 
 #include "data_cache.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/expenses_pages.hpp"
 #include "http.hpp"
 #include "config.hpp"

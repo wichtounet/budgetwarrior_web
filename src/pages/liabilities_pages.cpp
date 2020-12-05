@@ -9,7 +9,7 @@
 
 #include "liabilities.hpp"
 
-#include "writer.hpp"
+#include "pages/html_writer.hpp"
 #include "pages/liabilities_pages.hpp"
 #include "http.hpp"
 
