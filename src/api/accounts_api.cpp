@@ -18,10 +18,6 @@
 using namespace budget;
 
 void budget::add_accounts_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_name", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -46,10 +42,6 @@ void budget::add_accounts_api(const httplib::Request& req, httplib::Response& re
 }
 
 void budget::edit_accounts_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_name", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -78,10 +70,6 @@ void budget::edit_accounts_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::delete_accounts_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -106,10 +94,6 @@ void budget::delete_accounts_api(const httplib::Request& req, httplib::Response&
 }
 
 void budget::list_accounts_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 
@@ -128,10 +112,6 @@ void budget::list_accounts_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::archive_accounts_month_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         budget::archive_accounts_impl(true);
 
@@ -144,10 +124,6 @@ void budget::archive_accounts_month_api(const httplib::Request& req, httplib::Re
 }
 
 void budget::archive_accounts_year_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         budget::archive_accounts_impl(false);
 

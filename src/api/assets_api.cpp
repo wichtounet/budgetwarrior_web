@@ -21,10 +21,6 @@
 using namespace budget;
 
 void budget::add_assets_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_name", "input_portfolio", "input_alloc", "input_share_based", "input_ticker"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -78,10 +74,6 @@ void budget::add_assets_api(const httplib::Request& req, httplib::Response& res)
 }
 
 void budget::edit_assets_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_name", "input_portfolio", "input_alloc", "input_share_based", "input_ticker"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -128,10 +120,6 @@ void budget::edit_assets_api(const httplib::Request& req, httplib::Response& res
 }
 
 void budget::delete_assets_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -156,10 +144,6 @@ void budget::delete_assets_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::list_assets_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 
@@ -178,10 +162,6 @@ void budget::list_assets_api(const httplib::Request& req, httplib::Response& res
 }
 
 void budget::add_asset_values_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_asset", "input_date", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -206,10 +186,6 @@ void budget::add_asset_values_api(const httplib::Request& req, httplib::Response
 }
 
 void budget::edit_asset_values_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_asset", "input_date", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -240,10 +216,6 @@ void budget::edit_asset_values_api(const httplib::Request& req, httplib::Respons
 }
 
 void budget::delete_asset_values_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -268,10 +240,6 @@ void budget::delete_asset_values_api(const httplib::Request& req, httplib::Respo
 }
 
 void budget::list_asset_values_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 
@@ -290,10 +258,6 @@ void budget::list_asset_values_api(const httplib::Request& req, httplib::Respons
 }
 
 void budget::batch_asset_values_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         auto asset_values = all_asset_values();
 
@@ -334,10 +298,6 @@ void budget::batch_asset_values_api(const httplib::Request& req, httplib::Respon
 }
 
 void budget::add_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_asset", "input_shares", "input_price", "input_date"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -362,10 +322,6 @@ void budget::add_asset_shares_api(const httplib::Request& req, httplib::Response
 }
 
 void budget::edit_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_asset", "input_shares", "input_price", "input_date"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -396,10 +352,6 @@ void budget::edit_asset_shares_api(const httplib::Request& req, httplib::Respons
 }
 
 void budget::delete_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -424,10 +376,6 @@ void budget::delete_asset_shares_api(const httplib::Request& req, httplib::Respo
 }
 
 void budget::list_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 
@@ -448,10 +396,6 @@ void budget::list_asset_shares_api(const httplib::Request& req, httplib::Respons
 // Asset Classes
 
 void budget::add_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_name"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -473,10 +417,6 @@ void budget::add_asset_classes_api(const httplib::Request& req, httplib::Respons
 }
 
 void budget::edit_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_name"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -504,10 +444,6 @@ void budget::edit_asset_classes_api(const httplib::Request& req, httplib::Respon
 }
 
 void budget::delete_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -541,10 +477,6 @@ void budget::delete_asset_classes_api(const httplib::Request& req, httplib::Resp
 }
 
 void budget::list_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 
@@ -565,10 +497,6 @@ void budget::list_asset_classes_api(const httplib::Request& req, httplib::Respon
 // Liabilities
 
 void budget::add_liabilities_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_name", "input_currency"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -591,10 +519,6 @@ void budget::add_liabilities_api(const httplib::Request& req, httplib::Response&
 }
 
 void budget::edit_liabilities_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_name", "input_currency"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -623,10 +547,6 @@ void budget::edit_liabilities_api(const httplib::Request& req, httplib::Response
 }
 
 void budget::delete_liabilities_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -651,10 +571,6 @@ void budget::delete_liabilities_api(const httplib::Request& req, httplib::Respon
 }
 
 void budget::list_liabilities_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 

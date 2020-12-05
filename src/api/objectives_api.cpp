@@ -18,10 +18,6 @@
 using namespace budget;
 
 void budget::add_objectives_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_name", "input_type", "input_type", "input_source", "input_operator", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -48,10 +44,6 @@ void budget::add_objectives_api(const httplib::Request& req, httplib::Response& 
 }
 
 void budget::edit_objectives_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_name", "input_type", "input_type", "input_source", "input_operator", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -83,10 +75,6 @@ void budget::edit_objectives_api(const httplib::Request& req, httplib::Response&
 }
 
 void budget::delete_objectives_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -111,10 +99,6 @@ void budget::delete_objectives_api(const httplib::Request& req, httplib::Respons
 }
 
 void budget::list_objectives_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 

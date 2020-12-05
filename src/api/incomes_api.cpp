@@ -18,10 +18,6 @@
 using namespace budget;
 
 void budget::add_incomes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -41,10 +37,6 @@ void budget::add_incomes_api(const httplib::Request& req, httplib::Response& res
 }
 
 void budget::edit_incomes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_amount"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -72,10 +64,6 @@ void budget::edit_incomes_api(const httplib::Request& req, httplib::Response& re
 }
 
 void budget::delete_incomes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -100,10 +88,6 @@ void budget::delete_incomes_api(const httplib::Request& req, httplib::Response& 
 }
 
 void budget::list_incomes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 

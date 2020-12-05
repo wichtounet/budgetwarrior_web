@@ -29,26 +29,14 @@ using namespace budget;
 namespace {
 
 void server_up_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     api_success_content(req, res, "yes");
 }
 
 void server_version_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     api_success_content(req, res, get_version_short());
 }
 
 void server_version_support_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"version"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -64,10 +52,6 @@ void server_version_support_api(const httplib::Request& req, httplib::Response& 
 }
 
 void retirement_configure_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_wrate", "input_roi"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -85,17 +69,21 @@ void retirement_configure_api(const httplib::Request& req, httplib::Response& re
 auto api_wrapper(void (*api_function)(const httplib::Request &, httplib::Response &)) {
     return [api_function](const httplib::Request& req, httplib::Response& res) {
         try {
+            if (!api_start(req, res)) {
+                return;
+            }
+
             api_function(req, res);
         } catch (const budget_exception& e) {
-            res.set_content("Exception occured: " + e.message(), "text/plain");
+            api_error(req, res, "Exception occurred: " + e.message());
             std::cout << "ERROR: budget_exception occured in api("
                       << req.path << "): " << e.message() << std::endl;
         } catch (const date_exception& e) {
-            res.set_content("Exception occured: " + e.message(), "text/plain");
+            api_error(req, res, "Exception occurred: " + e.message());
             std::cout << "ERROR: date_exception occured in api("
                       << req.path << "): " << e.message() << std::endl;
         } catch (...) {
-            res.set_content("Unkown Exception occured", "text/plain");
+            api_error(req, res, "Unknown Exception occurred");
             std::cout << "ERROR: Unknown exception occured in api("
                       << req.path << ")" << std::endl;
         }

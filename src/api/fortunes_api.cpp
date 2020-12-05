@@ -19,10 +19,6 @@
 using namespace budget;
 
 void budget::add_fortunes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_amount") || !req.has_param("input_date")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -45,10 +41,6 @@ void budget::add_fortunes_api(const httplib::Request& req, httplib::Response& re
 }
 
 void budget::edit_fortunes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_id") || !req.has_param("input_amount") || !req.has_param("input_date")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -77,10 +69,6 @@ void budget::edit_fortunes_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::delete_fortunes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_id")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -105,10 +93,6 @@ void budget::delete_fortunes_api(const httplib::Request& req, httplib::Response&
 }
 
 void budget::list_fortunes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 

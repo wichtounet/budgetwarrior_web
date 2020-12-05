@@ -18,10 +18,6 @@
 using namespace budget;
 
 void budget::add_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_name", "input_date", "input_amount", "input_account"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -46,10 +42,6 @@ void budget::add_expenses_api(const httplib::Request& req, httplib::Response& re
 }
 
 void budget::edit_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id", "input_name", "input_date", "input_amount", "input_account"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -80,10 +72,6 @@ void budget::edit_expenses_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::delete_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!parameters_present(req, {"input_id"})) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -108,10 +96,6 @@ void budget::delete_expenses_api(const httplib::Request& req, httplib::Response&
 }
 
 void budget::list_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 

@@ -19,10 +19,6 @@
 using namespace budget;
 
 void budget::add_recurrings_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_account") || !req.has_param("input_recurs") || !req.has_param("input_type")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -57,10 +53,6 @@ void budget::add_recurrings_api(const httplib::Request& req, httplib::Response& 
 }
 
 void budget::edit_recurrings_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_id") || !req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_account") || !req.has_param("input_recurs")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -98,10 +90,6 @@ void budget::edit_recurrings_api(const httplib::Request& req, httplib::Response&
 }
 
 void budget::delete_recurrings_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_id")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -126,10 +114,6 @@ void budget::delete_recurrings_api(const httplib::Request& req, httplib::Respons
 }
 
 void budget::list_recurrings_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 

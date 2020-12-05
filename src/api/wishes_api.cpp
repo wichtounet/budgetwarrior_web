@@ -19,10 +19,6 @@
 using namespace budget;
 
 void budget::add_wishes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_urgency") || !req.has_param("input_importance")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -50,10 +46,6 @@ void budget::add_wishes_api(const httplib::Request& req, httplib::Response& res)
 }
 
 void budget::edit_wishes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_id") || !req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_urgency") ||
         !req.has_param("input_importance") || !req.has_param("input_paid") || !req.has_param("input_paid_amount")) {
         api_error(req, res, "Invalid parameters");
@@ -92,10 +84,6 @@ void budget::edit_wishes_api(const httplib::Request& req, httplib::Response& res
 }
 
 void budget::delete_wishes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     if (!req.has_param("input_id")) {
         api_error(req, res, "Invalid parameters");
         return;
@@ -120,10 +108,6 @@ void budget::delete_wishes_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::list_wishes_api(const httplib::Request& req, httplib::Response& res) {
-    if (!api_start(req, res)) {
-        return;
-    }
-
     try {
         std::stringstream ss;
 
