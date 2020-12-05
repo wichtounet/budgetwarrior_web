@@ -11,14 +11,15 @@
 
 namespace budget {
 
-void expenses_page(const httplib::Request& req, httplib::Response& res);
-void search_expenses_page(const httplib::Request& req, httplib::Response& res);
-void time_graph_expenses_page(const httplib::Request& req, httplib::Response& res);
-void all_expenses_page(const httplib::Request& req, httplib::Response& res);
-void month_breakdown_expenses_page(const httplib::Request& req, httplib::Response& res);
-void year_breakdown_expenses_page(const httplib::Request& req, httplib::Response& res);
-void add_expenses_page(const httplib::Request& req, httplib::Response& res);
-void edit_expenses_page(const httplib::Request& req, httplib::Response& res);
+void expenses_page(html_writer & w, const httplib::Request& req);
+void search_expenses_page(html_writer & w, const httplib::Request& req);
+void time_graph_expenses_page(html_writer & w);
+void all_expenses_page(html_writer & w);
+void month_breakdown_expenses_page(html_writer & w, const httplib::Request& req);
+void year_breakdown_expenses_page(html_writer & w, const httplib::Request& req);
+void add_expenses_page(html_writer & w);
+void edit_expenses_page(html_writer & w, const httplib::Request& req);
+
 void month_breakdown_expenses_graph(budget::html_writer& w, const std::string& title,
                                     budget::month month, budget::year year, bool mono = false, 
                                     const std::string& style = "");

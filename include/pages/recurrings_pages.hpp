@@ -11,8 +11,8 @@
 
 namespace budget {
 
-void recurrings_list_page(const httplib::Request& req, httplib::Response& res);
-void add_recurrings_page(const httplib::Request& req, httplib::Response& res);
-void edit_recurrings_page(const httplib::Request& req, httplib::Response& res);
+void recurrings_list_page(html_writer& w);
+void add_recurrings_page(html_writer& w);
+void edit_recurrings_page(html_writer& w, const httplib::Request& req);
 
 } //end of namespace budget

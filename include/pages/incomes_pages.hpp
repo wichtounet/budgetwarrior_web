@@ -11,7 +11,7 @@
 
 namespace budget {
 
-void incomes_page(const httplib::Request& req, httplib::Response& res);
-void set_incomes_page(const httplib::Request& req, httplib::Response& res);
+void incomes_page(html_writer & w);
+void set_incomes_page(html_writer & w);
 
 } //end of namespace budget

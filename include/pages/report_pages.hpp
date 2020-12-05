@@ -11,6 +11,6 @@
 
 namespace budget {
 
-void report_page(const httplib::Request& req, httplib::Response& res);
+void report_page(html_writer& w);
 
 } //end of namespace budget

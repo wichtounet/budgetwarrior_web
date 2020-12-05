@@ -12,10 +12,10 @@
 namespace budget {
 
 // Wishes Pages
-void wishes_list_page(const httplib::Request& req, httplib::Response& res);
-void wishes_status_page(const httplib::Request& req, httplib::Response& res);
-void wishes_estimate_page(const httplib::Request& req, httplib::Response& res);
-void add_wishes_page(const httplib::Request& req, httplib::Response& res);
-void edit_wishes_page(const httplib::Request& req, httplib::Response& res);
+void wishes_list_page(html_writer & w);
+void wishes_status_page(html_writer & w);
+void wishes_estimate_page(html_writer & w);
+void add_wishes_page(html_writer & w);
+void edit_wishes_page(html_writer & w, const httplib::Request& req);
 
 } //end of namespace budget

@@ -31,28 +31,13 @@ void add_share_based_picker(budget::writer& w, bool share_based) {
 
 } // namespace
 
-void budget::assets_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Assets")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::assets_page(html_writer& w) {
     budget::show_assets(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_assets_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New asset")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_assets_page(html_writer& w) {
     w << title_begin << "New asset" << title_end;
 
     form_begin(w, "/api/assets/add/", "/assets/add/");
@@ -70,18 +55,9 @@ void budget::add_assets_page(const httplib::Request& req, httplib::Response& res
     add_text_picker(w, "Ticker", "input_ticker", "", false);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_assets_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Edit asset")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::edit_assets_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         display_error_message(w, "Invalid parameter for the request");
     } else {
@@ -113,7 +89,4 @@ void budget::edit_assets_page(const httplib::Request& req, httplib::Response& re
             form_end(w);
         }
     }
-
-    page_end(w, req, res);
 }
-

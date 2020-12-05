@@ -11,8 +11,8 @@
 
 namespace budget {
 
-void list_liabilities_page(const httplib::Request& req, httplib::Response& res);
-void add_liabilities_page(const httplib::Request& req, httplib::Response& res);
-void edit_liabilities_page(const httplib::Request& req, httplib::Response& res);
+void list_liabilities_page(html_writer& w);
+void add_liabilities_page(html_writer& w);
+void edit_liabilities_page(html_writer& w, const httplib::Request& req);
 
 } //end of namespace budget

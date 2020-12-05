@@ -11,13 +11,14 @@
 
 namespace budget {
 
-void time_graph_income_page(const httplib::Request& req, httplib::Response& res);
-void time_graph_earnings_page(const httplib::Request& req, httplib::Response& res);
-void add_earnings_page(const httplib::Request& req, httplib::Response& res);
-void edit_earnings_page(const httplib::Request& req, httplib::Response& res);
-void earnings_page(const httplib::Request& req, httplib::Response& res);
-void search_earnings_page(const httplib::Request& req, httplib::Response& res);
-void all_earnings_page(const httplib::Request& req, httplib::Response& res);
+void time_graph_income_page(html_writer & w);
+void time_graph_earnings_page(html_writer & w);
+void add_earnings_page(html_writer & w);
+void edit_earnings_page(html_writer & w, const httplib::Request& req);
+void earnings_page(html_writer & w, const httplib::Request& req);
+void search_earnings_page(html_writer & w, const httplib::Request& req);
+void all_earnings_page(html_writer & w);
+
 void month_breakdown_income_graph(budget::html_writer& w, const std::string& title,
                                   budget::month month, budget::year year, bool mono = false,
                                   const std::string& style = "");

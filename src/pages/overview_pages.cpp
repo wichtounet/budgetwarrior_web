@@ -18,50 +18,25 @@
 
 using namespace budget;
 
-void budget::overview_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_page(html_writer & w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
         display_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
         auto today = budget::local_day();
         display_month_overview(today.month(), today.year(), w);
     }
-
-    page_end(w, req, res);
 }
 
-void budget::overview_aggregate_all_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview Aggregate")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_aggregate_all_page(html_writer & w) {
     // Configuration of the overview
     bool full             = config_contains_and_true("aggregate_full");
     bool disable_groups   = config_contains_and_true("aggregate_no_group");
     std::string separator = config_value("aggregate_separator", "/");
 
     aggregate_all_overview(w, full, disable_groups, separator);
-
-    page_end(w, req, res);
 }
 
-void budget::overview_aggregate_year_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview Aggregate")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_aggregate_year_page(html_writer & w, const httplib::Request& req) {
     // Configuration of the overview
     bool full             = config_contains_and_true("aggregate_full");
     bool disable_groups   = config_contains_and_true("aggregate_no_group");
@@ -73,18 +48,9 @@ void budget::overview_aggregate_year_page(const httplib::Request& req, httplib::
         auto today = budget::local_day();
         aggregate_year_overview(w, full, disable_groups, separator, today.year());
     }
-
-    page_end(w, req, res);
 }
 
-void budget::overview_aggregate_year_fv_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview Aggregate")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_aggregate_year_fv_page(html_writer & w, const httplib::Request& req) {
     // Configuration of the overview
     bool full             = config_contains_and_true("aggregate_full");
     bool disable_groups   = config_contains_and_true("aggregate_no_group");
@@ -96,18 +62,9 @@ void budget::overview_aggregate_year_fv_page(const httplib::Request& req, httpli
         auto today = budget::local_day();
         aggregate_year_fv_overview(w, full, disable_groups, separator, today.year());
     }
-
-    page_end(w, req, res);
 }
 
-void budget::overview_aggregate_year_month_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview Aggregate Per Month")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_aggregate_year_month_page(html_writer & w, const httplib::Request& req) {
     // Configuration of the overview
     bool full             = config_contains_and_true("aggregate_full");
     bool disable_groups   = config_contains_and_true("aggregate_no_group");
@@ -119,18 +76,9 @@ void budget::overview_aggregate_year_month_page(const httplib::Request& req, htt
         auto today = budget::local_day();
         aggregate_year_month_overview(w, full, disable_groups, separator, today.year());
     }
-
-    page_end(w, req, res);
 }
 
-void budget::overview_aggregate_month_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview Aggregate")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_aggregate_month_page(html_writer & w, const httplib::Request& req) {
     // Configuration of the overview
     bool full             = config_contains_and_true("aggregate_full");
     bool disable_groups   = config_contains_and_true("aggregate_no_group");
@@ -142,18 +90,9 @@ void budget::overview_aggregate_month_page(const httplib::Request& req, httplib:
         auto today = budget::local_day();
         aggregate_month_overview(w, full, disable_groups, separator, today.month(), today.year());
     }
-
-    page_end(w, req, res);
 }
 
-void budget::overview_year_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview Year")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
     data_cache cache;
 
     if (req.matches.size() == 2) {
@@ -164,18 +103,9 @@ void budget::overview_year_page(const httplib::Request& req, httplib::Response& 
         display_year_overview_header(cache, today.year(), w);
         display_year_overview(cache, today.year(), w);
     }
-
-    page_end(w, req, res);
 }
 
-void budget::time_graph_savings_rate_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Savings rate over time")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::time_graph_savings_rate_page(html_writer & w) {
     auto ss = start_time_chart(w, "Savings rate over time", "line", "savings_time_graph", "");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -252,11 +182,9 @@ void budget::time_graph_savings_rate_page(const httplib::Request& req, httplib::
     ss << "]";
 
     end_chart(w, ss);
-
-    page_end(w, req, res);
 }
 
-void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Response& res) {
+void budget::time_graph_tax_rate_page(html_writer & w) {
     std::stringstream content_stream;
 
     data_cache cache;
@@ -265,12 +193,6 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
        auto taxes_account = config_value("taxes_account");
 
        if (account_exists(taxes_account)) {
-           if (!page_start(req, res, content_stream, "Tax Rate Over Time")) {
-               return;
-           }
-
-            budget::html_writer w(content_stream);
-
             auto ss = start_time_chart(w, "Tax rate over time", "line", "tax_time_graph", "");
 
             ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -352,25 +274,14 @@ void budget::time_graph_tax_rate_page(const httplib::Request& req, httplib::Resp
 
             end_chart(w, ss);
 
-            page_end(w, req, res);
-
            return;
        }
     }
 
-    if (!page_start(req, res, content_stream, "Taxes support not configured")) {
-        return;
-    }
+    w << "Taxes support not configured";
 }
 
-void budget::side_overview_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Overview")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::side_overview_page(html_writer & w, const httplib::Request& req) {
     if(config_value("side_category", "").empty() || config_value("side_prefix", "").empty()) {
         w << "Side hustle is not configured";
     } else {
@@ -381,6 +292,4 @@ void budget::side_overview_page(const httplib::Request& req, httplib::Response& 
             display_side_month_overview(today.month(), today.year(), w);
         }
     }
-
-    page_end(w, req, res);
 }

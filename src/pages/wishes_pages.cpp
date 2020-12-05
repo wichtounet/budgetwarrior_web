@@ -79,56 +79,25 @@ void add_urgency_picker(budget::writer& w, int urgency) {
 
 } // namespace
 
-void budget::wishes_list_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Wishes List")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::wishes_list_page(html_writer & w) {
     budget::list_wishes(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::wishes_status_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Wishes Status")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::wishes_status_page(html_writer & w) {
     budget::status_wishes(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::wishes_estimate_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Wishes Estimate")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::wishes_estimate_page(html_writer & w) {
     budget::estimate_wishes(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_wishes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New Wish")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_wishes_page(html_writer & w) {
     w << title_begin << "New Wish" << title_end;
 
     form_begin(w, "/api/wishes/add/", "/wishes/add/");
@@ -139,18 +108,12 @@ void budget::add_wishes_page(const httplib::Request& req, httplib::Response& res
     add_amount_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_wishes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-
-    if (!page_get_start(req, res, content_stream, "Edit Wish", {"input_id", "back_page"})){
+void budget::edit_wishes_page(html_writer & w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})){
         return;
     }
-
-    budget::html_writer w(content_stream);
 
     auto input_id = req.get_param_value("input_id");
 
@@ -174,6 +137,4 @@ void budget::edit_wishes_page(const httplib::Request& req, httplib::Response& re
 
         form_end(w);
     }
-
-    page_end(w, req, res);
 }

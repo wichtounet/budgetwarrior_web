@@ -14,16 +14,7 @@
 
 using namespace budget;
 
-void budget::report_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Report")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::report_page(html_writer & w) {
     auto today = budget::local_day();
     report(w, today.year(), false, "");
-
-    page_end(w, req, res);
 }

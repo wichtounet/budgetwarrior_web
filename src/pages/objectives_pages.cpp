@@ -205,40 +205,17 @@ void budget::objectives_card(budget::html_writer& w){
     w << R"=====(</div>)=====";
 }
 
-void budget::list_objectives_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Goals List")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::list_objectives_page(html_writer& w) {
     budget::list_objectives(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::status_objectives_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Goals Status")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::status_objectives_page(html_writer& w) {
     budget::status_objectives(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_objectives_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New goal")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_objectives_page(html_writer& w) {
     w << title_begin << "New objective" << title_end;
 
     form_begin(w, "/api/objectives/add/", "/objectives/add/");
@@ -250,18 +227,12 @@ void budget::add_objectives_page(const httplib::Request& req, httplib::Response&
     add_amount_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_objectives_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-
-    if (!page_get_start(req, res, content_stream, "Edit Objective", {"input_id", "back_page"})){
+void budget::edit_objectives_page(html_writer& w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})){
         return;
     }
-
-    budget::html_writer w(content_stream);
 
     auto input_id = req.get_param_value("input_id");
 
@@ -284,6 +255,4 @@ void budget::edit_objectives_page(const httplib::Request& req, httplib::Response
 
         form_end(w);
     }
-
-    page_end(w, req, res);
 }

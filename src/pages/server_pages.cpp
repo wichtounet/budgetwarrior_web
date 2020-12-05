@@ -462,34 +462,53 @@ bool parameters_present(const httplib::Request& req, std::vector<const char*> pa
     return true;
 }
 
-bool validate_parameters(std::stringstream& content_stream, const httplib::Request& req, std::vector<const char*> parameters) {
-    if(!parameters_present(req, parameters)){
-        budget::html_writer w(content_stream);
-
-        display_error_message(w, "Invalid parameter for the request");
-
-        return false;
-    }
-
-    return true;
+void call_render_function(html_writer&            w,
+                          const httplib::Request& req,
+                          httplib::Response&      res,
+                          void (*render_function)(html_writer&, const httplib::Request&)) {
+    cpp_unused(res);
+    render_function(w, req);
 }
 
-auto render_wrapper(void (*render_function)(const httplib::Request &, httplib::Response &)) {
-    return [render_function](const httplib::Request& req, httplib::Response& res) {
+void call_render_function(html_writer&            w,
+                          const httplib::Request& req,
+                          httplib::Response&      res,
+                          void (*render_function)(html_writer&)) {
+    cpp_unused(req);
+    cpp_unused(res);
+    render_function(w);
+}
+
+template <typename T>
+auto render_wrapper(const char* title, T render_function) {
+    return [title, render_function](const httplib::Request& req, httplib::Response& res) {
+        std::stringstream content_stream;
+
+        budget::html_writer w(content_stream);
+
         try {
-            render_function(req, res);
+            if (!page_start(req, res, content_stream, title)) {
+                return;
+            }
+
+            call_render_function(w, req, res, render_function);
+
+            page_end(w, req, res);
         } catch (const budget_exception& e) {
-            res.set_content("Exception occured: " + e.message(), "text/plain");
+            display_error_message(w, "Exception occured: " + e.message());
             std::cout << "ERROR: budget_exception occured in render("
                       << req.path << "): " << e.message() << std::endl;
+            page_end(w, req, res);
         } catch (const date_exception& e) {
-            res.set_content("Exception occured: " + e.message(), "text/plain");
+            display_error_message(w, "Exception occured: " + e.message());
             std::cout << "ERROR: date_exception occured in render("
                       << req.path << "): " << e.message() << std::endl;
+            page_end(w, req, res);
         } catch (...) {
-            res.set_content("Unkown Exception occured", "text/plain");
+            display_error_message(w, "Unknown Exception occured");
             std::cout << "ERROR: Unknown exception occured in render("
                       << req.path << ")" << std::endl;
+            page_end(w, req, res);
         }
     };
 }
@@ -498,133 +517,132 @@ auto render_wrapper(void (*render_function)(const httplib::Request &, httplib::R
 
 void budget::load_pages(httplib::Server& server) {
     // Declare all the pages
-    server.Get("/", render_wrapper(&index_page));
+    server.Get("/", render_wrapper("", &index_page));
 
-    server.Get("/overview/year/", render_wrapper(&overview_year_page));
-    server.Get(R"(/overview/year/(\d+)/)", render_wrapper(&overview_year_page));
-    server.Get("/overview/", render_wrapper(&overview_page));
-    server.Get(R"(/overview/(\d+)/(\d+)/)", render_wrapper(&overview_page));
-    server.Get("/overview/aggregate/year/", render_wrapper(&overview_aggregate_year_page));
-    server.Get(R"(/overview/aggregate/year/(\d+)/)", render_wrapper(&overview_aggregate_year_page));
-    server.Get("/overview/aggregate/year_month/", render_wrapper(&overview_aggregate_year_month_page));
-    server.Get(R"(/overview/aggregate/year_month/(\d+)/)", render_wrapper(&overview_aggregate_year_month_page));
-    server.Get("/overview/aggregate/year_fv/", render_wrapper(&overview_aggregate_year_fv_page));
-    server.Get(R"(/overview/aggregate/year_fv/(\d+)/)", render_wrapper(&overview_aggregate_year_fv_page));
-    server.Get("/overview/aggregate/month/", render_wrapper(&overview_aggregate_month_page));
-    server.Get(R"(/overview/aggregate/month/(\d+)/(\d+)/)", render_wrapper(&overview_aggregate_month_page));
-    server.Get("/overview/aggregate/all/", render_wrapper(&overview_aggregate_all_page));
-    server.Get("/overview/savings/time/", render_wrapper(&time_graph_savings_rate_page));
-    server.Get("/overview/tax/time/", render_wrapper(&time_graph_tax_rate_page));
+    server.Get("/overview/year/", render_wrapper("Yearly Overview", &overview_year_page));
+    server.Get(R"(/overview/year/(\d+)/)", render_wrapper("Yearly Overview", &overview_year_page));
+    server.Get("/overview/", render_wrapper("Monthly Overview", &overview_page));
+    server.Get(R"(/overview/(\d+)/(\d+)/)", render_wrapper("Monthly Overview",&overview_page));
+    server.Get("/overview/aggregate/year/", render_wrapper("Yearly Aggregate", &overview_aggregate_year_page));
+    server.Get(R"(/overview/aggregate/year/(\d+)/)", render_wrapper("Yearly Aggregate", &overview_aggregate_year_page));
+    server.Get("/overview/aggregate/year_month/", render_wrapper("Yearly Aggregate", &overview_aggregate_year_month_page));
+    server.Get(R"(/overview/aggregate/year_month/(\d+)/)", render_wrapper("Yearly Aggregate", &overview_aggregate_year_month_page));
+    server.Get("/overview/aggregate/year_fv/", render_wrapper("Yearly Aggregate", &overview_aggregate_year_fv_page));
+    server.Get(R"(/overview/aggregate/year_fv/(\d+)/)", render_wrapper("Yearly Aggregate", &overview_aggregate_year_fv_page));
+    server.Get("/overview/aggregate/month/", render_wrapper("Monthly Aggregate", &overview_aggregate_month_page));
+    server.Get(R"(/overview/aggregate/month/(\d+)/(\d+)/)", render_wrapper("Monthly Aggregate", &overview_aggregate_month_page));
+    server.Get("/overview/aggregate/all/", render_wrapper("Aggregate", &overview_aggregate_all_page));
+
+    server.Get("/overview/savings/time/", render_wrapper("Savings Rate Over Time", &time_graph_savings_rate_page));
+    server.Get("/overview/tax/time/", render_wrapper("Tax Rate Over Time", &time_graph_tax_rate_page));
 
     bool side_hustle = !config_value("side_category", "").empty() && !config_value("side_prefix", "").empty();
     if (side_hustle) {
-        server.Get("/side_hustle/overview/", render_wrapper(&side_overview_page));
-        server.Get(R"(/side_hustle/overview/(\d+)/(\d+)/)", render_wrapper(&side_overview_page));
+        server.Get("/side_hustle/overview/", render_wrapper("Side Hustle Overview", &side_overview_page));
+        server.Get(R"(/side_hustle/overview/(\d+)/(\d+)/)", render_wrapper("Side Hustle Overview", &side_overview_page));
     }
 
-    server.Get("/report/", render_wrapper(&report_page));
+    server.Get("/report/", render_wrapper("Report", &report_page));
 
-    server.Get("/accounts/", render_wrapper(&accounts_page));
-    server.Get("/accounts/all/", render_wrapper(&all_accounts_page));
-    server.Get("/accounts/add/", render_wrapper(&add_accounts_page));
-    server.Get("/accounts/edit/", render_wrapper(&edit_accounts_page));
-    server.Get("/accounts/archive/month/", render_wrapper(&archive_accounts_month_page));
-    server.Get("/accounts/archive/year/", render_wrapper(&archive_accounts_year_page));
+    server.Get("/accounts/", render_wrapper("Accounts", &accounts_page));
+    server.Get("/accounts/all/", render_wrapper("Accounts", &all_accounts_page));
+    server.Get("/accounts/add/", render_wrapper("Accounts", &add_accounts_page));
+    server.Get("/accounts/edit/", render_wrapper("Accounts", &edit_accounts_page));
+    server.Get("/accounts/archive/month/", render_wrapper("Accounts", &archive_accounts_month_page));
+    server.Get("/accounts/archive/year/", render_wrapper("Accounts", &archive_accounts_year_page));
 
-    server.Get("/incomes/", render_wrapper(&incomes_page));
-    server.Get("/incomes/set/", render_wrapper(&set_incomes_page));
+    server.Get("/incomes/", render_wrapper("Incomes", &incomes_page));
+    server.Get("/incomes/set/", render_wrapper("Incomes", &set_incomes_page));
+    server.Get("/income/time/", render_wrapper("Income over time", &time_graph_income_page));
 
-    server.Get(R"(/expenses/(\d+)/(\d+)/)", render_wrapper(&expenses_page));
-    server.Get("/expenses/", render_wrapper(&expenses_page));
-    server.Get("/expenses/search/", render_wrapper(&search_expenses_page));
+    server.Get(R"(/expenses/(\d+)/(\d+)/)", render_wrapper("Expenses", &expenses_page));
+    server.Get("/expenses/", render_wrapper("Expenses", &expenses_page));
+    server.Get("/expenses/search/", render_wrapper("Expenses", &search_expenses_page));
 
-    server.Get(R"(/expenses/breakdown/month/(\d+)/(\d+)/)", render_wrapper(&month_breakdown_expenses_page));
-    server.Get("/expenses/breakdown/month/", render_wrapper(&month_breakdown_expenses_page));
+    server.Get(R"(/expenses/breakdown/month/(\d+)/(\d+)/)", render_wrapper("Expenses Breakdown", &month_breakdown_expenses_page));
+    server.Get("/expenses/breakdown/month/", render_wrapper("Expenses Breakdown", &month_breakdown_expenses_page));
+    server.Get(R"(/expenses/breakdown/year/(\d+)/)", render_wrapper("Expenses Breakdown", &year_breakdown_expenses_page));
+    server.Get("/expenses/breakdown/year/", render_wrapper("Expenses Breakdown", &year_breakdown_expenses_page));
 
-    server.Get(R"(/expenses/breakdown/year/(\d+)/)", render_wrapper(&year_breakdown_expenses_page));
-    server.Get("/expenses/breakdown/year/", render_wrapper(&year_breakdown_expenses_page));
+    server.Get("/expenses/time/", render_wrapper("Expenses", &time_graph_expenses_page));
+    server.Get("/expenses/all/", render_wrapper("Expenses", &all_expenses_page));
+    server.Get("/expenses/add/", render_wrapper("Expenses", &add_expenses_page));
+    server.Get("/expenses/edit/", render_wrapper("Expenses", &edit_expenses_page));
 
-    server.Get("/expenses/time/", render_wrapper(&time_graph_expenses_page));
-    server.Get("/expenses/all/", render_wrapper(&all_expenses_page));
-    server.Get("/expenses/add/", render_wrapper(&add_expenses_page));
-    server.Get("/expenses/edit/", render_wrapper(&edit_expenses_page));
+    server.Get(R"(/earnings/(\d+)/(\d+)/)", render_wrapper("Earnings", &earnings_page));
+    server.Get("/earnings/", render_wrapper("Earnings", &earnings_page));
+    server.Get("/earnings/search/", render_wrapper("Earnings", &search_earnings_page));
+    server.Get("/earnings/time/", render_wrapper("Earnings", &time_graph_earnings_page));
+    server.Get("/earnings/all/", render_wrapper("Earnings", &all_earnings_page));
+    server.Get("/earnings/add/", render_wrapper("Earnings", &add_earnings_page));
+    server.Get("/earnings/edit/", render_wrapper("Earnings", &edit_earnings_page));
 
-    server.Get(R"(/earnings/(\d+)/(\d+)/)", render_wrapper(&earnings_page));
-    server.Get("/earnings/", render_wrapper(&earnings_page));
-    server.Get("/earnings/search/", render_wrapper(&search_earnings_page));
+    server.Get("/portfolio/status/", render_wrapper("Portfolio", &portfolio_status_page));
+    server.Get("/portfolio/graph/", render_wrapper("Portfolio", &portfolio_graph_page));
+    server.Get("/portfolio/currency/", render_wrapper("Portfolio", &portfolio_currency_page));
+    server.Get("/portfolio/allocation/", render_wrapper("Portfolio", &portfolio_allocation_page));
+    server.Get("/rebalance/", render_wrapper("Rebalance", &rebalance_page));
+    server.Get("/rebalance/nocash/", render_wrapper("Rebalance", &rebalance_nocash_page));
+    server.Get("/assets/", render_wrapper("Assets", &assets_page));
+    server.Get("/net_worth/status/", render_wrapper("Net Worth", &net_worth_status_page));
+    server.Get("/net_worth/status/small/", render_wrapper("Net Worth", &net_worth_small_status_page)); // Not in the menu for now
+    server.Get("/net_worth/graph/", render_wrapper("Net Worth", &net_worth_graph_page));
+    server.Get("/net_worth/currency/", render_wrapper("Net Worth", &net_worth_currency_page));
+    server.Get("/net_worth/allocation/", render_wrapper("Net Worth", &net_worth_allocation_page));
+    server.Get("/assets/add/", render_wrapper("Assets", &add_assets_page));
+    server.Get("/assets/edit/", render_wrapper("Assets", &edit_assets_page));
+    server.Get(R"(/assets/graph/(\d+)/)", render_wrapper("Assets", &asset_graph_page));
+    server.Get("/assets/graph/", render_wrapper("Assets", &asset_graph_page));
 
-    server.Get("/earnings/time/", render_wrapper(&time_graph_earnings_page));
-    server.Get("/income/time/", render_wrapper(&time_graph_income_page));
-    server.Get("/earnings/all/", render_wrapper(&all_earnings_page));
-    server.Get("/earnings/add/", render_wrapper(&add_earnings_page));
-    server.Get("/earnings/edit/", render_wrapper(&edit_earnings_page));
+    server.Get("/asset_values/list/", render_wrapper("Asset Values", &list_asset_values_page));
+    server.Get("/asset_values/add/", render_wrapper("Asset Values", &add_asset_values_page));
+    server.Get("/asset_values/add/liability/", render_wrapper("Asset Values", &add_asset_values_liability_page));
+    server.Get("/asset_values/batch/full/", render_wrapper("Asset Values", &full_batch_asset_values_page));
+    server.Get("/asset_values/batch/current/", render_wrapper("Asset Values", &current_batch_asset_values_page));
+    server.Get("/asset_values/edit/", render_wrapper("Asset Values", &edit_asset_values_page));
 
-    server.Get("/portfolio/status/", render_wrapper(&portfolio_status_page));
-    server.Get("/portfolio/graph/", render_wrapper(&portfolio_graph_page));
-    server.Get("/portfolio/currency/", render_wrapper(&portfolio_currency_page));
-    server.Get("/portfolio/allocation/", render_wrapper(&portfolio_allocation_page));
-    server.Get("/rebalance/", render_wrapper(&rebalance_page));
-    server.Get("/rebalance/nocash/", render_wrapper(&rebalance_nocash_page));
-    server.Get("/assets/", render_wrapper(&assets_page));
-    server.Get("/net_worth/status/", render_wrapper(&net_worth_status_page));
-    server.Get("/net_worth/status/small/", render_wrapper(&net_worth_small_status_page)); // Not in the menu for now
-    server.Get("/net_worth/graph/", render_wrapper(&net_worth_graph_page));
-    server.Get("/net_worth/currency/", render_wrapper(&net_worth_currency_page));
-    server.Get("/net_worth/allocation/", render_wrapper(&net_worth_allocation_page));
-    server.Get("/assets/add/", render_wrapper(&add_assets_page));
-    server.Get("/assets/edit/", render_wrapper(&edit_assets_page));
-    server.Get(R"(/assets/graph/(\d+)/)", render_wrapper(&asset_graph_page));
-    server.Get("/assets/graph/", render_wrapper(&asset_graph_page));
+    server.Get("/asset_shares/list/", render_wrapper("Asset Shares", &list_asset_shares_page));
+    server.Get("/asset_shares/add/", render_wrapper("Asset Shares", &add_asset_shares_page));
+    server.Get("/asset_shares/edit/", render_wrapper("Asset Shares", &edit_asset_shares_page));
 
-    server.Get("/asset_values/list/", render_wrapper(&list_asset_values_page));
-    server.Get("/asset_values/add/", render_wrapper(&add_asset_values_page));
-    server.Get("/asset_values/add/liability/", render_wrapper(&add_asset_values_liability_page));
-    server.Get("/asset_values/batch/full/", render_wrapper(&full_batch_asset_values_page));
-    server.Get("/asset_values/batch/current/", render_wrapper(&current_batch_asset_values_page));
-    server.Get("/asset_values/edit/", render_wrapper(&edit_asset_values_page));
+    server.Get("/asset_classes/list/", render_wrapper("Asset Classes", &list_asset_classes_page));
+    server.Get("/asset_classes/add/", render_wrapper("Asset Classes", &add_asset_classes_page));
+    server.Get("/asset_classes/edit/", render_wrapper("Asset Classes", &edit_asset_classes_page));
 
-    server.Get("/asset_shares/list/", render_wrapper(&list_asset_shares_page));
-    server.Get("/asset_shares/add/", render_wrapper(&add_asset_shares_page));
-    server.Get("/asset_shares/edit/", render_wrapper(&edit_asset_shares_page));
+    server.Get("/liabilities/", render_wrapper("Liabilities", &list_liabilities_page));
+    server.Get("/liabilities/list/", render_wrapper("Liabilities", &list_liabilities_page));
+    server.Get("/liabilities/add/", render_wrapper("Liabilities", &add_liabilities_page));
+    server.Get("/liabilities/edit/", render_wrapper("Liabilities", &edit_liabilities_page));
 
-    server.Get("/asset_classes/list/", render_wrapper(&list_asset_classes_page));
-    server.Get("/asset_classes/add/", render_wrapper(&add_asset_classes_page));
-    server.Get("/asset_classes/edit/", render_wrapper(&edit_asset_classes_page));
+    server.Get("/objectives/list/", render_wrapper("Ojbectives", &list_objectives_page));
+    server.Get("/objectives/status/", render_wrapper("Ojbectives", &status_objectives_page));
+    server.Get("/objectives/add/", render_wrapper("Ojbectives", &add_objectives_page));
+    server.Get("/objectives/edit/", render_wrapper("Ojbectives", &edit_objectives_page));
 
-    server.Get("/liabilities/", render_wrapper(&list_liabilities_page));
-    server.Get("/liabilities/list/", render_wrapper(&list_liabilities_page));
-    server.Get("/liabilities/add/", render_wrapper(&add_liabilities_page));
-    server.Get("/liabilities/edit/", render_wrapper(&edit_liabilities_page));
+    server.Get("/wishes/list/", render_wrapper("Wishes", &wishes_list_page));
+    server.Get("/wishes/status/", render_wrapper("Wishes", &wishes_status_page));
+    server.Get("/wishes/estimate/", render_wrapper("Wishes", &wishes_estimate_page));
+    server.Get("/wishes/add/", render_wrapper("Wishes", &add_wishes_page));
+    server.Get("/wishes/edit/", render_wrapper("Wishes", &edit_wishes_page));
 
-    server.Get("/objectives/list/", render_wrapper(&list_objectives_page));
-    server.Get("/objectives/status/", render_wrapper(&status_objectives_page));
-    server.Get("/objectives/add/", render_wrapper(&add_objectives_page));
-    server.Get("/objectives/edit/", render_wrapper(&edit_objectives_page));
+    server.Get("/retirement/status/", render_wrapper("Retirement", &retirement_status_page));
+    server.Get("/retirement/configure/", render_wrapper("Retirement", &retirement_configure_page));
+    server.Get("/retirement/fi/", render_wrapper("Retirement", &retirement_fi_ratio_over_time));
 
-    server.Get("/wishes/list/", render_wrapper(&wishes_list_page));
-    server.Get("/wishes/status/", render_wrapper(&wishes_status_page));
-    server.Get("/wishes/estimate/", render_wrapper(&wishes_estimate_page));
-    server.Get("/wishes/add/", render_wrapper(&add_wishes_page));
-    server.Get("/wishes/edit/", render_wrapper(&edit_wishes_page));
+    server.Get("/recurrings/list/", render_wrapper("Recurring Operations", &recurrings_list_page));
+    server.Get("/recurrings/add/", render_wrapper("Recurring Operations", &add_recurrings_page));
+    server.Get("/recurrings/edit/", render_wrapper("Recurring Operations", &edit_recurrings_page));
 
-    server.Get("/retirement/status/", render_wrapper(&retirement_status_page));
-    server.Get("/retirement/configure/", render_wrapper(&retirement_configure_page));
-    server.Get("/retirement/fi/", render_wrapper(&retirement_fi_ratio_over_time));
+    server.Get("/debts/list/", render_wrapper("Debts", &budget::list_debts_page));
+    server.Get("/debts/all/", render_wrapper("Debts", &budget::all_debts_page));
+    server.Get("/debts/add/", render_wrapper("Debts", &budget::add_debts_page));
+    server.Get("/debts/edit/", render_wrapper("Debts", &budget::edit_debts_page));
 
-    server.Get("/recurrings/list/", render_wrapper(&recurrings_list_page));
-    server.Get("/recurrings/add/", render_wrapper(&add_recurrings_page));
-    server.Get("/recurrings/edit/", render_wrapper(&edit_recurrings_page));
-
-    server.Get("/debts/list/", render_wrapper(&budget::list_debts_page));
-    server.Get("/debts/all/", render_wrapper(&budget::all_debts_page));
-    server.Get("/debts/add/", render_wrapper(&budget::add_debts_page));
-    server.Get("/debts/edit/", render_wrapper(&budget::edit_debts_page));
-
-    server.Get("/fortunes/graph/", render_wrapper(&graph_fortunes_page));
-    server.Get("/fortunes/status/", render_wrapper(&status_fortunes_page));
-    server.Get("/fortunes/list/", render_wrapper(&list_fortunes_page));
-    server.Get("/fortunes/add/", render_wrapper(&add_fortunes_page));
-    server.Get("/fortunes/edit/", render_wrapper(&edit_fortunes_page));
+    server.Get("/fortunes/graph/", render_wrapper("Fortunes", &graph_fortunes_page));
+    server.Get("/fortunes/status/", render_wrapper("Fortunes", &status_fortunes_page));
+    server.Get("/fortunes/list/", render_wrapper("Fortunes", &list_fortunes_page));
+    server.Get("/fortunes/add/", render_wrapper("Fortunes", &add_fortunes_page));
+    server.Get("/fortunes/edit/", render_wrapper("Fortunes", &edit_fortunes_page));
 
     // Handle error
 
@@ -720,6 +738,16 @@ bool budget::page_start(const httplib::Request& req, httplib::Response& res, std
     return true;
 }
 
+bool budget::validate_parameters(html_writer& w, const httplib::Request& req, std::vector<const char*> parameters) {
+    if(!parameters_present(req, parameters)){
+        display_error_message(w, "Invalid parameter for the request");
+
+        return false;
+    }
+
+    return true;
+}
+
 void budget::page_end(budget::html_writer & w, const httplib::Request& req, httplib::Response& res) {
     w << "</main>";
     w.load_deferred_scripts();
@@ -743,19 +771,6 @@ void budget::make_tables_sortable(budget::html_writer& w){
     )=====");
 
     w.use_module("datatables");
-}
-
-bool budget::page_get_start(const httplib::Request& req, httplib::Response& res,
-                    std::stringstream& content_stream, const std::string& title, std::vector<const char*> parameters) {
-    if (!page_start(req, res, content_stream, title)) {
-        return false;
-    }
-
-    if (!validate_parameters(content_stream, req, parameters)){
-        return false;
-    }
-
-    return true;
 }
 
 void budget::display_error_message(budget::writer& w, const std::string& message) {

@@ -12,9 +12,9 @@
 namespace budget {
 
 // Debts Pages
-void list_debts_page(const httplib::Request& req, httplib::Response& res);
-void all_debts_page(const httplib::Request& req, httplib::Response& res);
-void edit_debts_page(const httplib::Request& req, httplib::Response& res);
-void add_debts_page(const httplib::Request& req, httplib::Response& res);
+void list_debts_page(html_writer& w);
+void all_debts_page(html_writer& w);
+void edit_debts_page(html_writer& w, const httplib::Request& req);
+void add_debts_page(html_writer& w);
 
 } //end of namespace budget

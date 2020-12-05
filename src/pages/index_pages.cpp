@@ -100,14 +100,7 @@ void cash_flow_card(budget::html_writer& w){
 
 } // namespace
 
-void budget::index_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::index_page(html_writer & w) {
     bool left_column = !no_assets() && !no_asset_values();
 
     if (left_column) {
@@ -142,7 +135,4 @@ void budget::index_page(const httplib::Request& req, httplib::Response& res) {
 
         w << R"=====(</div>)====="; // row
     }
-
-    // end the page
-    page_end(w, req, res);
 }

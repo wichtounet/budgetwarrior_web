@@ -11,6 +11,6 @@
 
 namespace budget {
 
-void index_page(const httplib::Request& req, httplib::Response& res);
+void index_page(html_writer & w);
 
 } //end of namespace budget

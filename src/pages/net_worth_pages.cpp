@@ -181,14 +181,7 @@ void budget::liabilities_card(budget::html_writer& w){
     w << R"=====(</div>)====="; //card
 }
 
-void budget::asset_graph_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Asset Graph")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
     data_cache cache;
 
     auto asset = req.matches.size() == 2
@@ -276,8 +269,6 @@ void budget::asset_graph_page(const httplib::Request& req, httplib::Response& re
             w << p_begin << "You have not bought any share yet" << p_end;
         }
     }
-
-    page_end(w, req, res);
 }
 
 void budget::asset_graph(budget::html_writer& w, const std::string style, const asset& asset) {
@@ -403,51 +394,19 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
     }
 }
 
-void budget::net_worth_status_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Net Worth Status")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::net_worth_status_page(html_writer & w) {
     budget::show_asset_values(w);
-
-    page_end(w, req, res);
 }
 
-void budget::net_worth_small_status_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Net Worth Status")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::net_worth_small_status_page(html_writer& w) {
     budget::small_show_asset_values(w);
-
-    page_end(w, req, res);
 }
 
-void budget::net_worth_graph_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Net Worth Graph")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::net_worth_graph_page(html_writer& w) {
     net_worth_graph(w);
-
-    page_end(w, req, res);
 }
 
-void budget::net_worth_allocation_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Net Worth Allocation")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::net_worth_allocation_page(html_writer& w) {
     // 1. Display the currency breakdown over time
 
     auto ss = start_time_chart(w, "Net worth allocation", "area", "allocation_time_graph");
@@ -519,18 +478,9 @@ void budget::net_worth_allocation_page(const httplib::Request& req, httplib::Res
     ss2 << "]";
 
     end_chart(w, ss2);
-
-    page_end(w, req, res);
 }
 
-void budget::portfolio_allocation_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Portfolio Allocation")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::portfolio_allocation_page(html_writer& w) {
     // 1. Display the currency breakdown over time
 
     auto ss = start_time_chart(w, "Portfolio allocation", "area", "allocation_time_graph");
@@ -606,16 +556,9 @@ void budget::portfolio_allocation_page(const httplib::Request& req, httplib::Res
     ss2 << "]";
 
     end_chart(w, ss2);
-
-    page_end(w, req, res);
 }
 
-void budget::net_worth_currency_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Net Worth Graph")) {
-        return;
-    }
-
+void budget::net_worth_currency_page(html_writer& w) {
     std::set<std::string> currencies;
 
     data_cache cache;
@@ -623,8 +566,6 @@ void budget::net_worth_currency_page(const httplib::Request& req, httplib::Respo
     for (auto& asset : cache.user_assets()) {
         currencies.insert(asset.currency);
     }
-
-    budget::html_writer w(content_stream);
 
     // 1. Display the currency breakdown over time
 
@@ -721,30 +662,15 @@ void budget::net_worth_currency_page(const httplib::Request& req, httplib::Respo
     ss2 << "]";
 
     end_chart(w, ss2);
-
-    page_end(w, req, res);
 }
 
-void budget::portfolio_status_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Portfolio")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::portfolio_status_page(html_writer& w) {
     budget::show_asset_portfolio(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::portfolio_currency_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Portfolio Graph")) {
-        return;
-    }
-
+void budget::portfolio_currency_page(html_writer& w) {
     std::set<std::string> currencies;
 
     data_cache cache;
@@ -754,8 +680,6 @@ void budget::portfolio_currency_page(const httplib::Request& req, httplib::Respo
             currencies.insert(asset.currency);
         }
     }
-
-    budget::html_writer w(content_stream);
 
     // 1. Display the currency breakdown over time
 
@@ -830,18 +754,9 @@ void budget::portfolio_currency_page(const httplib::Request& req, httplib::Respo
     ss2 << "]";
 
     end_chart(w, ss2);
-
-    page_end(w, req, res);
 }
 
-void budget::portfolio_graph_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Portfolio Graph")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::portfolio_graph_page(html_writer& w) {
     auto ss = start_time_chart(w, "Portfolio", "area");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -881,19 +796,11 @@ void budget::portfolio_graph_page(const httplib::Request& req, httplib::Response
     ss << "]";
 
     end_chart(w, ss);
-
-    page_end(w, req, res);
 }
 
-void rebalance_page_base(const httplib::Request& req, httplib::Response& res, bool nocash) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Rebalance")) {
-        return;
-    }
-
+void rebalance_page_base(html_writer& w, bool nocash) {
     // 1. Display the rebalance table
 
-    budget::html_writer w(content_stream);
     budget::show_asset_rebalance(w, nocash);
 
     make_tables_sortable(w);
@@ -1044,14 +951,12 @@ void rebalance_page_base(const httplib::Request& req, httplib::Response& res, bo
     w << R"=====(</div>)=====";
 
     w << R"=====(</div>)=====";
-
-    page_end(w, req, res);
 }
 
-void budget::rebalance_page(const httplib::Request& req, httplib::Response& res) {
-    rebalance_page_base(req, res, false);
+void budget::rebalance_page(html_writer& w) {
+    rebalance_page_base(w, false);
 }
 
-void budget::rebalance_nocash_page(const httplib::Request& req, httplib::Response& res) {
-    rebalance_page_base(req, res, true);
+void budget::rebalance_nocash_page(html_writer& w) {
+    rebalance_page_base(w, true);
 }

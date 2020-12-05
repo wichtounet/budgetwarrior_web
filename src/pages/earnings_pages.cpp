@@ -95,14 +95,7 @@ void budget::month_breakdown_income_graph(budget::html_writer& w, const std::str
 }
 
 
-void budget::time_graph_income_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Income over time")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::time_graph_income_page(html_writer & w) {
     data_cache cache;
 
     {
@@ -214,18 +207,9 @@ void budget::time_graph_income_page(const httplib::Request& req, httplib::Respon
 
         end_chart(w, ss);
     }
-
-    page_end(w, req, res);
 }
 
-void budget::time_graph_earnings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Earnings over time")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::time_graph_earnings_page(html_writer & w) {
     auto ss = start_time_chart(w, "Earnings over time", "line", "earnings_time_graph", "");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -269,8 +253,6 @@ void budget::time_graph_earnings_page(const httplib::Request& req, httplib::Resp
     ss << "]";
 
     end_chart(w, ss);
-
-    page_end(w, req, res);
 }
 
 namespace {
@@ -288,15 +270,8 @@ void add_quick_earning_action(budget::html_writer & w, size_t i, budget::earning
 
 } // end of anonymous namespace
 
-void budget::add_earnings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New earning")) {
-        return;
-    }
-
+void budget::add_earnings_page(html_writer& w) {
     data_cache cache;
-
-    budget::html_writer w(content_stream);
 
     w << title_begin << "New earning" << title_end;
 
@@ -346,18 +321,9 @@ void budget::add_earnings_page(const httplib::Request& req, httplib::Response& r
     add_account_picker(w, budget::local_day(), account);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_earnings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Edit earning")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::edit_earnings_page(html_writer & w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         display_error_message(w, "Invalid parameter for the request");
     } else {
@@ -382,18 +348,9 @@ void budget::edit_earnings_page(const httplib::Request& req, httplib::Response& 
             form_end(w);
         }
     }
-
-    page_end(w, req, res);
 }
 
-void budget::earnings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Earnings")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::earnings_page(html_writer & w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
         show_earnings(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
@@ -401,32 +358,15 @@ void budget::earnings_page(const httplib::Request& req, httplib::Response& res) 
     }
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::all_earnings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "All Earnings")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::all_earnings_page(html_writer & w) {
     budget::show_all_earnings(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::search_earnings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Search Earnings")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::search_earnings_page(html_writer & w, const httplib::Request& req) {
     page_form_begin(w, "/earnings/search/");
 
     add_name_picker(w);
@@ -440,6 +380,4 @@ void budget::search_earnings_page(const httplib::Request& req, httplib::Response
     }
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }

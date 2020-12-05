@@ -204,14 +204,7 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, const std::s
 }
 
 
-void budget::expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Expenses")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::expenses_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
         show_expenses(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
@@ -219,18 +212,9 @@ void budget::expenses_page(const httplib::Request& req, httplib::Response& res) 
     }
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::search_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Search Expenses")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::search_expenses_page(html_writer& w, const httplib::Request& req) {
     page_form_begin(w, "/expenses/search/");
 
     add_name_picker(w);
@@ -244,18 +228,9 @@ void budget::search_expenses_page(const httplib::Request& req, httplib::Response
     }
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::time_graph_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Expenses over time")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::time_graph_expenses_page(html_writer& w) {
     auto ss = start_time_chart(w, "Expenses over time", "line", "expenses_time_graph", "");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -371,30 +346,15 @@ void budget::time_graph_expenses_page(const httplib::Request& req, httplib::Resp
             end_chart(w, ss);
         }
     }
-
-    page_end(w, req, res);
 }
 
-void budget::all_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "All Expenses")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::all_expenses_page(html_writer& w) {
     budget::show_all_expenses(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::month_breakdown_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Expenses Breakdown")) {
-        return;
-    }
-
+void budget::month_breakdown_expenses_page(html_writer& w, const httplib::Request& req) {
     auto today = budget::local_day();
 
     auto month = today.month();
@@ -405,21 +365,12 @@ void budget::month_breakdown_expenses_page(const httplib::Request& req, httplib:
         month = to_number<size_t>(req.matches[2]);
     }
 
-    budget::html_writer w(content_stream);
-
     w << title_begin << "Expenses Breakdown of " << month << " " << year << budget::year_month_selector{"expenses/breakdown/month", year, month} << title_end;
 
     month_breakdown_expenses_graph(w, "Expenses Breakdown", month, year);
-
-    page_end(w, req, res);
 }
 
-void budget::year_breakdown_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Expenses Breakdown")) {
-        return;
-    }
-
+void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request& req) {
     auto today = budget::local_day();
 
     auto year = today.year();
@@ -427,8 +378,6 @@ void budget::year_breakdown_expenses_page(const httplib::Request& req, httplib::
     if (req.matches.size() == 2) {
         year = to_number<size_t>(req.matches[1]);
     }
-
-    budget::html_writer w(content_stream);
 
     w << title_begin << "Expense Categories Breakdown of " << year << budget::year_selector{"expenses/breakdown/year", year} << title_end;
 
@@ -549,8 +498,6 @@ void budget::year_breakdown_expenses_page(const httplib::Request& req, httplib::
 
         end_chart(w, aggregate_ss);
     }
-
-    page_end(w, req, res);
 }
 
 namespace {
@@ -568,15 +515,8 @@ void add_quick_expense_action(budget::html_writer & w, size_t i, budget::expense
 
 } // end of anonymous namespace
 
-void budget::add_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New Expense")) {
-        return;
-    }
-
+void budget::add_expenses_page(html_writer& w) {
     data_cache cache;
-
-    budget::html_writer w(content_stream);
 
     w << title_begin << "New Expense" << title_end;
 
@@ -626,18 +566,9 @@ void budget::add_expenses_page(const httplib::Request& req, httplib::Response& r
     add_account_picker(w, budget::local_day(), account);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_expenses_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Edit Expense")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::edit_expenses_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         display_error_message(w, "Invalid parameter for the request");
     } else {
@@ -662,6 +593,4 @@ void budget::edit_expenses_page(const httplib::Request& req, httplib::Response& 
             form_end(w);
         }
     }
-
-    page_end(w, req, res);
 }

@@ -13,28 +13,13 @@
 
 using namespace budget;
 
-void budget::list_fortunes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Objectives List")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::list_fortunes_page(html_writer & w) {
     budget::list_fortunes(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::graph_fortunes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Fortune")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::graph_fortunes_page(html_writer & w) {
     auto ss = start_chart(w, "Fortune", "spline");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -61,32 +46,15 @@ void budget::graph_fortunes_page(const httplib::Request& req, httplib::Response&
     ss << "]";
 
     end_chart(w, ss);
-
-    page_end(w, req, res);
 }
 
-void budget::status_fortunes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Objectives Status")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::status_fortunes_page(html_writer & w) {
     budget::status_fortunes(w, false);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_fortunes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New fortune")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_fortunes_page(html_writer & w) {
     w << title_begin << "New fortune" << title_end;
 
     form_begin(w, "/api/fortunes/add/", "/fortunes/add/");
@@ -95,18 +63,12 @@ void budget::add_fortunes_page(const httplib::Request& req, httplib::Response& r
     add_amount_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_fortunes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-
-    if (!page_get_start(req, res, content_stream, "Edit Fortune", {"input_id", "back_page"})){
+void budget::edit_fortunes_page(html_writer & w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})){
         return;
     }
-
-    budget::html_writer w(content_stream);
 
     auto input_id = req.get_param_value("input_id");
 
@@ -126,6 +88,4 @@ void budget::edit_fortunes_page(const httplib::Request& req, httplib::Response& 
 
         form_end(w);
     }
-
-    page_end(w, req, res);
 }

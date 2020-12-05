@@ -12,11 +12,11 @@
 namespace budget {
 
 // Asset Values Pages
-void list_asset_values_page(const httplib::Request& req, httplib::Response& res);
-void add_asset_values_page(const httplib::Request& req, httplib::Response& res);
-void edit_asset_values_page(const httplib::Request& req, httplib::Response& res);
-void full_batch_asset_values_page(const httplib::Request& req, httplib::Response& res);
-void current_batch_asset_values_page(const httplib::Request& req, httplib::Response& res);
-void add_asset_values_liability_page(const httplib::Request& req, httplib::Response& res);
+void list_asset_values_page(html_writer& w);
+void add_asset_values_page(html_writer& w);
+void edit_asset_values_page(html_writer& w, const httplib::Request& req);
+void full_batch_asset_values_page(html_writer& w);
+void current_batch_asset_values_page(html_writer& w);
+void add_asset_values_liability_page(html_writer& w);
 
 } //end of namespace budget

@@ -11,10 +11,11 @@
 
 namespace budget {
 
+void list_objectives_page(html_writer & w);
+void status_objectives_page(html_writer & w);
+void add_objectives_page(html_writer & w);
+void edit_objectives_page(html_writer & w, const httplib::Request& req);
+
 void objectives_card(budget::html_writer& w);
-void list_objectives_page(const httplib::Request& req, httplib::Response& res);
-void status_objectives_page(const httplib::Request& req, httplib::Response& res);
-void add_objectives_page(const httplib::Request& req, httplib::Response& res);
-void edit_objectives_page(const httplib::Request& req, httplib::Response& res);
 
 } //end of namespace budget

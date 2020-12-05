@@ -11,11 +11,11 @@
 
 namespace budget {
 
-void accounts_page(const httplib::Request& req, httplib::Response& res);
-void all_accounts_page(const httplib::Request& req, httplib::Response& res);
-void add_accounts_page(const httplib::Request& req, httplib::Response& res);
-void edit_accounts_page(const httplib::Request& req, httplib::Response& res);
-void archive_accounts_month_page(const httplib::Request& req, httplib::Response& res);
-void archive_accounts_year_page(const httplib::Request& req, httplib::Response& res);
+void accounts_page(html_writer& w);
+void all_accounts_page(html_writer& w);
+void add_accounts_page(html_writer& w);
+void edit_accounts_page(html_writer& w, const httplib::Request& req);
+void archive_accounts_month_page(html_writer& w);
+void archive_accounts_year_page(html_writer& w);
 
 } //end of namespace budget

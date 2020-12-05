@@ -12,8 +12,8 @@
 namespace budget {
 
 // Asset Pages
-void assets_page(const httplib::Request& req, httplib::Response& res);
-void add_assets_page(const httplib::Request& req, httplib::Response& res);
-void edit_assets_page(const httplib::Request& req, httplib::Response& res);
+void assets_page(html_writer & w);
+void add_assets_page(html_writer & w);
+void edit_assets_page(html_writer & w, const httplib::Request& req);
 
 } //end of namespace budget

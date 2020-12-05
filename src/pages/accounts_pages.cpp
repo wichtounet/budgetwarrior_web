@@ -13,42 +13,19 @@
 
 using namespace budget;
 
-void budget::accounts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Accounts")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::accounts_page(html_writer & w) {
     budget::show_accounts(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::all_accounts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "All Accounts")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::all_accounts_page(html_writer & w) {
     budget::show_all_accounts(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_accounts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New account")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_accounts_page(html_writer & w) {
     w << title_begin << "New account" << title_end;
 
     form_begin(w, "/api/accounts/add/", "/accounts/add/");
@@ -57,18 +34,9 @@ void budget::add_accounts_page(const httplib::Request& req, httplib::Response& r
     add_amount_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_accounts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Edit account")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::edit_accounts_page(html_writer & w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         display_error_message(w, "Invalid parameter for the request");
     } else {
@@ -91,18 +59,9 @@ void budget::edit_accounts_page(const httplib::Request& req, httplib::Response& 
             form_end(w);
         }
     }
-
-    page_end(w, req, res);
 }
 
-void budget::archive_accounts_month_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Archive accounts from the beginning of the month")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::archive_accounts_month_page(html_writer & w) {
     w << title_begin << "Archive accounts from the beginning of the month" << title_end;
 
     form_begin(w, "/api/accounts/archive/month/", "/accounts/");
@@ -110,18 +69,9 @@ void budget::archive_accounts_month_page(const httplib::Request& req, httplib::R
     w << "<p>This will create new accounts that will be used starting from the beginning of the current month. Are you sure you want to proceed ? </p>";
 
     form_end(w, "Confirm");
-
-    page_end(w, req, res);
 }
 
-void budget::archive_accounts_year_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Archive accounts from the beginning of the year")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::archive_accounts_year_page(html_writer & w) {
     w << title_begin << "Archive accounts from the beginning of the year" << title_end;
 
     form_begin(w, "/api/accounts/archive/year/", "/accounts/");
@@ -129,6 +79,4 @@ void budget::archive_accounts_year_page(const httplib::Request& req, httplib::Re
     w << "<p>This will create new accounts that will be used starting from the beginning of the current year. Are you sure you want to proceed ? </p>";
 
     form_end(w, "Confirm");
-
-    page_end(w, req, res);
 }

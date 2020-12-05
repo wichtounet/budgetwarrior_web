@@ -69,28 +69,13 @@ void add_type_picker(budget::writer& w, const std::string& default_value = "") {
 
 } // namespace
 
-void budget::recurrings_list_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Recurring Operations")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::recurrings_list_page(html_writer& w) {
     budget::show_recurrings(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_recurrings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New Recurring Operation")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_recurrings_page(html_writer& w) {
     w << title_begin << "New Recurring Expense" << title_end;
 
     form_begin(w, "/api/recurrings/add/", "/recurrings/add/");
@@ -102,18 +87,9 @@ void budget::add_recurrings_page(const httplib::Request& req, httplib::Response&
     add_type_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_recurrings_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Edit Recurring Operation")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::edit_recurrings_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         display_error_message(w, "Invalid parameter for the request");
     } else {
@@ -138,6 +114,4 @@ void budget::edit_recurrings_page(const httplib::Request& req, httplib::Response
             form_end(w);
         }
     }
-
-    page_end(w, req, res);
 }

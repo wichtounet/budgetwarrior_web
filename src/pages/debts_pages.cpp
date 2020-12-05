@@ -42,42 +42,19 @@ void add_direction_picker(budget::writer& w, const std::string& default_value = 
 
 } // end of anonymous namespace
 
-void budget::list_debts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Debts")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::list_debts_page(html_writer& w) {
     budget::list_debts(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::all_debts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "All Debts")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::all_debts_page(html_writer& w) {
     budget::display_all_debts(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::add_debts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "New Debt")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::add_debts_page(html_writer& w) {
     w << title_begin << "New Debt" << title_end;
 
     form_begin(w, "/api/debts/add/", "/debts/add/");
@@ -88,18 +65,12 @@ void budget::add_debts_page(const httplib::Request& req, httplib::Response& res)
     add_title_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::edit_debts_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-
-    if (!page_get_start(req, res, content_stream, "Edit Debt", {"input_id", "back_page"})) {
+void budget::edit_debts_page(html_writer& w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})){
         return;
     }
-
-    budget::html_writer w(content_stream);
 
     auto input_id = req.get_param_value("input_id");
 
@@ -122,6 +93,4 @@ void budget::edit_debts_page(const httplib::Request& req, httplib::Response& res
 
         form_end(w);
     }
-
-    page_end(w, req, res);
 }

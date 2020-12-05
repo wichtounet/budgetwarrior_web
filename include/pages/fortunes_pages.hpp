@@ -11,10 +11,10 @@
 
 namespace budget {
 
-void list_fortunes_page(const httplib::Request& req, httplib::Response& res);
-void graph_fortunes_page(const httplib::Request& req, httplib::Response& res);
-void status_fortunes_page(const httplib::Request& req, httplib::Response& res);
-void add_fortunes_page(const httplib::Request& req, httplib::Response& res);
-void edit_fortunes_page(const httplib::Request& req, httplib::Response& res);
+void list_fortunes_page(html_writer & w);
+void graph_fortunes_page(html_writer & w);
+void status_fortunes_page(html_writer & w);
+void add_fortunes_page(html_writer & w);
+void edit_fortunes_page(html_writer & w, const httplib::Request& req);
 
 } //end of namespace budget

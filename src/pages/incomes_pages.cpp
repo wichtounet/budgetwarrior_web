@@ -13,28 +13,13 @@
 
 using namespace budget;
 
-void budget::incomes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "All Incomes")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
+void budget::incomes_page(html_writer & w) {
     budget::show_incomes(w);
 
     make_tables_sortable(w);
-
-    page_end(w, req, res);
 }
 
-void budget::set_incomes_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Set income")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::set_incomes_page(html_writer & w) {
     w << title_begin << "Set income" << title_end;
 
     form_begin(w, "/api/incomes/add/", "/incomes/set/");
@@ -42,6 +27,4 @@ void budget::set_incomes_page(const httplib::Request& req, httplib::Response& re
     add_amount_picker(w);
 
     form_end(w);
-
-    page_end(w, req, res);
 }

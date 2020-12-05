@@ -34,41 +34,23 @@ void add_percent_picker(budget::writer& w, const std::string& title, const std::
 
 } // namespace
 
-void budget::retirement_status_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Retirement status")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::retirement_status_page(html_writer & w) {
     w << title_begin << "Retirement status" << title_end;
 
     if(!internal_config_contains("withdrawal_rate")){
         display_error_message(w, "Not enough information, please configure Retirement Options first");
-        page_end(w, req, res);
         return;
     }
 
     if(!internal_config_contains("expected_roi")){
         display_error_message(w, "Not enough information, please configure Retirement Options first");
-        page_end(w, req, res);
         return;
     }
 
     budget::retirement_status(w);
-
-    page_end(w, req, res);
 }
 
-void budget::retirement_configure_page(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "Retirement configure")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::retirement_configure_page(html_writer & w) {
     w << title_begin << "Retirement Options" << title_end;
 
     form_begin(w, "/api/retirement/configure/", "/retirement/status/");
@@ -86,20 +68,10 @@ void budget::retirement_configure_page(const httplib::Request& req, httplib::Res
     }
 
     form_end(w);
-
-    page_end(w, req, res);
 }
 
-void budget::retirement_fi_ratio_over_time(const httplib::Request& req, httplib::Response& res) {
-    std::stringstream content_stream;
-    if (!page_start(req, res, content_stream, "FI Ratio over time")) {
-        return;
-    }
-
-    budget::html_writer w(content_stream);
-
+void budget::retirement_fi_ratio_over_time(html_writer& w) {
     if (no_assets() || no_asset_values()){
-        page_end(w, req, res);
         return;
     }
 
@@ -135,6 +107,4 @@ void budget::retirement_fi_ratio_over_time(const httplib::Request& req, httplib:
     ss << "]";
 
     end_chart(w, ss);
-
-    page_end(w, req, res);
 }
