@@ -95,14 +95,105 @@ void budget::overview_aggregate_month_page(html_writer & w, const httplib::Reque
 void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
     data_cache cache;
 
+    budget::year year = budget::local_day().year();
     if (req.matches.size() == 2) {
-        display_year_overview_header(cache, to_number<size_t>(req.matches[1]), w);
-        display_year_overview(cache, to_number<size_t>(req.matches[1]), w);
-    } else {
-        auto today = budget::local_day();
-        display_year_overview_header(cache, today.year(), w);
-        display_year_overview(cache, today.year(), w);
+        year = to_number<size_t>(req.matches[1]);
     }
+
+    // Display the Summary Yearly Overview
+    display_year_overview_header(cache, year, w);
+
+    auto last = 13;
+    if (year == budget::local_day().year()) {
+        last = budget::local_day().month() + 1;
+    }
+
+    // Display the Yearly expense
+
+    {
+        auto ss = start_time_chart(w, "Expenses", "line", "year_overview_expenses_time_graph", "");
+
+        ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+        ss << R"=====(yAxis: { min: 0, title: { text: 'Monthly Expenses' }},)=====";
+        ss << R"=====(legend: { enabled: false },)=====";
+
+        ss << "series: [";
+
+        ss << "{ name: '" << year << " Expenses',";
+        ss << "data: [";
+
+        for (budget::month month = start_month(year); month < last; ++month) {
+            auto sum = accumulate_amount(all_expenses_month(cache, year, month));
+
+            std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+        }
+
+        ss << "]},";
+
+        if (year - 1 >= start_year()) {
+            ss << "{ name: '" << year - 1 << " Expenses',";
+            ss << "data: [";
+
+            for (budget::month month = start_month(year - 1); month < 13; ++month) {
+                auto sum = accumulate_amount(all_expenses_month(cache, year - 1, month));
+
+                std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+            }
+
+            ss << "]},";
+        }
+
+        ss << "]";
+
+        end_chart(w, ss);
+    }
+
+    // Display the Yearly Income
+
+    {
+        auto ss = start_time_chart(w, "Income", "line", "year_overview_income_time_graph", "");
+
+        ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+        ss << R"=====(yAxis: { min: 0, title: { text: 'Monthly Income' }},)=====";
+        ss << R"=====(legend: { enabled: false },)=====";
+
+        ss << "series: [";
+
+        ss << "{ name: '" << year << " Expenses',";
+        ss << "data: [";
+
+        for (budget::month month = start_month(year); month < last; ++month) {
+            auto sum = get_base_income(cache, budget::date(year, month, 2)) + accumulate_amount(all_earnings_month(cache, year, month));
+
+            std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+        }
+
+        ss << "]},";
+
+        if (year - 1 >= start_year()) {
+            ss << "{ name: '" << year - 1 << " Expenses',";
+            ss << "data: [";
+
+            for (budget::month month = start_month(year - 1); month < 13; ++month) {
+                auto sum = get_base_income(cache, budget::date(year - 1, month, 2)) + accumulate_amount(all_earnings_month(cache, year - 1, month));
+
+                std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+            }
+
+            ss << "]},";
+        }
+
+        ss << "]";
+
+        end_chart(w, ss);
+    }
+
+    // Display The Full Table Yearly Overview
+    display_year_overview(cache, year, w);
 }
 
 void budget::time_graph_savings_rate_page(html_writer & w) {
