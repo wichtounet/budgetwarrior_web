@@ -1166,7 +1166,7 @@ void budget::add_integer_picker(budget::writer& w, const std::string& title, con
 
 void budget::add_money_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required,
                               bool one_line, const std::string& currency) {
-    if(!currency.empty()){
+    if(!currency.empty() && !one_line){
         throw budget_exception("add_money_picker currency only works with one_line", true);
     }
 
