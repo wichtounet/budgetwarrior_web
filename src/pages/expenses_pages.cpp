@@ -247,12 +247,12 @@ void budget::time_graph_expenses_page(html_writer& w) {
 
     data_cache cache;
 
-    auto sy = start_year();
+    auto sy = start_year(cache);
 
     for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
         budget::year year = j;
 
-        auto sm = start_month(year);
+        auto sm = start_month(cache, year);
         auto last = 13;
 
         if(year == budget::local_day().year()){
@@ -305,12 +305,10 @@ void budget::time_graph_expenses_page(html_writer& w) {
             std::vector<budget::money> serie;
             std::vector<std::string> dates;
 
-            auto sy = start_year();
-
             for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
                 budget::year year = j;
 
-                auto sm   = start_month(year);
+                auto sm   = start_month(cache, year);
                 auto last = 13;
 
                 if (year == budget::local_day().year()) {
