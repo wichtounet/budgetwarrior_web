@@ -10,8 +10,6 @@
 #include "retirement.hpp"
 #include "config.hpp"
 #include "assets.hpp"
-#include "data_cache.hpp"
-
 #include "pages/html_writer.hpp"
 #include "pages/retirement_pages.hpp"
 #include "http.hpp"
@@ -89,13 +87,11 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
     std::vector<budget::money> serie;
     std::vector<std::string> dates;
 
-    data_cache cache;
-
-    auto date     = budget::asset_start_date(cache);
+    auto date     = budget::asset_start_date(w.cache);
     auto end_date = budget::local_day();
 
     while (date <= end_date) {
-        auto ratio = budget::fi_ratio(date, cache);
+        auto ratio = budget::fi_ratio(date, w.cache);
 
         std::string datestr = "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", " + std::to_string(date.day().value) + ")";
         ss << "[" << datestr << "," << budget::to_string(100 * ratio) << "],";

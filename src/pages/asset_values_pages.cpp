@@ -66,16 +66,14 @@ void budget::full_batch_asset_values_page(html_writer& w) {
 
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
-    data_cache cache;
-
-    auto assets = cache.user_assets();
+    auto assets = w.cache.user_assets();
     std::sort(assets.begin(), assets.end(), [](auto& lhs, auto & rhs) {
         return lhs.name <= rhs.name;
     });
 
     for (auto& asset : assets) {
         if (!asset.share_based) {
-            budget::money amount = get_asset_value(asset, cache);
+            budget::money amount = get_asset_value(asset, w.cache);
 
             add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
         }
@@ -91,16 +89,14 @@ void budget::current_batch_asset_values_page(html_writer& w) {
 
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
-    data_cache cache;
-
-    auto assets = cache.user_assets();
+    auto assets = w.cache.user_assets();
     std::sort(assets.begin(), assets.end(), [](auto& lhs, auto & rhs) {
         return lhs.name <= rhs.name;
     });
 
     for (auto& asset : assets) {
         if (!asset.share_based) {
-            budget::money amount = get_asset_value(asset, cache);
+            budget::money amount = get_asset_value(asset, w.cache);
 
             if (amount) {
                 add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);

@@ -15,15 +15,12 @@
 #include "pages/html_writer.hpp"
 #include "http.hpp"
 #include "config.hpp"
-#include "data_cache.hpp"
 
 using namespace budget;
 
 namespace {
 
-budget::money monthly_income(budget::month month, budget::year year) {
-    data_cache cache;
-
+budget::money monthly_income(data_cache & cache, budget::month month, budget::year year) {
     std::map<size_t, budget::money> account_sum;
 
     for (auto& earning : cache.earnings()) {
@@ -68,7 +65,7 @@ void cash_flow_card(budget::html_writer& w){
 
     w << R"=====(<div class="card">)=====";
 
-    auto income = monthly_income(m, y);
+    auto income = monthly_income(w.cache, m, y);
     auto spending = monthly_spending(m, y);
 
     w << R"=====(<div class="card-header card-header-primary">)=====";

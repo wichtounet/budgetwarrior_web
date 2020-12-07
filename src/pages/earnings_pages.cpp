@@ -46,13 +46,11 @@ void budget::month_breakdown_income_graph(budget::html_writer& w, const std::str
 
     std::map<size_t, budget::money> account_sum;
 
-    data_cache cache;
-
-    for (auto& earning : all_earnings_month(cache, year, month)) {
+    for (auto& earning : all_earnings_month(w.cache, year, month)) {
         account_sum[earning.account] += earning.amount;
     }
 
-    budget::money total = get_base_income(cache);
+    budget::money total = get_base_income(w.cache);
 
     if (total) {
         ss << "{";
@@ -96,8 +94,6 @@ void budget::month_breakdown_income_graph(budget::html_writer& w, const std::str
 
 
 void budget::time_graph_income_page(html_writer & w) {
-    data_cache cache;
-
     {
         auto ss = start_time_chart(w, "Income over time", "line", "income_time_graph", "");
 
@@ -113,12 +109,12 @@ void budget::time_graph_income_page(html_writer & w) {
         std::vector<budget::money> serie;
         std::vector<std::string> dates;
 
-        auto sy = start_year(cache);
+        auto sy = start_year(w.cache);
 
         for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
             budget::year year = j;
 
-            auto sm = start_month(cache, year);
+            auto sm = start_month(w.cache, year);
             auto last = 13;
 
             if(year == budget::local_day().year()){
@@ -128,9 +124,9 @@ void budget::time_graph_income_page(html_writer & w) {
             for(unsigned short i = sm; i < last; ++i){
                 budget::month month = i;
 
-                budget::money sum = get_base_income(cache, budget::date(year, month, 2));
+                budget::money sum = get_base_income(w.cache, budget::date(year, month, 2));
 
-                for (auto& earning : all_earnings_month(cache, year, month)) {
+                for (auto& earning : all_earnings_month(w.cache, year, month)) {
                     sum += earning.amount;
                 }
 
@@ -167,12 +163,12 @@ void budget::time_graph_income_page(html_writer & w) {
         std::vector<budget::money> serie;
         std::vector<std::string> dates;
 
-        auto sy = start_year(cache);
+        auto sy = start_year(w.cache);
 
         for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
             budget::year year = j;
 
-            auto sm = start_month(cache, year);
+            auto sm = start_month(w.cache, year);
             auto last = 13;
 
             if (year == budget::local_day().year()) {
@@ -184,9 +180,9 @@ void budget::time_graph_income_page(html_writer & w) {
             for (unsigned short i = sm; i < last; ++i) {
                 budget::month month = i;
 
-                sum += get_base_income(cache, budget::date(year, month, 2));
+                sum += get_base_income(w.cache, budget::date(year, month, 2));
 
-                for (auto& earning : all_earnings_month(cache, year, month)) {
+                for (auto& earning : all_earnings_month(w.cache, year, month)) {
                     sum += earning.amount;
                 }
             }
@@ -221,14 +217,12 @@ void budget::time_graph_earnings_page(html_writer & w) {
     ss << "{ name: 'Monthly earnings',";
     ss << "data: [";
 
-    data_cache cache;
-
-    auto sy = start_year(cache);
+    auto sy = start_year(w.cache);
 
     for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
         budget::year year = j;
 
-        auto sm = start_month(cache, year);
+        auto sm = start_month(w.cache, year);
         auto last = 13;
 
         if(year == budget::local_day().year()){
@@ -240,7 +234,7 @@ void budget::time_graph_earnings_page(html_writer & w) {
 
             budget::money sum;
 
-            for (auto& earning : all_earnings_month(cache, year, month)) {
+            for (auto& earning : all_earnings_month(w.cache, year, month)) {
                 sum += earning.amount;
             }
 
@@ -271,18 +265,16 @@ void add_quick_earning_action(budget::html_writer & w, size_t i, budget::earning
 } // end of anonymous namespace
 
 void budget::add_earnings_page(html_writer& w) {
-    data_cache cache;
-
     w << title_begin << "New earning" << title_end;
 
     static constexpr size_t quick_actions = 3;
 
-    if (cache.earnings().size() > quick_actions) {
+    if (w.cache.earnings().size() > quick_actions) {
         std::map<std::string, size_t> counts;
         std::unordered_map<std::string, budget::earning> last_earnings;
         std::vector<std::pair<std::string, size_t>> order;
 
-        for (auto& earning : cache.sorted_earnings()) {
+        for (auto& earning : w.cache.sorted_earnings()) {
             ++counts[earning.name];
             last_earnings[earning.name] = earning;
         }

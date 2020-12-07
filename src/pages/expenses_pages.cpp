@@ -7,8 +7,6 @@
 
 #include <numeric>
 
-#include "data_cache.hpp"
-
 #include "pages/html_writer.hpp"
 #include "pages/expenses_pages.hpp"
 #include "http.hpp"
@@ -54,8 +52,6 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, const std::s
         )=====");
     }
 
-    data_cache cache;
-
     // standard breakdown per category
     {
         auto ss = start_chart_base(w, "pie", "month_breakdown_expense_categories_graph", style);
@@ -74,7 +70,7 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, const std::s
 
         std::map<size_t, budget::money> account_sum;
 
-        for (auto& expense : all_expenses_month(cache, year, month)) {
+        for (auto& expense : all_expenses_month(w.cache, year, month)) {
             account_sum[expense.account] += expense.amount;
         }
 
@@ -127,7 +123,7 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, const std::s
 
         std::map<std::string, budget::money> expense_sum;
 
-        for (auto& expense : all_expenses_month(cache, year, month)) {
+        for (auto& expense : all_expenses_month(w.cache, year, month)) {
             expense_sum[expense.name] += expense.amount;
         }
 
@@ -167,7 +163,7 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, const std::s
 
         std::map<std::string, budget::money> expense_sum;
 
-        for (auto& expense : all_expenses_month(cache, year, month)) {
+        for (auto& expense : all_expenses_month(w.cache, year, month)) {
             auto name = expense.name;
 
             if (name[name.size() - 1] == ' ') {
@@ -245,14 +241,12 @@ void budget::time_graph_expenses_page(html_writer& w) {
     std::vector<budget::money> serie;
     std::vector<std::string> dates;
 
-    data_cache cache;
-
-    auto sy = start_year(cache);
+    auto sy = start_year(w.cache);
 
     for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
         budget::year year = j;
 
-        auto sm = start_month(cache, year);
+        auto sm = start_month(w.cache, year);
         auto last = 13;
 
         if(year == budget::local_day().year()){
@@ -264,7 +258,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
 
             budget::money sum;
 
-            for (auto& expense : all_expenses_month(cache, year, month)) {
+            for (auto& expense : all_expenses_month(w.cache, year, month)) {
                 sum += expense.amount;
             }
 
@@ -308,7 +302,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
             for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
                 budget::year year = j;
 
-                auto sm   = start_month(cache, year);
+                auto sm   = start_month(w.cache, year);
                 auto last = 13;
 
                 if (year == budget::local_day().year()) {
@@ -320,7 +314,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
 
                     budget::money sum;
 
-                    for (auto& expense : all_expenses_month(cache, year, month)) {
+                    for (auto& expense : all_expenses_month(w.cache, year, month)) {
                         if (get_account(expense.account).name != taxes_account) {
                             sum += expense.amount;
                         }
@@ -379,8 +373,6 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
 
     w << title_begin << "Expense Categories Breakdown of " << year << budget::year_selector{"expenses/breakdown/year", year} << title_end;
 
-    data_cache cache;
-
     {
         auto ss = start_chart(w, "Expense Categories Breakdown", "pie", "category_pie");
 
@@ -396,7 +388,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
 
         std::map<std::string, budget::money> account_sum;
 
-        for (auto& expense : all_expenses_year(cache, year)) {
+        for (auto& expense : all_expenses_year(w.cache, year)) {
             account_sum[get_account(expense.account).name] += expense.amount;
         }
 
@@ -429,7 +421,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
 
         std::map<std::string, budget::money> expense_sum;
 
-        for (auto& expense : all_expenses_year(cache, year)) {
+        for (auto& expense : all_expenses_year(w.cache, year)) {
             expense_sum[expense.name] += expense.amount;
         }
 
@@ -466,7 +458,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
 
         std::map<std::string, budget::money> expense_sum;
 
-        for (auto& expense : all_expenses_year(cache, year)) {
+        for (auto& expense : all_expenses_year(w.cache, year)) {
             auto name = expense.name;
 
             if (name[name.size() - 1] == ' ') {
@@ -514,18 +506,16 @@ void add_quick_expense_action(budget::html_writer & w, size_t i, budget::expense
 } // end of anonymous namespace
 
 void budget::add_expenses_page(html_writer& w) {
-    data_cache cache;
-
     w << title_begin << "New Expense" << title_end;
 
     static constexpr size_t quick_actions = 3;
 
-    if (cache.expenses().size() > quick_actions) {
+    if (w.cache.expenses().size() > quick_actions) {
         std::map<std::string, size_t> counts;
         std::unordered_map<std::string, budget::expense> last_expenses;
         std::vector<std::pair<std::string, size_t>> order;
 
-        for (auto& expense : cache.sorted_expenses()) {
+        for (auto& expense : w.cache.sorted_expenses()) {
             ++counts[expense.name];
             last_expenses[expense.name] = expense;
         }

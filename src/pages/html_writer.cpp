@@ -332,8 +332,6 @@ budget::writer& budget::html_writer::operator<<(const budget::asset_selector& m)
 
     os << R"======(<div class="col selector text-right">)======";
 
-    data_cache cache;
-
     auto assets = cache.user_assets();
 
     size_t previous_asset = 0;

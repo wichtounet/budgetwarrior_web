@@ -7,8 +7,6 @@
 
 #include "cpp_utils/assert.hpp"
 
-#include "data_cache.hpp"
-
 #include "pages/objectives_pages.hpp"
 #include "pages/html_writer.hpp"
 #include "http.hpp"
@@ -120,10 +118,8 @@ void add_objective_source_picker(budget::writer& w, const std::string& default_v
 } // namespace
 
 void budget::objectives_card(budget::html_writer& w){
-    data_cache cache;
-
     // if the user does not use objectives, this card does not make sense
-    if (cache.objectives().empty()) {
+    if (w.cache.objectives().empty()) {
         return;
     }
 
@@ -133,16 +129,16 @@ void budget::objectives_card(budget::html_writer& w){
     const auto y = today.year();
 
     //Compute the year/month status
-    auto year_status  = budget::compute_year_status(cache);
-    auto month_status = budget::compute_month_status(cache, y, m);
+    auto year_status  = budget::compute_year_status(w.cache);
+    auto month_status = budget::compute_month_status(w.cache, y, m);
 
     w << R"=====(<div class="card">)=====";
     w << R"=====(<div class="card-header card-header-primary">Goals</div>)=====";
 
     w << R"=====(<div class="row card-body">)=====";
 
-    for (size_t i = 0; i < cache.objectives().size(); ++i) {
-        auto& objective = cache.objectives()[i];
+    for (size_t i = 0; i < w.cache.objectives().size(); ++i) {
+        auto& objective = w.cache.objectives()[i];
 
         w << R"=====(<div class="col-lg-2 col-md-3 col-sm-4 col-xs-6">)=====";
 

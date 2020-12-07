@@ -10,7 +10,6 @@
 
 #include "cpp_utils/assert.hpp"
 
-#include "data_cache.hpp"
 #include "config.hpp"
 #include "overview.hpp"
 #include "summary.hpp"
@@ -1054,9 +1053,7 @@ void budget::add_account_picker(budget::writer& w, budget::date day, const std::
                 <select class="form-control" id="input_account" name="input_account">
     )=====";
 
-    data_cache cache;
-
-    for (auto& account : all_accounts(cache, day.year(), day.month())) {
+    for (auto& account : all_accounts(w.cache, day.year(), day.month())) {
         if (budget::to_string(account.id) == default_value) {
             w << "<option selected value=\"" << account.id << "\">" << account.name << "</option>";
         } else {
@@ -1077,9 +1074,7 @@ void budget::add_share_asset_picker(budget::writer& w, const std::string& defaul
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    data_cache cache;
-
-    for (auto& asset : cache.user_assets()) {
+    for (auto& asset : w.cache.user_assets()) {
         if (asset.share_based) {
             if (budget::to_string(asset.id) == default_value) {
                 w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
@@ -1102,9 +1097,7 @@ void budget::add_value_asset_picker(budget::writer& w, const std::string& defaul
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    data_cache cache;
-
-    for (auto& asset : cache.user_assets()) {
+    for (auto& asset : w.cache.user_assets()) {
         if (!asset.share_based) {
             if (budget::to_string(asset.id) == default_value) {
                 w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
