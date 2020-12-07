@@ -304,8 +304,8 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
 
     auto current_net_worth = get_net_worth(w.cache);
     auto now               = budget::local_day();
-    auto y_net_worth       = get_net_worth({now.year(), 1, 1});
-    auto m_net_worth       = get_net_worth(now - days(now.day() - 1));
+    auto y_net_worth       = get_net_worth({now.year(), 1, 1}, w.cache);
+    auto m_net_worth       = get_net_worth(now - days(now.day() - 1), w.cache);
     auto ytd_growth        = 100.0 * ((1 / (y_net_worth / current_net_worth)) - 1);
     auto mtd_growth        = 100.0 * ((1 / (m_net_worth / current_net_worth)) - 1);
 
