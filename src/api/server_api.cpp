@@ -182,6 +182,8 @@ bool budget::api_start(const httplib::Request& req, httplib::Response& res) {
                 res.status = 401;
                 res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
 
+                std::cout << "INFO: Unauthorized Access: Not basic realm" << " (" << req.path << ")" << std::endl;
+
                 return false;
             }
 
@@ -191,6 +193,8 @@ bool budget::api_start(const httplib::Request& req, httplib::Response& res) {
             if (decoded.find(':') == std::string::npos) {
                 res.status = 401;
                 res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
+
+                std::cout << "INFO: Unauthorized Access: No credentials" << " (" << req.path << ")" << std::endl;
 
                 return false;
             }
@@ -202,6 +206,8 @@ bool budget::api_start(const httplib::Request& req, httplib::Response& res) {
                 res.status = 401;
                 res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
 
+                std::cout << "WARNING: Unauthorized Access: Invalid username " << username << " (" << req.path << ")" << std::endl;
+
                 return false;
             }
 
@@ -209,11 +215,17 @@ bool budget::api_start(const httplib::Request& req, httplib::Response& res) {
                 res.status = 401;
                 res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
 
+                std::cout << "WARNING: Unauthorized Access: Invalid password for " << username << " (" << req.path << ")" << std::endl;
+
                 return false;
             }
+
+            std::cout << "INFO: Valid authentication for " << username << " (" << req.path << ")" << std::endl;
         } else {
             res.status = 401;
             res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
+
+            std::cout << "WARNING: Unauthorized Access: No authentication" << " (" << req.path << ")" << std::endl;
 
             return false;
         }
