@@ -300,14 +300,8 @@ void budget::add_earnings_page(html_writer& w) {
     add_amount_picker(w);
 
     std::string account;
-
-    if (config_contains("default_account")) {
-        auto default_account = config_value("default_account");
-
-        if (account_exists(default_account)) {
-            auto today = budget::local_day();
-            account = budget::to_string(get_account(default_account, today.year(), today.month()).id);
-        }
+    if (has_default_account()) {
+        account = budget::to_string(default_account().id);
     }
 
     add_account_picker(w, budget::local_day(), account);
