@@ -273,93 +273,89 @@ void budget::time_graph_savings_rate_page(html_writer & w) {
 void budget::time_graph_tax_rate_page(html_writer & w) {
     std::stringstream content_stream;
 
-    if (config_contains("taxes_account")) {
-       auto taxes_account = config_value("taxes_account");
+    if (has_taxes_account()) {
+        auto ss = start_time_chart(w, "Tax rate over time", "line", "tax_time_graph", "");
 
-       if (account_exists(taxes_account)) {
-            auto ss = start_time_chart(w, "Tax rate over time", "line", "tax_time_graph", "");
+        ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+        ss << R"=====(legend: { enabled: false },)=====";
 
-            ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
-            ss << R"=====(legend: { enabled: false },)=====";
+        ss << "series: [";
 
-            ss << "series: [";
+        ss << "{ name: 'Tax Rate',";
+        ss << "data: [";
 
-            ss << "{ name: 'Tax Rate',";
-            ss << "data: [";
+        std::vector<float>       serie;
+        std::vector<std::string> dates;
 
-            std::vector<float> serie;
-            std::vector<std::string> dates;
+        auto sy = start_year(w.cache);
 
-            auto sy = start_year(w.cache);
+        double max = 1.0;
 
-            double max = 1.0;
+        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
+            budget::year year = j;
 
-            for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-                budget::year year = j;
+            auto sm   = start_month(w.cache, year);
+            auto last = 13;
 
-                auto sm = start_month(w.cache, year);
-                auto last = 13;
-
-                if (year == budget::local_day().year()) {
-                    last = budget::local_day().month() + 1;
-                }
-
-                for (unsigned short i = sm; i < last; ++i) {
-                    budget::month month = i;
-
-                    auto status = budget::compute_month_status(w.cache, year, month);
-
-                    double tax_rate = status.taxes / status.income;
-
-                    std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
-
-                    serie.push_back(tax_rate);
-                    dates.push_back(date);
-
-                    ss << "[" << date << " ," << 100.0 * tax_rate << "],";
-
-                    if (tax_rate > max) {
-                        max = tax_rate;
-                    }
-                }
+            if (year == budget::local_day().year()) {
+                last = budget::local_day().month() + 1;
             }
 
-            ss << "]},";
+            for (unsigned short i = sm; i < last; ++i) {
+                budget::month month = i;
 
-            ss << "{ name: '12 months average',";
-            ss << "data: [";
+                auto status = budget::compute_month_status(w.cache, year, month);
 
-            std::array<float, 12> average_12;
-            average_12.fill(0.0f);
+                double tax_rate = status.taxes / status.income;
 
-            for (size_t i = 0; i < serie.size(); ++i) {
-                average_12[i % 12] = serie[i];
+                std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
 
-                auto average = std::accumulate(average_12.begin(), average_12.end(), 0.0f);
+                serie.push_back(tax_rate);
+                dates.push_back(date);
 
-                if (i < 12) {
-                    average = average / float(i + 1);
-                } else {
-                    average = average / 12.f;
-                }
+                ss << "[" << date << " ," << 100.0 * tax_rate << "],";
 
-                ss << "[" << dates[i] << "," << 100.0 * average << "],";
-
-                if (average > max) {
-                    max = average;
+                if (tax_rate > max) {
+                    max = tax_rate;
                 }
             }
+        }
 
-            ss << "]},";
+        ss << "]},";
 
-            ss << "]";
+        ss << "{ name: '12 months average',";
+        ss << "data: [";
 
-            ss << ", yAxis: { min: 0, max: " << (int) (100.0 * max) << ", title: { text: 'Tax Savings Rate' }},";
+        std::array<float, 12> average_12;
+        average_12.fill(0.0f);
 
-            end_chart(w, ss);
+        for (size_t i = 0; i < serie.size(); ++i) {
+            average_12[i % 12] = serie[i];
 
-           return;
-       }
+            auto average = std::accumulate(average_12.begin(), average_12.end(), 0.0f);
+
+            if (i < 12) {
+                average = average / float(i + 1);
+            } else {
+                average = average / 12.f;
+            }
+
+            ss << "[" << dates[i] << "," << 100.0 * average << "],";
+
+            if (average > max) {
+                max = average;
+            }
+        }
+
+        ss << "]},";
+
+        ss << "]";
+
+        ss << ", yAxis: { min: 0, max: " << (int) (100.0 * max) << ", title: { text: 'Tax Savings Rate' }},";
+
+        end_chart(w, ss);
+
+        return;
     }
 
     w << "Taxes support not configured";

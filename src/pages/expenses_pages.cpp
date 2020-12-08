@@ -281,62 +281,60 @@ void budget::time_graph_expenses_page(html_writer& w) {
 
     // If configured as such, we create a second graph without taxes
 
-    if (config_contains("taxes_account")) {
-        auto taxes_account = config_value("taxes_account");
+    if (has_taxes_account()) {
+        auto taxes_account_name = taxes_account().name;
 
-        if (account_exists(taxes_account)) {
-            auto ss = start_time_chart(w, "Expenses w/o taxes over time", "line", "expenses_no_taxes_time_graph", "");
+        auto ss = start_time_chart(w, "Expenses w/o taxes over time", "line", "expenses_no_taxes_time_graph", "");
 
-            ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
-            ss << R"=====(yAxis: { min: 0, title: { text: 'Monthly Expenses W/O Taxes' }},)=====";
-            ss << R"=====(legend: { enabled: false },)=====";
+        ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+        ss << R"=====(yAxis: { min: 0, title: { text: 'Monthly Expenses W/O Taxes' }},)=====";
+        ss << R"=====(legend: { enabled: false },)=====";
 
-            ss << "series: [";
+        ss << "series: [";
 
-            ss << "{ name: 'Monthly expenses W/O Taxes',";
-            ss << "data: [";
+        ss << "{ name: 'Monthly expenses W/O Taxes',";
+        ss << "data: [";
 
-            std::vector<budget::money> serie;
-            std::vector<std::string> dates;
+        std::vector<budget::money> serie;
+        std::vector<std::string> dates;
 
-            for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-                budget::year year = j;
+        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
+            budget::year year = j;
 
-                auto sm   = start_month(w.cache, year);
-                auto last = 13;
+            auto sm   = start_month(w.cache, year);
+            auto last = 13;
 
-                if (year == budget::local_day().year()) {
-                    last = budget::local_day().month() + 1;
-                }
-
-                for (unsigned short i = sm; i < last; ++i) {
-                    budget::month month = i;
-
-                    budget::money sum;
-
-                    for (auto& expense : all_expenses_month(w.cache, year, month)) {
-                        if (get_account(expense.account).name != taxes_account) {
-                            sum += expense.amount;
-                        }
-                    }
-
-                    std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
-
-                    serie.push_back(sum);
-                    dates.push_back(date);
-
-                    ss << "[" << date << "," << budget::money_to_string(sum) << "],";
-                }
+            if (year == budget::local_day().year()) {
+                last = budget::local_day().month() + 1;
             }
 
-            ss << "]},";
+            for (unsigned short i = sm; i < last; ++i) {
+                budget::month month = i;
 
-            add_average_12_serie(ss, serie, dates);
+                budget::money sum;
 
-            ss << "]";
+                for (auto& expense : all_expenses_month(w.cache, year, month)) {
+                    if (get_account(expense.account).name != taxes_account_name) {
+                        sum += expense.amount;
+                    }
+                }
 
-            end_chart(w, ss);
+                std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+
+                serie.push_back(sum);
+                dates.push_back(date);
+
+                ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+            }
         }
+
+        ss << "]},";
+
+        add_average_12_serie(ss, serie, dates);
+
+        ss << "]";
+
+        end_chart(w, ss);
     }
 }
 
