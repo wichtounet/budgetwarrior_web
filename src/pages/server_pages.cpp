@@ -38,6 +38,7 @@
 #include "pages/objectives_pages.hpp"
 #include "pages/overview_pages.hpp"
 #include "pages/net_worth_pages.hpp"
+#include "pages/web_config.hpp"
 #include "http.hpp"
 
 using namespace budget;
@@ -196,8 +197,6 @@ std::string header(const std::string& title, bool menu = true) {
               </li>
         )=====";
 
-        bool side_hustle = !config_value("side_category", "").empty() && !config_value("side_prefix", "").empty();
-
         // Overview
 
         stream << R"=====(
@@ -213,7 +212,7 @@ std::string header(const std::string& title, bool menu = true) {
                   <a class="dropdown-item" href="/overview/aggregate/all/">Aggregate All</a>
         )=====";
 
-        if (side_hustle) {
+        if (is_side_hustle_enabled()) {
             stream << R"=====(
                   <a class="dropdown-item" href="/side_hustle/overview/">Side Hustle Overview Month</a>
             )=====";
@@ -535,8 +534,7 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/overview/savings/time/", render_wrapper("Savings Rate Over Time", &time_graph_savings_rate_page));
     server.Get("/overview/tax/time/", render_wrapper("Tax Rate Over Time", &time_graph_tax_rate_page));
 
-    bool side_hustle = !config_value("side_category", "").empty() && !config_value("side_prefix", "").empty();
-    if (side_hustle) {
+    if (is_side_hustle_enabled()) {
         server.Get("/side_hustle/overview/", render_wrapper("Side Hustle Overview", &side_overview_page));
         server.Get(R"(/side_hustle/overview/(\d+)/(\d+)/)", render_wrapper("Side Hustle Overview", &side_overview_page));
     }

@@ -11,6 +11,7 @@
 
 #include "pages/html_writer.hpp"
 #include "pages/overview_pages.hpp"
+#include "pages/web_config.hpp"
 #include "http.hpp"
 #include "config.hpp"
 #include "compute.hpp"
@@ -368,8 +369,8 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
 
     writer << title_begin << "Side Hustle Overview of " << month << " " << year << budget::year_month_selector{"side_hustle/overview", year, month} << title_end;
 
-    auto side_category = config_value("side_category");
-    auto side_prefix   = config_value("side_prefix");
+    auto side_category = user_config_value("side_category", "");
+    auto side_prefix   = user_config_value("side_prefix", "");
 
     std::vector<std::vector<std::string>> contents;
     std::vector<money> total_expenses(1, budget::money());
@@ -430,7 +431,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
 } // end of anonymous namespace
 
 void budget::side_overview_page(html_writer & w, const httplib::Request& req) {
-    if(config_value("side_category", "").empty() || config_value("side_prefix", "").empty()) {
+    if (!budget::is_side_hustle_enabled()) {
         w << "Side hustle is not configured";
     } else {
         if (req.matches.size() == 3) {
