@@ -1072,6 +1072,21 @@ void budget::add_account_picker(budget::writer& w, budget::date day, const std::
     )=====";
 }
 
+void budget::add_account_picker_by_name(budget::writer& w, budget::date day, const std::string & title, const std::string& default_value, const std::string & input) {
+    w << "<div class=\"form-group\"><label for=\"" << input << "\">" << title << "</label>";
+    w << "<select class=\"form-control\" id=\"" << input << "\" name=\"" << input << "\">";
+
+    for (auto& account : all_accounts(w.cache, day.year(), day.month())) {
+        if (account.name == default_value) {
+            w << "<option selected value=\"" << account.name << "\">" << account.name << "</option>";
+        } else {
+            w << "<option value=\"" << account.name << "\">" << account.name << "</option>";
+        }
+    }
+
+    w << R"=====(</select></div>)=====";
+}
+
 void budget::add_share_asset_picker(budget::writer& w, const std::string& default_value) {
     w << R"=====(
             <div class="form-group">
