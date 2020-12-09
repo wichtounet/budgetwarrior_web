@@ -18,6 +18,7 @@
 #include "api/wishes_api.hpp"
 #include "api/fortunes_api.hpp"
 #include "api/assets_api.hpp"
+#include "api/user_api.hpp"
 
 #include "config.hpp"
 #include "version.hpp"
@@ -171,6 +172,8 @@ void budget::load_api(httplib::Server& server) {
     server.Post("/api/objectives/edit/", api_wrapper(&edit_objectives_api));
     server.Get("/api/objectives/delete/", api_wrapper(&delete_objectives_api));
     server.Get("/api/objectives/list/", api_wrapper(&list_objectives_api));
+
+    server.Post("/api/user/config/", api_wrapper(&user_config_api));
 }
 
 bool budget::api_start(const httplib::Request& req, httplib::Response& res) {

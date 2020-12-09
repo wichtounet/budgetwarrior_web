@@ -38,6 +38,7 @@
 #include "pages/objectives_pages.hpp"
 #include "pages/overview_pages.hpp"
 #include "pages/net_worth_pages.hpp"
+#include "pages/user_pages.hpp"
 #include "pages/web_config.hpp"
 #include "http.hpp"
 
@@ -164,6 +165,10 @@ std::string header(const std::string& title, bool menu = true) {
 
                 .flat-hr {
                     margin:0px;
+                }
+
+                input[type=radio] {
+                    margin-left: 10px;
                 }
             </style>
     )=====";
@@ -374,6 +379,8 @@ std::string header(const std::string& title, bool menu = true) {
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="dropdown_others" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Others</a>
                 <div class="dropdown-menu" aria-labelledby="dropdown_others">
+                  <a class="dropdown-item" href="/user/config/">Configuration</a>
+                  <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="/recurrings/list/">List Recurring Operations</a>
                   <a class="dropdown-item" href="/recurrings/add/">Add Recurring Operation</a>
         )=====";
@@ -640,6 +647,8 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/fortunes/list/", render_wrapper("Fortunes", &list_fortunes_page));
     server.Get("/fortunes/add/", render_wrapper("Fortunes", &add_fortunes_page));
     server.Get("/fortunes/edit/", render_wrapper("Fortunes", &edit_fortunes_page));
+
+    server.Get("/user/config/", render_wrapper("Configuration", &user_config_page));
 
     // Handle error
 
