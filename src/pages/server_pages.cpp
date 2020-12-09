@@ -385,7 +385,7 @@ std::string header(const std::string& title, bool menu = true) {
                   <a class="dropdown-item" href="/recurrings/add/">Add Recurring Operation</a>
         )=====";
 
-        if (budget::is_debts_disabled()) {
+        if (!budget::is_debts_disabled()) {
             stream << R"=====(
                       <div class="dropdown-divider"></div>
                       <a class="dropdown-item" href="/debts/add/">Add Debt</a>
@@ -541,10 +541,8 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/overview/savings/time/", render_wrapper("Savings Rate Over Time", &time_graph_savings_rate_page));
     server.Get("/overview/tax/time/", render_wrapper("Tax Rate Over Time", &time_graph_tax_rate_page));
 
-    if (is_side_hustle_enabled()) {
-        server.Get("/side_hustle/overview/", render_wrapper("Side Hustle Overview", &side_overview_page));
-        server.Get(R"(/side_hustle/overview/(\d+)/(\d+)/)", render_wrapper("Side Hustle Overview", &side_overview_page));
-    }
+    server.Get("/side_hustle/overview/", render_wrapper("Side Hustle Overview", &side_overview_page));
+    server.Get(R"(/side_hustle/overview/(\d+)/(\d+)/)", render_wrapper("Side Hustle Overview", &side_overview_page));
 
     server.Get("/report/", render_wrapper("Report", &report_page));
 

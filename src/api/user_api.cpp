@@ -24,18 +24,21 @@ bool yes_or_no(const std::string& value) {
 } // end of anonymous namespace
 
 void budget::user_config_api(const httplib::Request& req, httplib::Response& res) {
-    if (!req.has_param("input_enable_fortune")) {
+    if (!req.has_param("input_enable_fortune") || !req.has_param("input_enable_debts")) {
         api_error(req, res, "Invalid parameters");
         return;
     }
 
-    if (!yes_or_no(req.get_param_value("input_enable_fortune"))) {
+    if (!yes_or_no(req.get_param_value("input_enable_fortune")) || !yes_or_no(req.get_param_value("input_enable_debts"))) {
         api_error(req, res, "Invalid parameter value");
         return;
     }
 
     auto disable_fortune = req.get_param_value("input_enable_fortune") == "no";
     internal_config_value("disable_fortune") = disable_fortune ? "true" : "false";
+
+    auto disable_debts = req.get_param_value("input_enable_debts") == "no";
+    internal_config_value("disable_debts") = disable_debts ? "true" : "false";
 
     budget::save_config();
 

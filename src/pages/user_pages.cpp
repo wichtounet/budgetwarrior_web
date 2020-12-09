@@ -19,6 +19,7 @@ void budget::user_config_page(html_writer& w) {
     form_begin(w, "/api/user/config/", "/user/config/");
 
     add_yes_no_picker(w, "Enable fortune module", "input_enable_fortune", !budget::is_fortune_disabled());
+    add_yes_no_picker(w, "Enable debts module", "input_enable_debts", !budget::is_debts_disabled());
 
     form_end(w);
 }
