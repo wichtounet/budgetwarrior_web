@@ -24,7 +24,7 @@ bool yes_or_no(const std::string& value) {
 } // end of anonymous namespace
 
 void budget::user_config_api(const httplib::Request& req, httplib::Response& res) {
-    if (!req.has_param("input_enable_fortune") || !req.has_param("input_enable_debts") || !req.has_param("input_default_account")) {
+    if (!parameters_present(req, {"input_enable_fortune", "input_enable_debts", "input_default_account", "input_taxes_account"})) {
         api_error(req, res, "Invalid parameters");
         return;
     }
@@ -41,6 +41,7 @@ void budget::user_config_api(const httplib::Request& req, httplib::Response& res
     internal_config_value("disable_debts") = disable_debts ? "true" : "false";
 
     internal_config_value("default_account") = req.get_param_value("input_default_account");
+    internal_config_value("taxes_account") = req.get_param_value("input_taxes_account");
 
     budget::save_config();
 

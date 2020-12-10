@@ -27,5 +27,8 @@ void budget::user_config_page(html_writer& w) {
     std::string def = has_default_account() ? default_account().name : "";
     add_account_picker_by_name(w, today, "Default account", def, "input_default_account");
 
+    std::string taxes = has_taxes_account() ? taxes_account().name : "";
+    add_account_picker_by_name(w, today, "Taxes account", taxes, "input_taxes_account", true);
+
     form_end(w);
 }

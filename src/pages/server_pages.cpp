@@ -1072,9 +1072,18 @@ void budget::add_account_picker(budget::writer& w, budget::date day, const std::
     )=====";
 }
 
-void budget::add_account_picker_by_name(budget::writer& w, budget::date day, const std::string & title, const std::string& default_value, const std::string & input) {
+void budget::add_account_picker_by_name(
+        budget::writer& w, budget::date day, const std::string& title, const std::string& default_value, const std::string& input, bool allow_empty) {
     w << "<div class=\"form-group\"><label for=\"" << input << "\">" << title << "</label>";
     w << "<select class=\"form-control\" id=\"" << input << "\" name=\"" << input << "\">";
+
+    if (allow_empty) {
+        if ("" == default_value) {
+            w << "<option selected value=\"\"></option>";
+        } else {
+            w << "<option value=\"\"></option>";
+        }
+    }
 
     for (auto& account : all_accounts(w.cache, day.year(), day.month())) {
         if (account.name == default_value) {
