@@ -30,5 +30,11 @@ void budget::user_config_page(html_writer& w) {
     std::string taxes = has_taxes_account() ? taxes_account().name : "";
     add_account_picker_by_name(w, today, "Taxes account", taxes, "input_taxes_account", true);
 
+    std::string sh_account = user_config_value("side_category", "");
+    add_account_picker_by_name(w, today, "Side Hustle Account", sh_account, "input_sh_account", true);
+
+    std::string sh_prefix = user_config_value("side_prefix", "");
+    add_text_picker(w, "Side Hustle Prefix", "input_sh_prefix", sh_prefix);
+
     form_end(w);
 }
