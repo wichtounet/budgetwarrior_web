@@ -59,8 +59,8 @@ void retirement_configure_api(const httplib::Request& req, httplib::Response& re
     }
 
     // Save the configuration
-    internal_config_value("withdrawal_rate") = req.get_param_value("input_wrate");
-    internal_config_value("expected_roi") = req.get_param_value("input_roi");
+    internal_config_set("withdrawal_rate", req.get_param_value("input_wrate"));
+    internal_config_set("expected_roi", req.get_param_value("input_roi"));
 
     save_config();
 

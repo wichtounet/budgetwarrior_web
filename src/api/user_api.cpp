@@ -35,16 +35,16 @@ void budget::user_config_api(const httplib::Request& req, httplib::Response& res
     }
 
     auto disable_fortune = req.get_param_value("input_enable_fortune") == "no";
-    internal_config_value("disable_fortune") = disable_fortune ? "true" : "false";
+    internal_config_set("disable_fortune", disable_fortune ? "true" : "false");
 
     auto disable_debts = req.get_param_value("input_enable_debts") == "no";
-    internal_config_value("disable_debts") = disable_debts ? "true" : "false";
+    internal_config_set("disable_debts", disable_debts ? "true" : "false");
 
-    internal_config_value("default_account") = req.get_param_value("input_default_account");
-    internal_config_value("taxes_account") = req.get_param_value("input_taxes_account");
+    internal_config_set("default_account", req.get_param_value("input_default_account"));
+    internal_config_set("taxes_account", req.get_param_value("input_taxes_account"));
 
-    internal_config_value("side_category") = req.get_param_value("input_sh_account");
-    internal_config_value("side_prefix") = req.get_param_value("input_sh_prefix");
+    internal_config_set("side_category", req.get_param_value("input_sh_account"));
+    internal_config_set("side_prefix", req.get_param_value("input_sh_prefix"));
 
     budget::save_config();
 
