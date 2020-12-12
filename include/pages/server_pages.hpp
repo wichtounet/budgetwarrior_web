@@ -41,6 +41,7 @@ void form_begin_edit(budget::writer& w, const std::string& action, const std::st
 void form_end(budget::writer& w, const std::string& button = "");
 
 void add_text_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required = true);
+void add_password_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required = true);
 void add_name_picker(budget::writer& w, const std::string& default_value = "");
 void add_title_picker(budget::writer& w, const std::string& default_value = "");
 void add_amount_picker(budget::writer& w, const std::string& default_value = "");

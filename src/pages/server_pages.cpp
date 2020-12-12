@@ -842,6 +842,29 @@ void budget::add_text_picker(budget::writer& w, const std::string& title, const 
     )=====";
 }
 
+void budget::add_password_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required) {
+    w << R"=====(<div class="form-group">)=====";
+
+    w << "<label for=\"" << name << "\">" << title << "</label>";
+
+    if (required) {
+        w << "<input required type=\"password\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+    } else {
+        w << "<input type=\"password\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+    }
+
+    if (default_value.empty()) {
+        w << " placeholder=\"Enter " << title << "\"";
+    } else {
+        w << " value=\"" << default_value << "\" ";
+    }
+
+    w << R"=====(
+            >
+         </div>
+    )=====";
+}
+
 
 void budget::add_name_picker(budget::writer& w, const std::string& default_value) {
     add_text_picker(w, "Name", "input_name", default_value);
