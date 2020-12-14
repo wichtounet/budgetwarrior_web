@@ -8,7 +8,10 @@
 #include <set>
 #include <numeric>
 
+#include <openssl/md5.h>
+
 #include "cpp_utils/assert.hpp"
+#include "cpp_utils/string.hpp"
 
 #include "config.hpp"
 #include "overview.hpp"
@@ -674,6 +677,47 @@ void budget::load_pages(httplib::Server& server) {
     });
 }
 
+namespace {
+
+std::string md5_to_string(unsigned char * h) {
+    std::stringstream ss;
+
+    ss << std::hex << std::setfill('0');
+
+    for (size_t i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+        long c = h[i];
+        ss << std::setw(2) << c;
+    }
+
+    return ss.str();
+}
+
+std::string md5_direct(const std::string & base) {
+    unsigned char hash[MD5_DIGEST_LENGTH];
+
+    MD5((unsigned char*) base.c_str(), base.size(), hash);
+
+    return md5_to_string(hash);
+}
+
+void ask_for_digest(httplib::Response& res) {
+    // The opaque value
+    std::string opaque = "budgetwarrior";
+
+    // Generate the random nonce
+    std::random_device rd;
+    std::mt19937_64 g(rd());
+    std::string nonce = std::to_string(g());
+
+    auto nonce_str  = "nonce=\"" + md5_direct(opaque) + "\"";
+    auto opaque_str = "opaque=\"" + md5_direct(nonce) + "\"";
+
+    res.status = 401;
+    res.set_header("WWW-Authenticate", "Digest realm=\"budgetwarrior\", qop=\"auth,auth-int\"," + nonce_str + "," + opaque_str);
+}
+
+} // end of anonymous namespace
+
 bool budget::page_start(const httplib::Request& req, httplib::Response& res, std::stringstream& content_stream, const std::string& title) {
     content_stream.imbue(std::locale("C"));
 
@@ -681,52 +725,81 @@ bool budget::page_start(const httplib::Request& req, httplib::Response& res, std
         if (req.has_header("Authorization")) {
             auto authorization = req.get_header_value("Authorization");
 
-            if (authorization.substr(0, 6) != "Basic ") {
-                res.status = 401;
-                res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
+            if (authorization.substr(0, 7) != "Digest ") {
+                ask_for_digest(res);
 
-                std::cout << "INFO: Unauthorized Access: Not basic realm" << " (" << req.path << ")" << std::endl;
-
-                return false;
-            }
-
-            auto sub_authorization = authorization.substr(6, authorization.size());
-            auto decoded           = base64_decode(sub_authorization);
-
-            if (decoded.find(':') == std::string::npos) {
-                res.status = 401;
-                res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
-
-                std::cout << "INFO: Unauthorized Access: No credentials" << " (" << req.path << ")" << std::endl;
+                std::cout << "INFO: Unauthorized Access: Not digest realm" << " (" << req.path << ")" << std::endl;
 
                 return false;
             }
 
-            auto username = decoded.substr(0, decoded.find(':'));
-            auto password = decoded.substr(decoded.find(':') + 1, decoded.size());
+            // Extract the part after Digest
+            auto sub_authorization = authorization.substr(7, authorization.size());
+
+            std::map<std::string, std::string> dict;
+            auto parts = split(sub_authorization, ',');
+
+            for (auto & part : parts) {
+                // Each part is supposed to be key=value
+                // Some of the values are in quotes
+
+                cpp::trim(part);
+                auto mid_pos = part.find('=');
+
+                if (mid_pos == std::string::npos) {
+                    continue;
+                }
+
+                auto key       = part.substr(0, mid_pos);
+                auto value_raw = part.substr(mid_pos + 1);
+
+                std::string value;
+                if (value_raw.size() >= 2 && value_raw[0] == '\"' && value_raw.back() == '\"') {
+                    value = value_raw.substr(1, value_raw.size() - 2);
+                } else {
+                    value = value_raw;
+                }
+
+                dict[key] = value;
+            }
+
+            if (dict["username"].empty() || dict["nonce"].empty() || dict["response"].empty() || dict["opaque"].empty() || dict["realm"].empty()
+                || dict["nc"].empty()) {
+                ask_for_digest(res);
+
+                std::cout << "INFO: Unauthorized Access: Missing some digest credentials" << " (" << req.path << ")" << std::endl;
+
+                return false;
+            }
+
+            auto username = dict["username"];
 
             if (username != get_web_user()) {
-                res.status = 401;
-                res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
+                ask_for_digest(res);
 
                 std::cout << "WARNING: Unauthorized Access: Invalid username " << username << " (" << req.path << ")" << std::endl;
 
                 return false;
             }
 
-            if (password != get_web_password()) {
-                res.status = 401;
-                res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
+            // At this stage, we have to compute the nonce, like the client, and
+            // compare to what the client answered
 
-                std::cout << "WARNING: Unauthorized Access: Invalid password for " << username << " (" << req.path << ")" << std::endl;
+            std::string response_final = md5_direct(md5_direct(get_web_user() + ":" + dict["realm"] + ":" + get_web_password())
+                                                    + ":" + dict["nonce"] + ":" + dict["nc"] + ":" + dict["cnonce"] + ":" + dict["qop"] + ":"
+                                                    + md5_direct(req.method + ":" + dict["uri"]));
+
+            if (dict["response"] != response_final) {
+                ask_for_digest(res);
+
+                std::cout << "WARNING: Unauthorized Access: Invalid response for " << username << " (" << req.path << ")" << std::endl;
 
                 return false;
             }
 
             std::cout << "INFO: Valid authentication for " << username << " (" << req.path << ")" << std::endl;
         } else {
-            res.status = 401;
-            res.set_header("WWW-Authenticate", "Basic realm=\"budgetwarrior\"");
+            ask_for_digest(res);
 
             std::cout << "WARNING: Unauthorized Access: No authentication" << " (" << req.path << ")" << std::endl;
 
