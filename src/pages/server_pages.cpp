@@ -718,9 +718,7 @@ void ask_for_digest(httplib::Response& res) {
 
 } // end of anonymous namespace
 
-bool budget::page_start(const httplib::Request& req, httplib::Response& res, std::stringstream& content_stream, const std::string& title) {
-    content_stream.imbue(std::locale("C"));
-
+bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
     if (is_secure()) {
         if (req.has_header("Authorization")) {
             auto authorization = req.get_header_value("Authorization");
@@ -798,6 +796,8 @@ bool budget::page_start(const httplib::Request& req, httplib::Response& res, std
             }
 
             std::cout << "INFO: Valid authentication for " << username << " (" << req.path << ")" << std::endl;
+
+            return true;
         } else {
             ask_for_digest(res);
 
@@ -805,6 +805,16 @@ bool budget::page_start(const httplib::Request& req, httplib::Response& res, std
 
             return false;
         }
+    }
+
+    return true;
+}
+
+bool budget::page_start(const httplib::Request& req, httplib::Response& res, std::stringstream& content_stream, const std::string& title) {
+    content_stream.imbue(std::locale("C"));
+
+    if (!authenticate(req, res)) {
+        return false;
     }
 
     content_stream << header(title);
