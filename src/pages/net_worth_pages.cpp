@@ -326,7 +326,13 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
     auto ss = start_time_chart(w, card ? "" : "Net worth", "area", "net_worth_graph", style);
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
-    ss << R"=====(yAxis: { min: 0, title: { text: 'Net Worth' }},)=====";
+
+    if (current_net_worth.negative()) {
+        ss << R"=====(yAxis: { title: { text: 'Net Worth' }},)=====";
+    } else {
+        ss << R"=====(yAxis: { min: 0, title: { text: 'Net Worth' }},)=====";
+    }
+
     ss << R"=====(legend: { enabled: false },)=====";
 
     if (!card) {
