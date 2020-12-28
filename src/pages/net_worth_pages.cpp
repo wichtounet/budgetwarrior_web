@@ -376,14 +376,56 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
         w << R"=====(</div>)====="; //card-body
         w << R"=====(</div>)====="; //card
     }
+}
 
-    if (!card) {
-        w << p_begin << "MTD Change " << current_net_worth - m_net_worth << " __currency__" << p_end;
-        w << p_begin << "MTD Growth " << mtd_growth << " %" << p_end;
-
-        w << p_begin << "YTD Change " << current_net_worth - y_net_worth << " __currency__" << p_end;
-        w << p_begin << "YTD Growth " << ytd_growth << " %" << p_end;
+void budget::net_worth_accrual_graph(budget::html_writer& w) {
+    // if the user does not use assets, this graph does not make sense
+    if (no_assets() || no_asset_values()) {
+        return;
     }
+
+    auto ss = start_time_chart(w, "Net worth Accrual", "container", "net_worth_accrual_graph", "");
+
+    ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+    ss << R"=====(yAxis: { title: { text: 'Net Worth Growth' }},)=====";
+    ss << R"=====(legend: { enabled: false },)=====";
+
+    ss << "series: [";
+
+    ss << "{ type: 'column', name: 'Net Worth Growth', negativeColor: 'red',";
+    ss << "data: [";
+
+    auto date      = budget::asset_start_date(w.cache);
+    auto end_date  = budget::local_day();
+
+    // We need to skip the first month
+    date += months(1);
+
+    std::vector<budget::money> serie;
+    std::vector<std::string> dates;
+
+    while (date <= end_date) {
+        budget::money sum;
+
+        auto start = get_net_worth(date.start_of_month(), w.cache);
+        auto end   = get_net_worth(date.end_of_month(), w.cache);
+
+        std::string date_str = "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", 1)";
+        ss << "[" << date_str << " ," << budget::money_to_string(end - start) << "],";
+
+        serie.emplace_back(end - start);
+        dates.emplace_back(date_str);
+
+        date += months(1);
+    }
+
+    ss << "]},";
+
+    add_average_12_serie(ss, serie, dates);
+
+    ss << "]";
+
+    end_chart(w, ss);
 }
 
 void budget::net_worth_status_page(html_writer & w) {
@@ -395,7 +437,26 @@ void budget::net_worth_small_status_page(html_writer& w) {
 }
 
 void budget::net_worth_graph_page(html_writer& w) {
+    // First, we display the net worth graph
     net_worth_graph(w);
+
+    // Then, we can display some general information
+
+    auto current_net_worth = get_net_worth(w.cache);
+    auto now               = budget::local_day();
+    auto y_net_worth       = get_net_worth({now.year(), 1, 1}, w.cache);
+    auto m_net_worth       = get_net_worth(now - days(now.day() - 1), w.cache);
+    auto ytd_growth        = 100.0 * ((1 / (y_net_worth / current_net_worth)) - 1);
+    auto mtd_growth        = 100.0 * ((1 / (m_net_worth / current_net_worth)) - 1);
+
+    w << p_begin << "MTD Change " << current_net_worth - m_net_worth << " __currency__" << p_end;
+    w << p_begin << "MTD Growth " << mtd_growth << " %" << p_end;
+
+    w << p_begin << "YTD Change " << current_net_worth - y_net_worth << " __currency__" << p_end;
+    w << p_begin << "YTD Growth " << ytd_growth << " %" << p_end;
+
+    // Finally, we display the net worth accrual graph
+    net_worth_accrual_graph(w);
 }
 
 void budget::net_worth_allocation_page(html_writer& w) {

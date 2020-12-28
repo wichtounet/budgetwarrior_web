@@ -1110,7 +1110,7 @@ void budget::end_chart(budget::html_writer& w, std::stringstream& ss) {
 void budget::add_average_12_serie(std::stringstream& ss,
                                  std::vector<budget::money> serie,
                                  std::vector<std::string> dates) {
-    ss << "{ name: '12 months average',";
+    ss << "{ type: 'line', name: '12 months average',";
     ss << "data: [";
 
     std::array<budget::money, 12> average_12;
