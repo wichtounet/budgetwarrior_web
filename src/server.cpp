@@ -27,6 +27,7 @@
 #include "currency.hpp"
 #include "share.hpp"
 #include "http.hpp"
+#include "logging.hpp"
 
 #include "api/server_api.hpp"
 #include "pages/server_pages.hpp"
@@ -42,7 +43,7 @@ std::mutex lock;
 std::condition_variable cv;
 
 void server_signal_handler(int signum) {
-    std::cout << "INFO: Received signal (" << signum << ")" << std::endl;
+    LOG_F(INFO, "Received signal ({})", signum);
 
     cron = false;
 
@@ -61,11 +62,11 @@ void install_signal_handler() {
     sigaction(SIGTERM, &action, NULL);
     sigaction(SIGINT, &action, NULL);
 
-    std::cout << "INFO: Installed the signal handler" << std::endl;
+    LOG_F(INFO, "Installed the signal handler");
 }
 
 bool start_server(){
-    std::cout << "INFO: Started the server thread" << std::endl;
+    LOG_F(INFO, "Started the server thread");
 
     httplib::Server server;
 
@@ -79,18 +80,18 @@ bool start_server(){
     server_ptr = &server;
 
     // Listen
-    std::cout << "INFO: Server is starting to listen on " << listen << ':' << port << std::endl;
+    LOG_F(INFO, "Server is starting to listen on {}:{}", listen, port);
     if (!server.listen(listen.c_str(), port)) {
-        std::cerr << "INFO: Server failed to start" << std::endl;
+        LOG_F(ERROR, "Server failed to start");
         return false;
     }
 
-    std::cout << "INFO: Server has exited normally" << std::endl;
+    LOG_F(INFO, "Server has exited normally");
     return true;
 }
 
 void start_cron_loop(){
-    std::cout << "INFO: Started the cron thread" << std::endl;
+    LOG_F(INFO, "Started the cron thread");
     size_t hours = 0;
 
     while(cron){
@@ -127,7 +128,7 @@ void start_cron_loop(){
         budget::prefetch_share_price_cache();
     }
 
-    std::cout << "INFO: Cron Thread has exited" << std::endl;
+    LOG_F(INFO, "Cron thread has exited");
 }
 
 void load(){
@@ -147,14 +148,18 @@ void load(){
 
 } //end of anonymous namespace
 
-int main(){
+int main(int argc, char** argv){
     std::locale global_locale("");
     std::locale::global(global_locale);
+
+    // Initialize logging for the server
+    loguru::g_stderr_verbosity = loguru::Verbosity_INFO;
+    loguru::init(argc, argv);
 
     load();
 
     if (!load_config()) {
-        std::cout << "ERROR: " << "could not load config" << std::endl;
+        LOG_F(ERROR, "Could not config");
         return 0;
     }
 
