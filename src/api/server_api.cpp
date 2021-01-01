@@ -26,6 +26,7 @@
 #include "version.hpp"
 #include "writer.hpp"
 #include "http.hpp"
+#include "logging.hpp"
 
 using namespace budget;
 
@@ -79,16 +80,13 @@ auto api_wrapper(void (*api_function)(const httplib::Request &, httplib::Respons
             api_function(req, res);
         } catch (const budget_exception& e) {
             api_error(req, res, "Exception occurred: " + e.message());
-            std::cout << "ERROR: budget_exception occured in api("
-                      << req.path << "): " << e.message() << std::endl;
+            LOG_F(ERROR, "budget_exception occured in render({}): {}", req.path, e.message());
         } catch (const date_exception& e) {
             api_error(req, res, "Exception occurred: " + e.message());
-            std::cout << "ERROR: date_exception occured in api("
-                      << req.path << "): " << e.message() << std::endl;
+            LOG_F(ERROR, "date_exception occured in render({}): {}", req.path, e.message());
         } catch (...) {
             api_error(req, res, "Unknown Exception occurred");
-            std::cout << "ERROR: Unknown exception occured in api("
-                      << req.path << ")" << std::endl;
+            LOG_F(FATAL, "unknown_exception occured in render({}): {}", req.path);
         }
     };
 }

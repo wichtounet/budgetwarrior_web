@@ -20,6 +20,7 @@
 #include "pages/html_writer.hpp"
 #include "currency.hpp"
 #include "budget_exception.hpp"
+#include "logging.hpp"
 
 // Include all the pages
 #include "pages/assets_pages.hpp"
@@ -504,18 +505,15 @@ auto render_wrapper(const char* title, T render_function) {
             page_end(w, req, res);
         } catch (const budget_exception& e) {
             display_error_message(w, "Exception occured: " + e.message());
-            std::cout << "ERROR: budget_exception occured in render("
-                      << req.path << "): " << e.message() << std::endl;
+            LOG_F(ERROR, "budget_exception occured in render({}): {}", req.path, e.message());
             page_end(w, req, res);
         } catch (const date_exception& e) {
             display_error_message(w, "Exception occured: " + e.message());
-            std::cout << "ERROR: date_exception occured in render("
-                      << req.path << "): " << e.message() << std::endl;
+            LOG_F(ERROR, "date_exception occured in render({}): {}", req.path, e.message());
             page_end(w, req, res);
         } catch (...) {
             display_error_message(w, "Unknown Exception occured");
-            std::cout << "ERROR: Unknown exception occured in render("
-                      << req.path << ")" << std::endl;
+            LOG_F(FATAL, "unknown_exception occured in render({}): {}", req.path);
             page_end(w, req, res);
         }
     };
@@ -726,7 +724,7 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             if (authorization.substr(0, 7) != "Digest ") {
                 ask_for_digest(res);
 
-                std::cout << "INFO: Unauthorized Access: Not digest realm" << " (" << req.path << ")" << std::endl;
+                LOG_F(INFO, "Unauthorized Access: Not digest realm ({})", req.path);
 
                 return false;
             }
@@ -765,7 +763,7 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
                 || dict["nc"].empty()) {
                 ask_for_digest(res);
 
-                std::cout << "INFO: Unauthorized Access: Missing some digest credentials" << " (" << req.path << ")" << std::endl;
+                LOG_F(INFO, "Unauthorized Access: Missing some digest credentials ({})", req.path);
 
                 return false;
             }
@@ -775,7 +773,7 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             if (username != get_web_user()) {
                 ask_for_digest(res);
 
-                std::cout << "WARNING: Unauthorized Access: Invalid username " << username << " (" << req.path << ")" << std::endl;
+                LOG_F(WARNING, "Unauthorized Access: Invalid username {} ({})", username, req.path);
 
                 return false;
             }
@@ -790,18 +788,18 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             if (dict["response"] != response_final) {
                 ask_for_digest(res);
 
-                std::cout << "WARNING: Unauthorized Access: Invalid response for " << username << " (" << req.path << ")" << std::endl;
+                LOG_F(WARNING, "Unauthorized Access: Invalid response for {} ({})", username, req.path);
 
                 return false;
             }
 
-            std::cout << "INFO: Valid authentication for " << username << " (" << req.path << ")" << std::endl;
+            LOG_F(INFO, "Valid authentication for {} ({})", username, req.path);
 
             return true;
         } else {
             ask_for_digest(res);
 
-            std::cout << "WARNING: Unauthorized Access: No authentication" << " (" << req.path << ")" << std::endl;
+            LOG_F(WARNING, "Unauthorized Access: No authentication ({})", req.path, req.path);
 
             return false;
         }
