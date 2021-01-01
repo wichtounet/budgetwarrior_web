@@ -1,6 +1,7 @@
 [submodule "budgetwarrior"]
 	path = budgetwarrior
 	url = https://github.com/wichtounet/budgetwarrior.git
+	branch = master
 [submodule "make-utils"]
 	path = make-utils
 	url = https://github.com/wichtounet/make-utils.git

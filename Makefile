@@ -10,9 +10,9 @@ $(eval $(call use_cpp17))
 
 CXX_FLAGS += -pthread
 
-LD_FLAGS += -luuid -lssl -lcrypto
+LD_FLAGS += -luuid -lssl -lcrypto -ldl
 
-CXX_FLAGS += -Ibudgetwarrior/cpp-httplib -Ibudgetwarrior/include -Ibudg
+CXX_FLAGS += -Ibudgetwarrior/cpp-httplib -Ibudgetwarrior/include -Ibudgetwarrior/loguru -Ibudgetwarrior/fmt/include
 
 $(eval $(call auto_folder_compile,src))
 $(eval $(call auto_folder_compile,src/pages))
