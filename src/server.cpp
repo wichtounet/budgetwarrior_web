@@ -66,6 +66,11 @@ void install_signal_handler() {
 }
 
 bool start_server(){
+    // Name the thread
+    pthread_t self = pthread_self();
+    pthread_setname_np(self, "server thread");
+    loguru::set_thread_name("server thread");
+
     LOG_F(INFO, "Started the server thread");
 
     httplib::Server server;
@@ -91,6 +96,11 @@ bool start_server(){
 }
 
 void start_cron_loop(){
+    // Name the thread
+    pthread_t self = pthread_self();
+    pthread_setname_np(self, "cron thread");
+    loguru::set_thread_name("cron thread");
+
     LOG_F(INFO, "Started the cron thread");
     size_t hours = 0;
 
