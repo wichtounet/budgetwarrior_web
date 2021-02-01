@@ -459,6 +459,29 @@ void budget::net_worth_graph_page(html_writer& w) {
     net_worth_accrual_graph(w);
 }
 
+namespace {
+
+budget::money get_class_sum(data_cache & cache, budget::asset_class & clas, budget::date date) {
+    budget::money sum;
+
+    for (auto & asset : cache.user_assets()) {
+        sum += get_asset_value_conv(asset, date, cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
+    }
+
+    // TODO Remove this hack once liabilities support asset classes
+    if (clas.name == "Real Estate") {
+        if (liability_exists("Mortgage")) {
+            auto mortgage = get_liability("Mortgage");
+
+            sum -= get_liability_value_conv(mortgage, date, cache);
+        }
+    }
+
+    return sum;
+}
+
+} // end of anonymous namespace
+
 void budget::net_worth_allocation_page(html_writer& w) {
     // 1. Display the currency breakdown over time
 
@@ -479,11 +502,7 @@ void budget::net_worth_allocation_page(html_writer& w) {
         auto end_date = budget::local_day();
 
         while (date <= end_date) {
-            budget::money sum;
-
-            for (auto & asset : w.cache.user_assets()) {
-                sum += get_asset_value_conv(asset, date, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
-            }
+            auto sum = get_class_sum(w.cache, clas, date);
 
             ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 
@@ -513,12 +532,7 @@ void budget::net_worth_allocation_page(html_writer& w) {
         ss2 << "{ name: '" << clas.name << "',";
         ss2 << "y: ";
 
-        budget::money sum;
-
-        for (auto & asset : w.cache.user_assets()){
-            sum += get_asset_value_conv(asset, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
-        }
-
+        auto sum = get_class_sum(w.cache, clas, budget::local_day());
         ss2 << budget::money_to_string(sum);
 
         ss2 << "},";
