@@ -10,7 +10,6 @@
 
 #include <openssl/md5.h>
 
-#include "cpp_utils/assert.hpp"
 #include "cpp_utils/string.hpp"
 
 #include "config.hpp"

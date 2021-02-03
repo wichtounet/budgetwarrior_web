@@ -10,8 +10,6 @@
 #include <thread>
 #include <condition_variable>
 
-#include "cpp_utils/assert.hpp"
-
 #include "expenses.hpp"
 #include "earnings.hpp"
 #include "accounts.hpp"

@@ -5,8 +5,6 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
-#include "cpp_utils/assert.hpp"
-
 #include "pages/index_pages.hpp"
 #include "pages/earnings_pages.hpp"
 #include "pages/expenses_pages.hpp"

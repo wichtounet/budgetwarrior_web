@@ -7,8 +7,6 @@
 
 #include <set>
 
-#include "cpp_utils/assert.hpp"
-
 #include "pages/html_writer.hpp"
 #include "pages/net_worth_pages.hpp"
 #include "http.hpp"

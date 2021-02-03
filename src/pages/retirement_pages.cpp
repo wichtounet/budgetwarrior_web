@@ -5,8 +5,6 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
-#include "cpp_utils/assert.hpp"
-
 #include "retirement.hpp"
 #include "config.hpp"
 #include "assets.hpp"

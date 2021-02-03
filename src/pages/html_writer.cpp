@@ -5,7 +5,6 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
-#include "cpp_utils/assert.hpp"
 #include "cpp_utils/string.hpp"
 
 #include "pages/html_writer.hpp"
