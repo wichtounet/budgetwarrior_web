@@ -186,26 +186,34 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
 
     // Display additional information for share-based assets
     if (asset.share_based) {
-        int64_t bought_shares = 0;
-        int64_t sold_shares   = 0;
+        int64_t bought_shares  = 0;
+        int64_t sold_shares    = 0;
+        int64_t current_shares = 0;
 
         budget::money average_buy_price;
         budget::money average_sell_price;
 
-        auto current_price = share_price(asset.ticker);
-        date first_date    = local_day();
+        auto current_price  = share_price(asset.ticker);
+        date first_date     = local_day();
         bool first_date_set = false;
 
         for (auto& share : all_asset_shares()) {
             if (share.asset_id == asset.id) {
                 if (share.is_buy()) {
                     bought_shares += share.shares;
+                    current_shares += share.shares;
                     average_buy_price += (float)share.shares * share.price;
                 }
 
                 if (share.is_sell()) {
                     sold_shares += -share.shares;
+                    current_shares += share.shares;
                     average_sell_price += (float)-share.shares * share.price;
+                }
+
+                if (!current_shares) {
+                    // If the price went down to zero, we need to reset the buying price
+                    average_buy_price = 0;
                 }
 
                 if (!first_date_set) {
@@ -216,9 +224,9 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
         }
 
         if (bought_shares) {
-            average_buy_price /= bought_shares;
+            average_buy_price /= current_shares;
 
-            int64_t owned_shares = bought_shares - sold_shares;
+            int64_t owned_shares = current_shares;
 
             if (owned_shares >= 0) {
                 if (average_buy_price.positive()) {
