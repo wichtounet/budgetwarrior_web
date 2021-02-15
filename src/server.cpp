@@ -164,8 +164,6 @@ int main(int argc, char** argv){
     loguru::g_stderr_verbosity = loguru::Verbosity_INFO;
     loguru::init(argc, argv);
 
-    load();
-
     if (!load_config()) {
         LOG_F(ERROR, "Could not config");
         return 0;
@@ -179,7 +177,7 @@ int main(int argc, char** argv){
 
     auto old_data_version = to_number<size_t>(internal_config_value("data_version"));
 
-    LOG_F(INFO, "Detected database version {}" old_data_version);
+    LOG_F(INFO, "Detected database version {}", old_data_version);
 
     if (old_data_version > DATA_VERSION) {
         LOG_F(ERROR, "Unsupported database version ({}), you should update budgetwarrior", old_data_version);
@@ -195,7 +193,7 @@ int main(int argc, char** argv){
     }
 
     if (old_data_version < DATA_VERSION) {
-        LOG_F(INFO, "Migrating database...");
+        LOG_F(INFO, "Migrating database to version {}...", DATA_VERSION);
 
         if (old_data_version <= 4 && DATA_VERSION >= 5) {
             migrate_assets_4_to_5();
@@ -205,6 +203,10 @@ int main(int argc, char** argv){
             migrate_assets_5_to_6();
         }
 
+        if (old_data_version <= 6 && DATA_VERSION >= 7) {
+            migrate_liabilities_6_to_7();
+        }
+
         internal_config_set("data_version", to_string(DATA_VERSION));
 
         // We want to make sure the new data version is set in stone!
@@ -212,6 +214,9 @@ int main(int argc, char** argv){
 
         LOG_F(INFO, "Migration done");
     }
+
+    // Load all the data
+    load();
 
     volatile bool success = false;
     std::thread server_thread([&success](){ success = start_server(); });
