@@ -33,6 +33,11 @@ void budget::add_liabilities_page(html_writer& w) {
     form_begin(w, "/api/liabilities/add/", "/liabilities/add/");
 
     add_name_picker(w);
+
+    for (auto & clas : all_asset_classes()) {
+        add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), "");
+    }
+
     add_currency_picker(w);
 
     form_end(w);
@@ -58,6 +63,11 @@ void budget::edit_liabilities_page(html_writer& w, const httplib::Request& req) 
         auto liability = get_liability(id);
 
         add_name_picker(w, liability.name);
+
+        for (auto & clas : all_asset_classes()) {
+            add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), budget::money_to_string(get_asset_class_allocation(liability, clas)));
+        }
+
         add_currency_picker(w, liability.currency);
 
         form_end(w);

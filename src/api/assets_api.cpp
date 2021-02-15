@@ -403,6 +403,15 @@ void budget::add_liabilities_api(const httplib::Request& req, httplib::Response&
     liability liability;
     liability.guid     = budget::generate_guid();
     liability.name     = req.get_param_value("input_name");
+
+    for (auto& clas : all_asset_classes()) {
+        auto param_name = "input_class_" + to_string(clas.id);
+
+        if (req.has_param(param_name.c_str())) {
+            update_asset_class_allocation(liability, clas, budget::money_from_string(req.get_param_value(param_name.c_str())));
+        }
+    }
+
     liability.currency = req.get_param_value("input_currency");
 
     add_liability(liability);
@@ -425,6 +434,15 @@ void budget::edit_liabilities_api(const httplib::Request& req, httplib::Response
 
     liability liability = get_liability(budget::to_number<size_t>(id));
     liability.name      = req.get_param_value("input_name");
+
+    for (auto& clas : all_asset_classes()) {
+        auto param_name = "input_class_" + to_string(clas.id);
+
+        if (req.has_param(param_name.c_str())) {
+            update_asset_class_allocation(liability, clas, budget::money_from_string(req.get_param_value(param_name.c_str())));
+        }
+    }
+
     liability.currency  = req.get_param_value("input_currency");
 
     edit_liability(liability);
