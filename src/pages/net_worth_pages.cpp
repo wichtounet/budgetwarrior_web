@@ -710,9 +710,17 @@ void budget::net_worth_currency_page(html_writer& w) {
 
         budget::money sum;
 
+        // Add the assets in this currency
         for (auto & asset : w.cache.user_assets()) {
             if (asset.currency == currency) {
                 sum += get_asset_value_conv(asset, w.cache);
+            }
+        }
+
+        // Remove the liabilities in this currency
+        for (auto & liability : w.cache.liabilities()) {
+            if (liability.currency == currency) {
+                sum -= get_liability_value_conv(liability, w.cache);
             }
         }
 
