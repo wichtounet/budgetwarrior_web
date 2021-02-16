@@ -470,17 +470,14 @@ namespace {
 budget::money get_class_sum(data_cache & cache, budget::asset_class & clas, budget::date date) {
     budget::money sum;
 
+    // Add the value of the assets for this class
     for (auto & asset : cache.user_assets()) {
         sum += get_asset_value_conv(asset, date, cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
     }
 
-    // TODO Remove this hack once liabilities support asset classes
-    if (clas.name == "Real Estate") {
-        if (liability_exists("Mortgage")) {
-            auto mortgage = get_liability("Mortgage");
-
-            sum -= get_liability_value_conv(mortgage, date, cache);
-        }
+    // Remove the value of the liabilities for this class
+    for (auto & liability : cache.liabilities()) {
+        sum -= get_liability_value_conv(liability, date, cache) * (float(get_asset_class_allocation(liability, clas)) / 100.0f);
     }
 
     return sum;
