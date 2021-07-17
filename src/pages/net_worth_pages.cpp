@@ -224,42 +224,38 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
         }
 
         if (bought_shares) {
-            average_buy_price /= current_shares;
+            w << p_begin << "Number of shares: " << current_shares << p_end;
+            w << p_begin << "Current price: " << current_price << p_end;
 
-            int64_t owned_shares = current_shares;
-
-            if (owned_shares >= 0) {
+            if (current_shares >= 0) {
                 if (average_buy_price.positive()) {
-                    w << p_begin << "Number of shares: " << owned_shares << p_end;
-                    w << p_begin << "Average price: " << average_buy_price << p_end;
-                    w << p_begin << "Current price: " << current_price << p_end;
-                    w << p_begin << "Invested: " << (float)owned_shares * average_buy_price << p_end;
-                    w << p_begin << "Value: " << (float)owned_shares * current_price << p_end;
-                    w << p_begin << "Current profit: " << (float)owned_shares * (current_price - average_buy_price) << p_end;
+                    average_buy_price /= current_shares;
+
+                    w << p_begin << "Average buy price: " << average_buy_price << p_end;
+                    w << p_begin << "Invested: " << (float)current_shares * average_buy_price << p_end;
+                    w << p_begin << "Value: " << (float)current_shares * current_price << p_end;
+                    w << p_begin << "Current profit: " << (float)current_shares * (current_price - average_buy_price) << p_end;
                     w << p_begin << "ROI: " << (100.0f / (average_buy_price / current_price)) - 100.0f << "%" << p_end;
-                    w << p_begin << "First Invest: " << budget::to_string(first_date) << p_end;
-
-                    // TODO This is not entirely correct, since this should use
-                    // the date of sold and buy to have the correct profit
-                    if (sold_shares) {
-                        if (average_sell_price.positive()) {
-                            average_sell_price /= sold_shares;
-
-                            w << p_begin << p_end;
-                            w << p_begin << "Sold shares: " << sold_shares << p_end;
-                            w << p_begin << "Average sold price: " << average_sell_price << p_end;
-                            w << p_begin << "Realized profit: " << (float)sold_shares * (average_sell_price - average_buy_price) << p_end;
-                            w << p_begin << "Realized ROI: " << (100.0f / (average_buy_price / average_sell_price)) - 100.0f << "%" << p_end;
-                        } else {
-                            w << p_begin << "There is an issue with your average sell price! It should be positive" << p_end;
-                        }
-                    }
+                    w << p_begin << "First Invested: " << budget::to_string(first_date) << p_end;
                 } else {
                     w << p_begin << "There is an issue with your average buy price! It should be positive" << p_end;
                 }
-            } else {
-                w << p_begin << "Number of shares: " << owned_shares << p_end;
-                w << p_begin << "There is an issue with the total number of shares! It should not be negative" << p_end;
+            }
+
+            // TODO This is not entirely correct, since this should use
+            // the date of sold and buy to have the correct profit
+            if (sold_shares >= 0) {
+                if (average_sell_price.positive()) {
+                    average_sell_price /= sold_shares;
+
+                    w << p_begin << p_end;
+                    w << p_begin << "Sold shares: " << sold_shares << p_end;
+                    w << p_begin << "Average sold price: " << average_sell_price << p_end;
+                    w << p_begin << "Realized profit: " << (float)sold_shares * (average_sell_price - average_buy_price) << p_end;
+                    w << p_begin << "Realized ROI: " << (100.0f / (average_buy_price / average_sell_price)) - 100.0f << "%" << p_end;
+                } else {
+                    w << p_begin << "There is an issue with your average sell price! It should be positive" << p_end;
+                }
             }
         } else {
             w << p_begin << "You have not bought any share yet" << p_end;
