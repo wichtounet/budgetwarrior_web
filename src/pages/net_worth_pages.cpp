@@ -184,6 +184,10 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
 
     asset_graph(w, "", asset);
 
+    if (asset.currency != get_default_currency()) {
+        asset_graph_conv(w, "", asset);
+    }
+
     // Display additional information for share-based assets
     if (asset.share_based) {
         int64_t bought_shares  = 0;
@@ -285,6 +289,41 @@ void budget::asset_graph(budget::html_writer& w, const std::string style, const 
 
     while (date <= end_date) {
         auto sum = get_asset_value(asset, date, w.cache);
+
+        ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
+
+        date += days(1);
+    }
+
+    ss << "]},";
+
+    ss << "]";
+
+    end_chart(w, ss);
+}
+
+void budget::asset_graph_conv(budget::html_writer& w, const std::string style, const asset& asset) {
+    auto ss = start_time_chart(w, asset.name + "(" + get_default_currency() + ")", "area", "asset_graph_conv", style);
+
+    ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+    ss << R"=====(yAxis: { min: 0, title: { text: 'Net Worth' }},)=====";
+    ss << R"=====(legend: { enabled: false },)=====";
+
+    ss << R"=====(subtitle: {)=====";
+    ss << "text: '" << get_asset_value_conv(asset, w.cache) << " " << get_default_currency() << "',";
+    ss << R"=====(floating:true, align:"right", verticalAlign: "top", style: { fontWeight: "bold", fontSize: "inherit" })=====";
+    ss << R"=====(},)=====";
+
+    ss << "series: [";
+
+    ss << "{ name: 'Value',";
+    ss << "data: [";
+
+    auto date     = budget::asset_start_date(w.cache, asset);
+    auto end_date = budget::local_day();
+
+    while (date <= end_date) {
+        auto sum = get_asset_value_conv(asset, date, w.cache);
 
         ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 

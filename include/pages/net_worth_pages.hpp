@@ -33,5 +33,6 @@ void liabilities_card(budget::html_writer& w);
 void net_worth_graph(budget::html_writer& w, const std::string style = "", bool card = false);
 void net_worth_accrual_graph(budget::html_writer& w);
 void asset_graph(budget::html_writer& w, const std::string style, const asset& asset);
+void asset_graph_conv(budget::html_writer& w, const std::string style, const asset& asset);
 
 } //end of namespace budget
