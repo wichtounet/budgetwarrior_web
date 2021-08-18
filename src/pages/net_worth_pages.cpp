@@ -190,12 +190,14 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
 
     // Display additional information for share-based assets
     if (asset.share_based) {
-        int64_t bought_shares  = 0;
-        int64_t sold_shares    = 0;
-        int64_t current_shares = 0;
+        int64_t bought_shares      = 0;
+        int64_t last_bought_shares = 0;
+        int64_t sold_shares        = 0;
+        int64_t current_shares     = 0;
 
-        budget::money average_buy_price;
-        budget::money average_sell_price;
+        budget::money buy_price;
+        budget::money last_buy_price;
+        budget::money sell_price;
 
         auto current_price  = share_price(asset.ticker);
         date first_date     = local_day();
@@ -206,18 +208,22 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
                 if (share.is_buy()) {
                     bought_shares += share.shares;
                     current_shares += share.shares;
-                    average_buy_price += (float)share.shares * share.price;
+                    buy_price += (float)share.shares * share.price;
                 }
 
                 if (share.is_sell()) {
                     sold_shares += -share.shares;
                     current_shares += share.shares;
-                    average_sell_price += (float)-share.shares * share.price;
+                    sell_price += (float)-share.shares * share.price;
                 }
 
                 if (!current_shares) {
                     // If the price went down to zero, we need to reset the buying price
-                    average_buy_price = 0;
+                    last_bought_shares = bought_shares;
+                    last_buy_price     = buy_price;
+
+                    bought_shares = 0;
+                    buy_price     = 0;
                 }
 
                 if (!first_date_set) {
@@ -227,19 +233,24 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
             }
         }
 
+        if (!current_shares) {
+            bought_shares = last_bought_shares;
+            buy_price     = last_buy_price;
+        }
+
         w << p_begin << "Number of shares: " << current_shares << p_end;
         w << p_begin << "Current price: " << current_price << p_end;
 
         if (bought_shares) {
-            if (average_buy_price.positive()) {
-                average_buy_price /= bought_shares;
+            if (buy_price.positive()) {
+                buy_price /= bought_shares;
 
-                w << p_begin << "Average buy price: " << average_buy_price << p_end;
-                w << p_begin << "Invested: " << (float)bought_shares * average_buy_price << p_end;
+                w << p_begin << "Average buy price: " << buy_price << p_end;
+                w << p_begin << "Invested: " << (float)bought_shares * buy_price << p_end;
                 if (current_shares) {
                     w << p_begin << "Value: " << (float)bought_shares * current_price << p_end;
-                    w << p_begin << "Current profit: " << (float)bought_shares * (current_price - average_buy_price) << p_end;
-                    w << p_begin << "ROI: " << (100.0f / (average_buy_price / current_price)) - 100.0f << "%" << p_end;
+                    w << p_begin << "Current profit: " << (float)bought_shares * (current_price - buy_price) << p_end;
+                    w << p_begin << "ROI: " << (100.0f / (buy_price / current_price)) - 100.0f << "%" << p_end;
                 }
                 w << p_begin << "First Invested: " << budget::to_string(first_date) << p_end;
             } else {
@@ -247,17 +258,18 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
             }
         }
 
-        // TODO This is not entirely correct, since this should use
+        // TODO This is not correct, since this should use
         // the date of sold and buy to have the correct profit
+        // Also, this will not work with several buying and selling periods
         if (sold_shares >= 0) {
-            if (average_sell_price.positive()) {
-                average_sell_price /= sold_shares;
+            if (sell_price.positive()) {
+                sell_price /= sold_shares;
 
                 w << p_begin << p_end;
                 w << p_begin << "Sold shares: " << sold_shares << p_end;
-                w << p_begin << "Average sold price: " << average_sell_price << p_end;
-                w << p_begin << "Realized profit: " << (float)sold_shares * (average_sell_price - average_buy_price) << p_end;
-                w << p_begin << "Realized ROI: " << (100.0f / (average_buy_price / average_sell_price)) - 100.0f << "%" << p_end;
+                w << p_begin << "Average sold price: " << sell_price << p_end;
+                w << p_begin << "Realized profit: " << (float)sold_shares * (sell_price - buy_price) << p_end;
+                w << p_begin << "Realized ROI: " << (100.0f / (buy_price / sell_price)) - 100.0f << "%" << p_end;
             } else {
                 w << p_begin << "There is an issue with your average sell price! It should be positive" << p_end;
             }
