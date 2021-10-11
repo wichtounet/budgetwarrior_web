@@ -195,20 +195,31 @@ int main(int argc, char** argv){
     if (old_data_version < DATA_VERSION) {
         LOG_F(INFO, "Migrating database to version {}...", DATA_VERSION);
 
-        if (old_data_version <= 4 && DATA_VERSION >= 5) {
-            migrate_assets_4_to_5();
-        }
+        try {
+            if (old_data_version <= 4 && DATA_VERSION >= 5) {
+                migrate_assets_4_to_5();
+            }
 
-        if (old_data_version <= 5 && DATA_VERSION >= 6) {
-            migrate_assets_5_to_6();
-        }
+            if (old_data_version <= 5 && DATA_VERSION >= 6) {
+                migrate_assets_5_to_6();
+            }
 
-        if (old_data_version <= 6 && DATA_VERSION >= 7) {
-            migrate_liabilities_6_to_7();
-        }
+            if (old_data_version <= 6 && DATA_VERSION >= 7) {
+                migrate_liabilities_6_to_7();
+            }
 
-        if (old_data_version <= 7 && DATA_VERSION >= 8) {
-            migrate_assets_7_to_8();
+            if (old_data_version <= 7 && DATA_VERSION >= 8) {
+                migrate_assets_7_to_8();
+            }
+        } catch (const budget_exception& e) {
+            LOG_F(ERROR, "budget_exception occured in migrate: {}", e.message());
+            return 0;
+        } catch (const date_exception& e) {
+            LOG_F(ERROR, "date_exception occured in migrate: {}", e.message());
+            return 0;
+        } catch (const std::exception& e) {
+            LOG_F(ERROR, "std::exception occured in migrate: {}", e.what());
+            return 0;
         }
 
         internal_config_set("data_version", to_string(DATA_VERSION));
@@ -216,11 +227,22 @@ int main(int argc, char** argv){
         // We want to make sure the new data version is set in stone!
         save_config();
 
-        LOG_F(INFO, "Migration done");
+        LOG_F(INFO, "Migrated to database version {}", DATA_VERSION);
     }
 
     // Load all the data
-    load();
+    try {
+        load();
+    } catch (const budget_exception& e) {
+        LOG_F(ERROR, "budget_exception occured in load: {}", e.message());
+        return 0;
+    } catch (const date_exception& e) {
+        LOG_F(ERROR, "date_exception occured in load: {}", e.message());
+        return 0;
+    } catch (const std::exception& e) {
+        LOG_F(ERROR, "std::exception occured in load: {}", e.what());
+        return 0;
+    }
 
     volatile bool success = false;
     std::thread server_thread([&success](){ success = start_server(); });
