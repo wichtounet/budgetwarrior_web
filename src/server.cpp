@@ -166,7 +166,7 @@ int main(int argc, char** argv){
 
     if (!load_config()) {
         LOG_F(ERROR, "Could not config");
-        return 0;
+        return 1;
     }
 
     set_server_running();
@@ -182,14 +182,14 @@ int main(int argc, char** argv){
     if (old_data_version > DATA_VERSION) {
         LOG_F(ERROR, "Unsupported database version ({}), you should update budgetwarrior", old_data_version);
 
-        return 0;
+        return 1;
     }
 
     if (old_data_version < MIN_DATA_VERSION) {
         LOG_F(ERROR, "Your database version ({}) is not supported anymore", old_data_version);
         LOG_F(ERROR, "You can use an older version of budgetwarrior to migrate it");
 
-        return 0;
+        return 1;
     }
 
     if (old_data_version < DATA_VERSION) {
@@ -213,13 +213,13 @@ int main(int argc, char** argv){
             }
         } catch (const budget_exception& e) {
             LOG_F(ERROR, "budget_exception occured in migrate: {}", e.message());
-            return 0;
+            return 1;
         } catch (const date_exception& e) {
             LOG_F(ERROR, "date_exception occured in migrate: {}", e.message());
-            return 0;
+            return 1;
         } catch (const std::exception& e) {
             LOG_F(ERROR, "std::exception occured in migrate: {}", e.what());
-            return 0;
+            return 1;
         }
 
         internal_config_set("data_version", to_string(DATA_VERSION));
@@ -235,13 +235,13 @@ int main(int argc, char** argv){
         load();
     } catch (const budget_exception& e) {
         LOG_F(ERROR, "budget_exception occured in load: {}", e.message());
-        return 0;
+        return 1;
     } catch (const date_exception& e) {
         LOG_F(ERROR, "date_exception occured in load: {}", e.message());
-        return 0;
+        return 1;
     } catch (const std::exception& e) {
         LOG_F(ERROR, "std::exception occured in load: {}", e.what());
-        return 0;
+        return 1;
     }
 
     volatile bool success = false;
