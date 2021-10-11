@@ -62,6 +62,8 @@ void budget::add_assets_api(const httplib::Request& req, httplib::Response& res)
         return;
     }
 
+    asset.active = req.get_param_value("input_active") == "yes";
+
     add_asset(asset);
 
     api_success(req, res, "asset " + to_string(asset.id) + " has been created", to_string(asset.id));
@@ -96,6 +98,7 @@ void budget::edit_assets_api(const httplib::Request& req, httplib::Response& res
     asset.currency        = req.get_param_value("input_currency");
     asset.share_based     = req.get_param_value("input_share_based") == "yes";
     asset.ticker          = req.get_param_value("input_ticker");
+    asset.active          = req.get_param_value("input_active") == "yes";
 
     if (asset.total_allocation() != money(100)) {
         api_error(req, res, "The total allocation of the asset is not 100%");
