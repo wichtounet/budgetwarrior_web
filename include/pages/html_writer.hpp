@@ -31,6 +31,7 @@ struct html_writer : writer {
     virtual writer& operator<<(const year_month_selector& m) override;
     virtual writer& operator<<(const year_selector& m) override;
     virtual writer& operator<<(const asset_selector& m) override;
+    virtual writer& operator<<(const active_asset_selector& m) override;
     virtual writer& operator<<(const add_button& m) override;
     virtual writer& operator<<(const set_button& m) override;
 
