@@ -174,7 +174,7 @@ void budget::liabilities_card(budget::html_writer& w){
 void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
     auto asset = req.matches.size() == 2
         ? get_asset(to_number<size_t>(req.matches[1]))
-        : *w.cache.user_assets().begin();
+        : *w.cache.active_user_assets().begin();
 
     if (req.matches.size() == 2) {
         w << title_begin << "Asset Graph" << budget::active_asset_selector{"assets/graph", to_number<size_t>(req.matches[1])} << title_end;
