@@ -177,9 +177,9 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
         : *w.cache.user_assets().begin();
 
     if (req.matches.size() == 2) {
-        w << title_begin << "Asset Graph" << budget::asset_selector{"assets/graph", to_number<size_t>(req.matches[1])} << title_end;
+        w << title_begin << "Asset Graph" << budget::active_asset_selector{"assets/graph", to_number<size_t>(req.matches[1])} << title_end;
     } else {
-        w << title_begin << "Asset Graph" << budget::asset_selector{"assets/graph", 0} << title_end;
+        w << title_begin << "Asset Graph" << budget::active_asset_selector{"assets/graph", 0} << title_end;
     }
 
     asset_graph(w, "", asset);
