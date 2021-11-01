@@ -13,6 +13,14 @@
 
 using namespace budget;
 
+namespace {
+
+void add_fi_picker(budget::writer& w, bool active) {
+    add_yes_no_picker(w, "FI?", "input_fi", active);
+}
+
+} // namespace
+
 void budget::list_asset_classes_page(html_writer & w) {
     budget::show_asset_classes(w);
 
@@ -25,6 +33,7 @@ void budget::add_asset_classes_page(html_writer & w) {
     form_begin(w, "/api/asset_classes/add/", "/asset_classes/add/");
 
     add_name_picker(w);
+    add_fi_picker(w, true);
 
     form_end(w);
 }
@@ -49,6 +58,7 @@ void budget::edit_asset_classes_page(html_writer & w, const httplib::Request& re
         auto asset_class = get_asset_class(id);
 
         add_name_picker(w, asset_class.name);
+        add_fi_picker(w, asset_class.fi);
 
         form_end(w);
     }

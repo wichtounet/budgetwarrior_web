@@ -329,6 +329,7 @@ void budget::add_asset_classes_api(const httplib::Request& req, httplib::Respons
     asset_class asset_class;
     asset_class.guid = budget::generate_guid();
     asset_class.name = req.get_param_value("input_name");
+    asset_class.fi   = req.get_param_value("input_fi") == "yes";
 
     add_asset_class(asset_class);
 
@@ -350,6 +351,7 @@ void budget::edit_asset_classes_api(const httplib::Request& req, httplib::Respon
 
     asset_class asset_class = get_asset_class(budget::to_number<size_t>(id));
     asset_class.name        = req.get_param_value("input_name");
+    asset_class.fi          = req.get_param_value("input_fi") == "yes";
 
     edit_asset_class(asset_class);
 
