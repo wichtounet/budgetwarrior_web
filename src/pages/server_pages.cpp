@@ -329,6 +329,7 @@ std::string header(const std::string& title, bool menu = true) {
                   <a class="dropdown-item" href="/retirement/status/">Status</a>
                   <a class="dropdown-item" href="/retirement/configure/">Configure</a>
                   <a class="dropdown-item" href="/retirement/fi/">FI Ratio Over Time</a>
+                  <a class="dropdown-item" href="/retirement/net_worth/">FI Net Worth</a>
                 </div>
               </li>
         )=====";
@@ -630,6 +631,7 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/retirement/status/", render_wrapper("Retirement", &retirement_status_page));
     server.Get("/retirement/configure/", render_wrapper("Retirement", &retirement_configure_page));
     server.Get("/retirement/fi/", render_wrapper("Retirement", &retirement_fi_ratio_over_time));
+    server.Get("/retirement/net_worth/", render_wrapper("FI Net Worth", &fi_net_worth_graph_page));
 
     server.Get("/recurrings/list/", render_wrapper("Recurring Operations", &recurrings_list_page));
     server.Get("/recurrings/add/", render_wrapper("Recurring Operations", &add_recurrings_page));

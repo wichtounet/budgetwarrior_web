@@ -347,16 +347,19 @@ void budget::asset_graph_conv(budget::html_writer& w, const std::string style, c
     end_chart(w, ss);
 }
 
-void budget::net_worth_graph(budget::html_writer& w, const std::string style, bool card) {
+namespace {
+
+template <typename Functor>
+void net_worth_graph(budget::html_writer& w, const std::string & title, const std::string style, bool card, Functor nw_func) {
     // if the user does not use assets, this graph does not make sense
     if (no_assets() || no_asset_values()) {
         return;
     }
 
-    auto current_net_worth = get_net_worth(w.cache);
     auto now               = budget::local_day();
-    auto y_net_worth       = get_net_worth({now.year(), 1, 1}, w.cache);
-    auto m_net_worth       = get_net_worth(now - days(now.day() - 1), w.cache);
+    auto current_net_worth = nw_func(now, w);
+    auto y_net_worth       = nw_func({now.year(), 1, 1}, w);
+    auto m_net_worth       = nw_func(now - days(now.day() - 1), w);
     auto ytd_growth        = 100.0 * ((1 / (y_net_worth / current_net_worth)) - 1);
     auto mtd_growth        = 100.0 * ((1 / (m_net_worth / current_net_worth)) - 1);
 
@@ -364,7 +367,9 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
         w << R"=====(<div class="card">)=====";
 
         w << R"=====(<div class="card-header card-header-primary">)=====";
-        w << R"=====(<div class="float-left">Net Worth</div>)=====";
+        w << R"=====(<div class="float-left">)=====";
+        w << title;
+        w << R"=====(</div>)=====";
         w << R"=====(<div class="float-right">)=====";
         w << current_net_worth << " __currency__ (YTD: " << ytd_growth << "% MTD: " << mtd_growth << "%)";
         w << R"=====(</div>)=====";
@@ -374,14 +379,14 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
         w << R"=====(<div class="card-body">)=====";
     }
 
-    auto ss = start_time_chart(w, card ? "" : "Net worth", "area", "net_worth_graph", style);
+    auto ss = start_time_chart(w, card ? "" : title, "area", "net_worth_graph", style);
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
 
     if (current_net_worth.negative()) {
-        ss << R"=====(yAxis: { title: { text: 'Net Worth' }},)=====";
+        ss << "yAxis: { title: { text: '" << title << "' }},";
     } else {
-        ss << R"=====(yAxis: { min: 0, title: { text: 'Net Worth' }},)=====";
+        ss << "yAxis: { min: 0, title: { text: '" << title << "' }},";
     }
 
     ss << R"=====(legend: { enabled: false },)=====";
@@ -395,22 +400,14 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
 
     ss << "series: [";
 
-    ss << "{ name: 'Net Worth',";
+    ss << "{ name: '" << title << "',";
     ss << "data: [";
 
     auto date     = budget::asset_start_date(w.cache);
     auto end_date = budget::local_day();
 
     while (date <= end_date) {
-        budget::money sum;
-
-        for (auto & asset : w.cache.user_assets()) {
-            sum += get_asset_value_conv(asset, date, w.cache);
-        }
-
-        for (auto & asset : w.cache.liabilities()) {
-            sum -= get_liability_value_conv(asset, date, w.cache);
-        }
+        auto sum = nw_func(date, w);
 
         ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 
@@ -427,6 +424,20 @@ void budget::net_worth_graph(budget::html_writer& w, const std::string style, bo
         w << R"=====(</div>)====="; //card-body
         w << R"=====(</div>)====="; //card
     }
+}
+
+}
+
+void budget::net_worth_graph(budget::html_writer& w, const std::string style, bool card) {
+    ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::html_writer & w){
+        return get_net_worth(d, w.cache);
+    });
+}
+
+void budget::fi_net_worth_graph(budget::html_writer& w, const std::string style, bool card) {
+    ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::html_writer & w){
+        return get_fi_net_worth(d, w.cache);
+    });
 }
 
 void budget::net_worth_accrual_graph(budget::html_writer& w) {
@@ -508,6 +519,26 @@ void budget::net_worth_graph_page(html_writer& w) {
 
     // Finally, we display the net worth accrual graph
     net_worth_accrual_graph(w);
+}
+
+void budget::fi_net_worth_graph_page(html_writer& w) {
+    // First, we display the net worth graph
+    fi_net_worth_graph(w);
+
+    // Then, we can display some general information
+
+    auto now               = budget::local_day();
+    auto current_net_worth = get_fi_net_worth(now, w.cache);
+    auto y_net_worth       = get_fi_net_worth({now.year(), 1, 1}, w.cache);
+    auto m_net_worth       = get_fi_net_worth(now - days(now.day() - 1), w.cache);
+    auto ytd_growth        = 100.0 * ((1 / (y_net_worth / current_net_worth)) - 1);
+    auto mtd_growth        = 100.0 * ((1 / (m_net_worth / current_net_worth)) - 1);
+
+    w << p_begin << "MTD Change " << current_net_worth - m_net_worth << " __currency__" << p_end;
+    w << p_begin << "MTD Growth " << mtd_growth << " %" << p_end;
+
+    w << p_begin << "YTD Change " << current_net_worth - y_net_worth << " __currency__" << p_end;
+    w << p_begin << "YTD Growth " << ytd_growth << " %" << p_end;
 }
 
 namespace {
