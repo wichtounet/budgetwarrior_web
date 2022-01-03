@@ -54,6 +54,8 @@ void budget::user_config_api(const httplib::Request& req, httplib::Response& res
     internal_config_set("side_category", req.get_param_value("input_sh_account"));
     internal_config_set("side_prefix", req.get_param_value("input_sh_prefix"));
 
+    internal_config_set("fi_expenses", req.get_param_value("input_fi_expenses"));
+
     internal_config_set("web_user", req.get_param_value("input_user"));
     internal_config_set("web_password", req.get_param_value("input_password"));
 

@@ -15,3 +15,14 @@ bool budget::is_side_hustle_enabled() {
 
     return !side_category.empty() && !side_prefix.empty();
 }
+
+budget::money budget::get_fi_expenses() {
+    budget::money expenses;
+
+    auto config = user_config_value("fi_expenses", "");
+    if (!config.empty()) {
+        expenses = budget::money_from_string(config);
+    }
+
+    return expenses;
+}

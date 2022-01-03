@@ -8,9 +8,11 @@
 #pragma once
 
 #include "config.hpp"
+#include "money.hpp"
 
 namespace budget {
 
 bool is_side_hustle_enabled();
+budget::money get_fi_expenses();
 
 } //end of namespace budget
