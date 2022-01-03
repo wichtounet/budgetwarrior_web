@@ -10,6 +10,7 @@
 #include "assets.hpp"
 #include "pages/html_writer.hpp"
 #include "pages/retirement_pages.hpp"
+#include "pages/web_config.hpp"
 #include "http.hpp"
 
 using namespace budget;
@@ -98,6 +99,32 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
     }
 
     ss << "]},";
+
+    auto fixed_expenses = budget::get_fi_expenses();
+
+    if (fixed_expenses) {
+        ss << "{ name: 'Fixed FI Ratio %',";
+        ss << "data: [";
+
+        std::vector<budget::money> serie;
+        std::vector<std::string>   dates;
+
+        auto date     = budget::asset_start_date(w.cache);
+        auto end_date = budget::local_day();
+
+        while (date <= end_date) {
+            auto ratio = budget::fixed_fi_ratio(date, w.cache, fixed_expenses);
+
+            std::string datestr =
+                    "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", " + std::to_string(date.day().value) + ")";
+            ss << "[" << datestr << "," << budget::to_string(100 * ratio) << "],";
+
+            date += days(1);
+        }
+
+        ss << "]},";
+    }
+
     ss << "]";
 
     end_chart(w, ss);
