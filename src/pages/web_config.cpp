@@ -10,10 +10,7 @@
 using namespace budget;
 
 bool budget::is_side_hustle_enabled() {
-    std::string side_category = user_config_value("side_category", "");
-    std::string side_prefix   = user_config_value("side_prefix", "");
-
-    return !side_category.empty() && !side_prefix.empty();
+    return !user_config_value("side_category", "").empty();
 }
 
 budget::money budget::get_fi_expenses() {

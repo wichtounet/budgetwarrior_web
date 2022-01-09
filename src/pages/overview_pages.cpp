@@ -384,7 +384,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
 
     for (auto& expense : writer.cache.expenses()) {
         if (get_account(expense.account).name == side_category) {
-            if (expense.name.find(side_prefix) == 0) {
+            if (side_prefix.empty() || expense.name.find(side_prefix) == 0) {
                 side_expenses.push_back(expense);
             }
         }
@@ -392,7 +392,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
 
     for (auto& earning : writer.cache.earnings()) {
         if (get_account(earning.account).name == side_category) {
-            if (earning.name.find(side_prefix) == 0) {
+            if (side_prefix.empty() || earning.name.find(side_prefix) == 0) {
                 side_earnings.push_back(earning);
             }
         }

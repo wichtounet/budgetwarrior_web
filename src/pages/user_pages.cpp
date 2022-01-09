@@ -34,7 +34,7 @@ void budget::user_config_page(html_writer& w) {
     add_account_picker_by_name(w, today, "Side Hustle Account", sh_account, "input_sh_account", true);
 
     std::string sh_prefix = user_config_value("side_prefix", "");
-    add_text_picker(w, "Side Hustle Prefix", "input_sh_prefix", sh_prefix);
+    add_text_picker(w, "Side Hustle Prefix", "input_sh_prefix", sh_prefix, false);
 
     std::string fi_expenses = user_config_value("fi_expenses", "");
     add_text_picker(w, "FI Expenses", "input_fi_expenses", fi_expenses);
