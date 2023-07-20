@@ -5,14 +5,14 @@ default: release_debug
 include make-utils/flags.mk
 include make-utils/cpp-utils.mk
 
-# Use C++17
-$(eval $(call use_cpp17))
+# Use C++23
+$(eval $(call use_cpp23))
 
 CXX_FLAGS += -pthread
 
 LD_FLAGS += -luuid -lssl -lcrypto -ldl
 
-CXX_FLAGS += -Ibudgetwarrior/cpp-httplib -Ibudgetwarrior/include -Ibudgetwarrior/loguru -Ibudgetwarrior/fmt/include
+CXX_FLAGS += -isystem budgetwarrior/cpp-httplib -Ibudgetwarrior/include -Ibudgetwarrior/loguru -Ibudgetwarrior/fmt/include
 
 $(eval $(call auto_folder_compile,src))
 $(eval $(call auto_folder_compile,src/pages))
