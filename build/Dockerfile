@@ -1,0 +1,8 @@
+FROM budgetwarrior:build
+
+ADD release_debug/bin/server /bin/server
+ADD budgetwarrior/tools/yfinance_quote.py /bin/yfinance_quote.py
+
+EXPOSE 80
+
+CMD ["/bin/server", ""]
