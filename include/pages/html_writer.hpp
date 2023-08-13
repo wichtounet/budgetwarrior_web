@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include<regex>
+
 #include "writer.hpp"
 
 namespace budget {
@@ -52,5 +54,12 @@ private:
 
     bool need_module(const std::string& module);
 };
+
+// Very small utility function necessary to convert regex matches (from httplib) to a number
+
+template <typename T, typename It>
+T to_number(const std::sub_match<It> & sm) {
+    return to_number<T>(sm.str());
+}
 
 } //end of namespace budget

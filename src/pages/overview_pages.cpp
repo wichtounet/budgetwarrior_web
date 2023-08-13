@@ -121,7 +121,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
         ss << "data: [";
 
         for (budget::month month = start_month(w.cache, year); month < last; ++month) {
-            auto sum = accumulate_amount(all_expenses_month(w.cache, year, month));
+            auto sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
 
             std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
             ss << "[" << date << "," << budget::money_to_string(sum) << "],";
@@ -134,7 +134,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
             ss << "data: [";
 
             for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
-                auto sum = accumulate_amount(all_expenses_month(w.cache, year - 1, month));
+                auto sum = fold_left_auto(all_expenses_month(w.cache, year - 1, month) | to_amount);
 
                 std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
@@ -163,7 +163,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
         ss << "data: [";
 
         for (budget::month month = start_month(w.cache, year); month < last; ++month) {
-            auto sum = get_base_income(w.cache, budget::date(year, month, 2)) + accumulate_amount(all_earnings_month(w.cache, year, month));
+            auto sum = get_base_income(w.cache, budget::date(year, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
 
             std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
             ss << "[" << date << "," << budget::money_to_string(sum) << "],";
@@ -176,7 +176,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
             ss << "data: [";
 
             for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
-                auto sum = get_base_income(w.cache, budget::date(year - 1, month, 2)) + accumulate_amount(all_earnings_month(w.cache, year - 1, month));
+                auto sum = get_base_income(w.cache, budget::date(year - 1, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year - 1, month) | to_amount);
 
                 std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
