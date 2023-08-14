@@ -13,6 +13,7 @@
 #include "currency.hpp"
 #include "config.hpp"
 #include "share.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -959,13 +960,12 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     std::map<size_t, budget::money> asset_amounts;
 
-    for (auto& asset : w.cache.user_assets()) {
-        if (asset.portfolio) {
-            if (nocash && asset.is_cash()) {
-                continue;
-            }
-            asset_amounts[asset.id] = get_asset_value(asset, w.cache);
+    for (auto& asset : w.cache.user_assets() | is_portfolio) {
+        if (nocash && asset.is_cash()) {
+            continue;
         }
+
+        asset_amounts[asset.id] = get_asset_value(asset, w.cache);
     }
 
     // Compute the colors for each asset that will be displayed
