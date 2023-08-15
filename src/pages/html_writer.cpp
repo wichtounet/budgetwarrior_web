@@ -12,6 +12,7 @@
 #include "expenses.hpp"
 #include "earnings.hpp"
 #include "budget_exception.hpp"
+#include "views.hpp"
 
 namespace {
 
@@ -161,25 +162,19 @@ budget::writer& budget::html_writer::operator<<(const budget::title_end_t&) {
 }
 
 std::vector<budget::year> active_years(){
+    using namespace budget;
+
     std::vector<budget::year> years;
 
-    for (auto& expense : budget::all_expenses()) {
-        if (expense.date != budget::TEMPLATE_DATE) {
-            auto y = expense.date.year();
-
-            if (!std::ranges::contains(years, y)) {
-                years.push_back(y);
-            }
+    for (auto y : budget::all_expenses() | not_template | to_date | to_year) {
+        if (!std::ranges::contains(years, y)) {
+            years.push_back(y);
         }
     }
 
-    for (auto& earning : budget::all_earnings()) {
-        if (earning.date != budget::TEMPLATE_DATE) {
-            auto y = earning.date.year();
-
-            if (!std::ranges::contains(years, y)) {
-                years.push_back(y);
-            }
+    for (auto y : budget::all_earnings() | not_template | to_date | to_year) {
+        if (!std::ranges::contains(years, y)) {
+            years.push_back(y);
         }
     }
 
