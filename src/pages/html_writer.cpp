@@ -167,7 +167,7 @@ std::vector<budget::year> active_years(){
         if (expense.date != budget::TEMPLATE_DATE) {
             auto y = expense.date.year();
 
-            if (std::find(years.begin(), years.end(), y) == years.end()) {
+            if (!std::ranges::contains(years, y)) {
                 years.push_back(y);
             }
         }
@@ -177,7 +177,7 @@ std::vector<budget::year> active_years(){
         if (earning.date != budget::TEMPLATE_DATE) {
             auto y = earning.date.year();
 
-            if (std::find(years.begin(), years.end(), y) == years.end()) {
+            if (!std::ranges::contains(years, y)) {
                 years.push_back(y);
             }
         }
@@ -233,7 +233,7 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
 
     auto years = active_years();
 
-    if(std::find(years.begin(), years.end(), m.current_year) == years.end()){
+    if(!std::ranges::contains(years, m.current_year)){
         years.push_back(m.current_year);
     }
 
@@ -288,7 +288,7 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
 
     auto years = active_years();
 
-    if(std::find(years.begin(), years.end(), m.current_year) == years.end()){
+    if(!std::ranges::contains(years, m.current_year)){
         years.push_back(m.current_year);
     }
 
@@ -715,11 +715,11 @@ void budget::html_writer::load_deferred_scripts(){
 }
 
 void budget::html_writer::use_module(const std::string& module){
-    if (std::find(modules.begin(), modules.end(), module) == modules.end()) {
+    if (std::ranges::contains(modules, module)) {
         modules.push_back(module);
     }
 }
 
 bool budget::html_writer::need_module(const std::string& module){
-    return std::find(modules.begin(), modules.end(), module) != modules.end();
+    return std::ranges::contains(modules, module);
 }

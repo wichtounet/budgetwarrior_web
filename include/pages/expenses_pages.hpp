@@ -20,7 +20,7 @@ void year_breakdown_expenses_page(html_writer & w, const httplib::Request& req);
 void add_expenses_page(html_writer & w);
 void edit_expenses_page(html_writer & w, const httplib::Request& req);
 
-void month_breakdown_expenses_graph(budget::html_writer& w, const std::string& title,
+void month_breakdown_expenses_graph(budget::html_writer& w, std::string_view title,
                                     budget::month month, budget::year year, bool mono = false, 
                                     const std::string& style = "");
 

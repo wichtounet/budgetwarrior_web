@@ -58,8 +58,8 @@ void budget::assets_card(budget::html_writer& w){
         for (auto& asset : w.cache.user_assets()) {
             std::string group = asset.name.substr(0, asset.name.find(separator));
 
-            if (std::find(groups.begin(), groups.end(), group) == groups.end()) {
-                groups.push_back(group);
+            if (!std::ranges::contains(groups, group)) {
+                groups.emplace_back(std::move(group));
             }
         }
 

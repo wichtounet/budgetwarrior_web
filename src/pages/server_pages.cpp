@@ -437,7 +437,7 @@ void display_message(budget::writer& w, const httplib::Request& req) {
     }
 }
 
-void replace_all(std::string& source, const std::string& from, const std::string& to) {
+void replace_all(std::string& source, std::string_view from, std::string_view to) {
     size_t current_pos = 0;
 
     while ((current_pos = source.find(from, current_pos)) != std::string::npos) {
