@@ -14,6 +14,8 @@
 #include "budget_exception.hpp"
 #include "views.hpp"
 
+#include <unordered_set>
+
 namespace {
 
 std::string success_to_string(int success) {
@@ -86,6 +88,23 @@ std::string html_format(budget::html_writer& w, const std::string& v){
 
     return v;
 }
+
+std::vector<budget::year> active_years(budget::year extra){
+    using namespace budget;
+
+    std::unordered_set<budget::year> years;
+
+    std::ranges::copy(all_expenses() | not_template | to_date | to_year, std::inserter(years, years.begin()));
+    std::ranges::copy(all_earnings() | not_template | to_date | to_year, std::inserter(years, years.begin()));
+
+    years.insert(extra);
+
+    // Convert to a sorted vector
+    std::vector<budget::year> vec{years.begin(), years.end()};
+    std::sort(vec.begin(), vec.end());
+    return vec;
+}
+
 
 } // end of anonymous namespace
 
@@ -161,26 +180,6 @@ budget::writer& budget::html_writer::operator<<(const budget::title_end_t&) {
     return *this;
 }
 
-std::vector<budget::year> active_years(){
-    using namespace budget;
-
-    std::vector<budget::year> years;
-
-    for (auto y : budget::all_expenses() | not_template | to_date | to_year) {
-        if (!std::ranges::contains(years, y)) {
-            years.push_back(y);
-        }
-    }
-
-    for (auto y : budget::all_earnings() | not_template | to_date | to_year) {
-        if (!std::ranges::contains(years, y)) {
-            years.push_back(y);
-        }
-    }
-
-    return years;
-}
-
 budget::writer& budget::html_writer::operator<<(const budget::year_month_selector& m) {
     if (title_started) {
         os << "</h2>";  // end of the title
@@ -226,13 +225,7 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
 
     os << "<select aria-label=\"Year\" id=\"year_selector\">";
 
-    auto years = active_years();
-
-    if(!std::ranges::contains(years, m.current_year)){
-        years.push_back(m.current_year);
-    }
-
-    std::sort(years.begin(), years.end());
+    const auto years = active_years(m.current_year);
 
     for(auto year : years){
         if(year == m.current_year){
@@ -281,13 +274,7 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
     os << "<a aria-label=\"Previous\" href=\"/" << m.page << "/" << previous_year << "/\"><span class=\"oi oi-arrow-thick-left\"></span></a>";
     os << "<select aria-label=\"Year\" id=\"year_selector\">";
 
-    auto years = active_years();
-
-    if(!std::ranges::contains(years, m.current_year)){
-        years.push_back(m.current_year);
-    }
-
-    std::sort(years.begin(), years.end());
+    const auto years = active_years(m.current_year);
 
     for(auto year : years){
         if(year == m.current_year){
