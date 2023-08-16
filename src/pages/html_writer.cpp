@@ -697,7 +697,7 @@ void budget::html_writer::load_deferred_scripts(){
 }
 
 void budget::html_writer::use_module(const std::string& module){
-    if (std::ranges::contains(modules, module)) {
+    if (!std::ranges::contains(modules, module)) {
         modules.push_back(module);
     }
 }
