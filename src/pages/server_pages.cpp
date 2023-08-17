@@ -44,6 +44,7 @@
 #include "pages/user_pages.hpp"
 #include "pages/web_config.hpp"
 #include "http.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -462,13 +463,7 @@ std::string footer() {
 }
 
 bool parameters_present(const httplib::Request& req, std::vector<const char*> parameters) {
-    for (auto& param : parameters) {
-        if (!req.has_param(param)) {
-            return false;
-        }
-    }
-
-    return true;
+    return !std::ranges::any_of(parameters, [&req] (const auto & param) { return req.has_param(param); } );
 }
 
 void call_render_function(html_writer&            w,
@@ -1208,13 +1203,11 @@ void budget::add_share_asset_picker(budget::writer& w, const std::string& defaul
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& asset : w.cache.user_assets()) {
-        if (asset.share_based) {
-            if (budget::to_string(asset.id) == default_value) {
-                w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
-            } else {
-                w << "<option value=\"" << asset.id << "\">" << asset.name << "</option>";
-            }
+    for (auto& asset : w.cache.user_assets() | share_based_only) {
+        if (budget::to_string(asset.id) == default_value) {
+            w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
+        } else {
+            w << "<option value=\"" << asset.id << "\">" << asset.name << "</option>";
         }
     }
 

@@ -10,6 +10,7 @@
 #include "pages/html_writer.hpp"
 #include "pages/asset_values_pages.hpp"
 #include "http.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -69,12 +70,10 @@ void budget::full_batch_asset_values_page(html_writer& w) {
         return lhs.name <= rhs.name;
     });
 
-    for (auto& asset : assets) {
-        if (!asset.share_based) {
-            budget::money amount = get_asset_value(asset, w.cache);
+    for (auto& asset : assets | not_share_based) {
+        budget::money amount = get_asset_value(asset, w.cache);
 
-            add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
-        }
+        add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
     }
 
     form_end(w);
@@ -92,13 +91,11 @@ void budget::current_batch_asset_values_page(html_writer& w) {
         return lhs.name <= rhs.name;
     });
 
-    for (auto& asset : assets) {
-        if (!asset.share_based) {
-            budget::money amount = get_asset_value(asset, w.cache);
+    for (auto& asset : assets | not_share_based) {
+        budget::money amount = get_asset_value(asset, w.cache);
 
-            if (amount) {
-                add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
-            }
+        if (amount) {
+            add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
         }
     }
 
