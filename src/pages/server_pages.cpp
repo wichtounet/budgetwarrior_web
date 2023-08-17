@@ -1259,7 +1259,7 @@ void budget::add_share_asset_picker(budget::writer& w, const std::string& defaul
     )=====";
 }
 
-void budget::add_value_asset_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_active_value_asset_picker(budget::writer& w, const std::string& default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Asset</label>
@@ -1280,7 +1280,7 @@ void budget::add_value_asset_picker(budget::writer& w, const std::string& defaul
     )=====";
 }
 
-void budget::add_liability_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_active_liability_picker(budget::writer& w, const std::string& default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Liability</label>
