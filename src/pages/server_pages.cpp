@@ -1224,13 +1224,53 @@ void budget::add_value_asset_picker(budget::writer& w, const std::string& defaul
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& asset : w.cache.user_assets()) {
-        if (!asset.share_based) {
-            if (budget::to_string(asset.id) == default_value) {
-                w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
-            } else {
-                w << "<option value=\"" << asset.id << "\">" << asset.name << "</option>";
-            }
+    for (auto& asset : w.cache.user_assets() | not_share_based) {
+        if (budget::to_string(asset.id) == default_value) {
+            w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
+        } else {
+            w << "<option value=\"" << asset.id << "\">" << asset.name << "</option>";
+        }
+    }
+
+    w << R"=====(
+                </select>
+            </div>
+    )=====";
+}
+
+void budget::add_share_asset_picker(budget::writer& w, const std::string& default_value) {
+    w << R"=====(
+            <div class="form-group">
+                <label for="input_asset">Asset</label>
+                <select class="form-control" id="input_asset" name="input_asset">
+    )=====";
+
+    for (auto& asset : w.cache.active_user_assets() | share_based_only) {
+        if (budget::to_string(asset.id) == default_value) {
+            w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
+        } else {
+            w << "<option value=\"" << asset.id << "\">" << asset.name << "</option>";
+        }
+    }
+
+    w << R"=====(
+                </select>
+            </div>
+    )=====";
+}
+
+void budget::add_value_asset_picker(budget::writer& w, const std::string& default_value) {
+    w << R"=====(
+            <div class="form-group">
+                <label for="input_asset">Asset</label>
+                <select class="form-control" id="input_asset" name="input_asset">
+    )=====";
+
+    for (auto& asset : w.cache.active_user_assets() | not_share_based) {
+        if (budget::to_string(asset.id) == default_value) {
+            w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
+        } else {
+            w << "<option value=\"" << asset.id << "\">" << asset.name << "</option>";
         }
     }
 

@@ -55,6 +55,8 @@ void add_account_picker_by_name(
         budget::writer& w, budget::date day, const std::string& title, const std::string& default_value, const std::string& input, bool allow_empty = false);
 void add_share_asset_picker(budget::writer& w, const std::string& default_value = "");
 void add_value_asset_picker(budget::writer& w, const std::string& default_value = "");
+void add_active_share_asset_picker(budget::writer& w, const std::string& default_value = "");
+void add_active_value_asset_picker(budget::writer& w, const std::string& default_value = "");
 void add_liability_picker(budget::writer& w, const std::string& default_value = "");
 void add_money_picker(budget::writer& w, const std::string& title, const std::string& name,
                       const std::string& default_value, bool required = true, bool one_line = false, const std::string& currency = "");

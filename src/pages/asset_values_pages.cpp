@@ -25,7 +25,7 @@ void budget::add_asset_values_page(html_writer& w) {
 
     form_begin(w, "/api/asset_values/add/", "/asset_values/add/");
 
-    add_value_asset_picker(w);
+    add_active_value_asset_picker(w);
     add_amount_picker(w);
     add_date_picker(w, budget::to_string(budget::local_day()));
 
