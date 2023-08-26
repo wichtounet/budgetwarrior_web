@@ -707,16 +707,12 @@ void budget::net_worth_currency_page(html_writer& w) {
         while (date <= end_date) {
             budget::money sum;
 
-            for (auto & asset : w.cache.user_assets()) {
-                if (asset.currency == currency) {
-                    sum += get_asset_value_conv(asset, date, w.cache);
-                }
+            for (const auto & asset : w.cache.user_assets() | filter_by_currency(currency)) {
+                sum += get_asset_value_conv(asset, date, w.cache);
             }
 
-            for (auto & liability : w.cache.liabilities()) {
-                if (liability.currency == currency) {
-                    sum -= get_liability_value_conv(liability, date, w.cache);
-                }
+            for (const auto & liability : w.cache.liabilities() | filter_by_currency(currency)) {
+                sum -= get_liability_value_conv(liability, date, w.cache);
             }
 
             ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
@@ -766,17 +762,13 @@ void budget::net_worth_currency_page(html_writer& w) {
         budget::money sum;
 
         // Add the assets in this currency
-        for (auto & asset : w.cache.user_assets()) {
-            if (asset.currency == currency) {
-                sum += get_asset_value_conv(asset, w.cache);
-            }
+        for (const auto & asset : w.cache.user_assets() | filter_by_currency(currency)) {
+            sum += get_asset_value_conv(asset, w.cache);
         }
 
         // Remove the liabilities in this currency
-        for (auto & liability : w.cache.liabilities()) {
-            if (liability.currency == currency) {
-                sum -= get_liability_value_conv(liability, w.cache);
-            }
+        for (const auto & liability : w.cache.liabilities() | filter_by_currency(currency)) {
+            sum -= get_liability_value_conv(liability, w.cache);
         }
 
         ss2 << budget::money_to_string(sum);
