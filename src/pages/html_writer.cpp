@@ -32,11 +32,11 @@ std::string success_to_string(int success) {
     return ss.str();
 }
 
-std::string edit_to_string(const std::string& module, const std::string& id){
+std::string edit_to_string(std::string_view module, std::string_view id){
     std::stringstream ss;
 
-    std::string delete_url = "/api/" + module + "/delete/?server=yes&back_page=__budget_this_page__&input_id=" + id;
-    std::string edit_url = "/" + module + "/edit/?server=yes&back_page=__budget_this_page__&input_id=" + id;
+    auto delete_url = "/api/" + std::string(module) + "/delete/?server=yes&back_page=__budget_this_page__&input_id=" + std::string(id);
+    auto edit_url = "/" + std::string(module) + "/edit/?server=yes&back_page=__budget_this_page__&input_id=" + std::string(id);
 
     // Add the delete button
     ss << R"=====(<a href=")=====";
@@ -55,19 +55,19 @@ std::string edit_to_string(const std::string& module, const std::string& id){
     return ss.str();
 }
 
-std::string html_format(budget::html_writer& w, const std::string& v){
+std::string html_format(budget::html_writer& w, std::string_view v){
     if(v.substr(0, 5) == "::red"){
         auto value = v.substr(5);
 
-        return "<span style=\"color:red;\">" + value + "</span>";
+        return "<span style=\"color:red;\">" + std::string(value) + "</span>";
     } else if(v.substr(0, 6) == "::blue"){
         auto value = v.substr(6);
 
-        return "<span style=\"color:blue;\">" + value + "</span>";
+        return "<span style=\"color:blue;\">" + std::string(value) + "</span>";
     } else if(v.substr(0, 7) == "::green"){
         auto value = v.substr(7);
 
-        return "<span style=\"color:green;\">" + value + "</span>";
+        return "<span style=\"color:green;\">" + std::string(value) + "</span>";
     } else if(v.substr(0, 9) == "::success"){
         auto value = v.substr(9);
         auto success = budget::to_number<unsigned long>(value);
@@ -76,7 +76,7 @@ std::string html_format(budget::html_writer& w, const std::string& v){
         auto value = v.substr(8);
 
         if(value.find("::") == std::string::npos){
-            return v;
+            return std::string(v);
         }
 
         auto module = value.substr(0, value.find("::"));
@@ -87,7 +87,7 @@ std::string html_format(budget::html_writer& w, const std::string& v){
         return edit_to_string(module, id);
     }
 
-    return v;
+    return std::string(v);
 }
 
 std::vector<budget::year> active_years(budget::year extra){
@@ -111,13 +111,13 @@ std::vector<budget::year> active_years(budget::year extra){
 
 budget::html_writer::html_writer(std::stringstream& os) : os(os) {}
 
-budget::writer& budget::html_writer::operator<<(const std::string& value){
+budget::writer& budget::html_writer::operator<<(std::string_view value){
     os << html_format(*this, value);
 
     return *this;
 }
 
-budget::writer& budget::html_writer::operator<<(const double& value){
+budget::writer& budget::html_writer::operator<<(double value){
     os << value;
 
     return *this;

@@ -15,7 +15,7 @@ using namespace budget;
 
 namespace {
 
-void add_currency_picker(budget::writer& w, const std::string& default_value = "") {
+void add_currency_picker(budget::writer& w, std::string_view default_value = "") {
     add_text_picker(w, "Currency", "input_currency", default_value);
 }
 

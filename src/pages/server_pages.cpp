@@ -860,7 +860,7 @@ void budget::display_error_message(budget::writer& w, const std::string& message
     w << R"=====(</div>)=====";
 }
 
-void budget::form_begin(budget::writer& w, const std::string& action, const std::string& back_page) {
+void budget::form_begin(budget::writer& w, std::string_view action, std::string_view back_page) {
     w << R"=====(<form method="POST" action=")=====";
     w << action;
     w << R"=====(">)=====";
@@ -870,13 +870,13 @@ void budget::form_begin(budget::writer& w, const std::string& action, const std:
     w << R"=====(">)=====";
 }
 
-void budget::page_form_begin(budget::writer& w, const std::string& action) {
+void budget::page_form_begin(budget::writer& w, std::string_view action) {
     w << R"=====(<form method="GET" action=")=====";
     w << action;
     w << R"=====(">)=====";
 }
 
-void budget::form_begin_edit(budget::writer& w, const std::string& action, const std::string& back_page, const std::string& input_id) {
+void budget::form_begin_edit(budget::writer& w, std::string_view action, std::string_view back_page, std::string_view input_id) {
     form_begin(w, action, html_base64_decode(back_page));
 
     w << R"=====(<input type="hidden" name="input_id" value=")=====";
@@ -884,7 +884,7 @@ void budget::form_begin_edit(budget::writer& w, const std::string& action, const
     w << R"=====(">)=====";
 }
 
-void budget::form_end(budget::writer& w, const std::string& button) {
+void budget::form_end(budget::writer& w, std::string_view button) {
     if (button.empty()) {
         w << R"=====(<button type="submit" class="btn btn-primary">Submit</button>)=====";
     } else {
@@ -896,7 +896,7 @@ void budget::form_end(budget::writer& w, const std::string& button) {
     w << "</form>";
 }
 
-void budget::add_text_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required) {
+void budget::add_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required) {
     w << R"=====(<div class="form-group">)=====";
 
     w << "<label for=\"" << name << "\">" << title << "</label>";

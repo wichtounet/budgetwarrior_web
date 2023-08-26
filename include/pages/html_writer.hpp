@@ -18,8 +18,8 @@ struct html_writer : writer {
 
     html_writer(std::stringstream& os);
 
-    virtual writer& operator<<(const std::string& value) override;
-    virtual writer& operator<<(const double& value) override;
+    virtual writer& operator<<(std::string_view value) override;
+    virtual writer& operator<<(double value) override;
 
     virtual writer& operator<<(const budget::money& m) override;
     virtual writer& operator<<(const budget::month& m) override;

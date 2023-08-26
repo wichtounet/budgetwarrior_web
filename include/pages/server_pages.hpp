@@ -36,12 +36,12 @@ void display_error_message(budget::writer& w, const std::string& message);
 void make_tables_sortable(budget::html_writer& w);
 
 // Forms
-void form_begin(budget::writer& w, const std::string& action, const std::string& back_page);
-void page_form_begin(budget::writer& w, const std::string& action);
-void form_begin_edit(budget::writer& w, const std::string& action, const std::string& back_page, const std::string& input_id);
-void form_end(budget::writer& w, const std::string& button = "");
+void form_begin(budget::writer& w, std::string_view action, std::string_view back_page);
+void page_form_begin(budget::writer& w, std::string_view action);
+void form_begin_edit(budget::writer& w, std::string_view action, std::string_view back_page, std::string_view input_id);
+void form_end(budget::writer& w, std::string_view button = "");
 
-void add_text_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required = true);
+void add_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required = true);
 void add_password_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required = true);
 void add_name_picker(budget::writer& w, const std::string& default_value = "");
 void add_title_picker(budget::writer& w, const std::string& default_value = "");
