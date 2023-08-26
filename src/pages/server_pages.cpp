@@ -52,7 +52,7 @@ namespace {
 
 static constexpr const char new_line = '\n';
 
-std::string header(const std::string& title, bool menu = true) {
+std::string header(std::string_view title, bool menu = true) {
     std::stringstream stream;
 
     // The header
@@ -804,7 +804,7 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
     return true;
 }
 
-bool budget::page_start(const httplib::Request& req, httplib::Response& res, std::stringstream& content_stream, const std::string& title) {
+bool budget::page_start(const httplib::Request& req, httplib::Response& res, std::stringstream& content_stream, std::string_view title) {
     content_stream.imbue(std::locale("C"));
 
     if (!authenticate(req, res)) {
@@ -854,7 +854,7 @@ void budget::make_tables_sortable(budget::html_writer& w){
     w.use_module("datatables");
 }
 
-void budget::display_error_message(budget::writer& w, const std::string& message) {
+void budget::display_error_message(budget::writer& w, std::string_view message) {
     w << R"=====(<div class="alert alert-danger" role="alert">)=====";
     w << message;
     w << R"=====(</div>)=====";
@@ -919,7 +919,7 @@ void budget::add_text_picker(budget::writer& w, std::string_view title, std::str
     )=====";
 }
 
-void budget::add_password_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required) {
+void budget::add_password_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required) {
     w << R"=====(<div class="form-group">)=====";
 
     w << "<label for=\"" << name << "\">" << title << "</label>";
@@ -943,23 +943,23 @@ void budget::add_password_picker(budget::writer& w, const std::string& title, co
 }
 
 
-void budget::add_name_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_name_picker(budget::writer& w, std::string_view default_value) {
     add_text_picker(w, "Name", "input_name", default_value);
 }
 
-void budget::add_title_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_title_picker(budget::writer& w, std::string_view default_value) {
     add_text_picker(w, "Title", "input_title", default_value);
 }
 
-void budget::add_amount_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_amount_picker(budget::writer& w, std::string_view default_value) {
     add_money_picker(w, "amount", "input_amount", default_value);
 }
 
-void budget::add_paid_amount_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_paid_amount_picker(budget::writer& w, std::string_view default_value) {
     add_money_picker(w, "paid amount", "input_paid_amount", default_value);
 }
 
-void budget::add_yes_no_picker(budget::writer& w, const std::string& title, const std::string& name, bool default_value) {
+void budget::add_yes_no_picker(budget::writer& w, std::string_view title, std::string_view name, bool default_value) {
     w << R"=====(<div class="form-group">)=====";
 
     w << "<label for=\"" << name << "\">" << title << "</label>";
@@ -994,7 +994,7 @@ void budget::add_paid_picker(budget::writer& w, bool paid) {
     add_yes_no_picker(w, "Paid", "input_paid", paid);
 }
 
-void budget::add_date_picker(budget::writer& w, const std::string& default_value, bool one_line) {
+void budget::add_date_picker(budget::writer& w, std::string_view default_value, bool one_line) {
     if (one_line) {
         w << R"=====(<div class="form-group row">)=====";
 
@@ -1039,7 +1039,7 @@ void budget::add_date_picker(budget::writer& w, const std::string& default_value
     }
 }
 
-std::stringstream budget::start_chart_base(budget::html_writer& w, const std::string& chart_type, const std::string& id, std::string style) {
+std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_view chart_type, std::string_view id, std::string style) {
     w.use_module("highcharts");
 
     w << R"=====(<div id=")=====";
@@ -1070,8 +1070,8 @@ std::stringstream budget::start_chart_base(budget::html_writer& w, const std::st
     return ss;
 }
 
-std::stringstream budget::start_chart(budget::html_writer& w, const std::string& title, const std::string& chart_type,
-                                      const std::string& id, std::string style) {
+std::stringstream budget::start_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
+                                      std::string_view id, std::string style) {
     auto ss = start_chart_base(w, chart_type, id, style);
 
     ss << R"=====(title: {text: ')=====";
@@ -1081,10 +1081,10 @@ std::stringstream budget::start_chart(budget::html_writer& w, const std::string&
     return ss;
 }
 
-std::stringstream budget::start_time_chart(budget::html_writer& w, const std::string& title, const std::string& chart_type,
-                                           const std::string& id, std::string style) {
+std::stringstream budget::start_time_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
+                                           std::string_view id, std::string style) {
     // Note: Not nice but we are simply injecting zoomType here
-    auto ss = start_chart_base(w, chart_type + "', zoomType: 'x", id, style);
+    auto ss = start_chart_base(w, std::string(chart_type) + "', zoomType: 'x", id, style);
 
     ss << R"=====(title: {text: ')=====";
     ss << title;
@@ -1151,7 +1151,7 @@ void budget::add_average_5_serie(std::stringstream& ss,
     ss << "]},";
 }
 
-void budget::add_account_picker(budget::writer& w, budget::date day, const std::string& default_value) {
+void budget::add_account_picker(budget::writer& w, budget::date day, std::string_view default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_account">Account</label>
@@ -1173,7 +1173,7 @@ void budget::add_account_picker(budget::writer& w, budget::date day, const std::
 }
 
 void budget::add_account_picker_by_name(
-        budget::writer& w, budget::date day, const std::string& title, const std::string& default_value, const std::string& input, bool allow_empty) {
+        budget::writer& w, budget::date day, std::string_view title, std::string_view default_value, std::string_view input, bool allow_empty) {
     w << "<div class=\"form-group\"><label for=\"" << input << "\">" << title << "</label>";
     w << "<select class=\"form-control\" id=\"" << input << "\" name=\"" << input << "\">";
 
@@ -1196,7 +1196,7 @@ void budget::add_account_picker_by_name(
     w << R"=====(</select></div>)=====";
 }
 
-void budget::add_share_asset_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_share_asset_picker(budget::writer& w, std::string_view default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Asset</label>
@@ -1217,7 +1217,7 @@ void budget::add_share_asset_picker(budget::writer& w, const std::string& defaul
     )=====";
 }
 
-void budget::add_value_asset_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_value_asset_picker(budget::writer& w, std::string_view default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Asset</label>
@@ -1238,7 +1238,7 @@ void budget::add_value_asset_picker(budget::writer& w, const std::string& defaul
     )=====";
 }
 
-void budget::add_active_share_asset_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_active_share_asset_picker(budget::writer& w, std::string_view default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Asset</label>
@@ -1259,7 +1259,7 @@ void budget::add_active_share_asset_picker(budget::writer& w, const std::string&
     )=====";
 }
 
-void budget::add_active_value_asset_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_active_value_asset_picker(budget::writer& w, std::string_view default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Asset</label>
@@ -1280,7 +1280,7 @@ void budget::add_active_value_asset_picker(budget::writer& w, const std::string&
     )=====";
 }
 
-void budget::add_liability_picker(budget::writer& w, const std::string& default_value) {
+void budget::add_liability_picker(budget::writer& w, std::string_view default_value) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_asset">Liability</label>
@@ -1302,7 +1302,7 @@ void budget::add_liability_picker(budget::writer& w, const std::string& default_
     )=====";
 }
 
-void budget::add_integer_picker(budget::writer& w, const std::string& title, const std::string& name, bool negative, const std::string& default_value) {
+void budget::add_integer_picker(budget::writer& w, std::string_view title, std::string_view name, bool negative, std::string_view default_value) {
     w << R"=====(<div class="form-group">)=====";
 
     w << "<label for=\"" << name << "\">" << title << "</label>";
@@ -1324,8 +1324,8 @@ void budget::add_integer_picker(budget::writer& w, const std::string& title, con
     w << "</div>";
 }
 
-void budget::add_money_picker(budget::writer& w, const std::string& title, const std::string& name, const std::string& default_value, bool required,
-                              bool one_line, const std::string& currency) {
+void budget::add_money_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required,
+                              bool one_line, std::string_view currency) {
     if(!currency.empty() && !one_line){
         throw budget_exception("add_money_picker currency only works with one_line", true);
     }
