@@ -33,9 +33,9 @@ void budget::add_debts_api(const httplib::Request& req, httplib::Response& res) 
     debt.title         = req.get_param_value("input_title");
     debt.amount        = budget::money_from_string(req.get_param_value("input_amount"));
 
-    add_debt(std::move(debt));
+    auto id = add_debt(std::move(debt));
 
-    api_success(req, res, "Debt " + to_string(debt.id) + " has been created", to_string(debt.id));
+    api_success(req, res, "Debt " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_debts_api(const httplib::Request& req, httplib::Response& res) {

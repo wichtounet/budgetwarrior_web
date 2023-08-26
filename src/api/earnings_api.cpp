@@ -30,9 +30,9 @@ void budget::add_earnings_api(const httplib::Request& req, httplib::Response& re
     earning.name    = req.get_param_value("input_name");
     earning.amount  = budget::money_from_string(req.get_param_value("input_amount"));
 
-    add_earning(std::move(earning));
+    auto id = add_earning(std::move(earning));
 
-    api_success(req, res, "Earning " + to_string(earning.id) + " has been created", to_string(earning.id));
+    api_success(req, res, "Earning " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_earnings_api(const httplib::Request& req, httplib::Response& res) {

@@ -30,9 +30,9 @@ void budget::add_expenses_api(const httplib::Request& req, httplib::Response& re
     expense.name    = req.get_param_value("input_name");
     expense.amount  = budget::money_from_string(req.get_param_value("input_amount"));
 
-    add_expense(std::move(expense));
+    auto id = add_expense(std::move(expense));
 
-    api_success(req, res, "Expense " + to_string(expense.id) + " has been created", to_string(expense.id));
+    api_success(req, res, "Expense " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_expenses_api(const httplib::Request& req, httplib::Response& res) {

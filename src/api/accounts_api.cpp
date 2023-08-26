@@ -30,9 +30,9 @@ void budget::add_accounts_api(const httplib::Request& req, httplib::Response& re
     account.since  = find_new_since();
     account.until  = budget::date(2099, 12, 31);
 
-    add_account(std::move(account));
+    auto id = add_account(std::move(account));
 
-    api_success(req, res, "Account " + to_string(account.id) + " has been created", to_string(account.id));
+    api_success(req, res, "Account " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_accounts_api(const httplib::Request& req, httplib::Response& res) {
