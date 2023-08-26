@@ -33,13 +33,7 @@ void budget::assets_card(budget::html_writer& w){
 
     // If all assets are in the form group/asset, then we use special style
 
-    bool group_style = true;
-
-    if (budget::config_contains("asset_no_group")) {
-        if (budget::config_value("asset_no_group") == "true") {
-            group_style = false;
-        }
-    }
+    bool group_style = !budget::config_contains_and_true("asset_no_group");
 
     // If one asset has no group, we disable grouping
     if (group_style) {
@@ -66,59 +60,51 @@ void budget::assets_card(budget::html_writer& w){
         for (auto& group : groups) {
             bool started = false;
 
-            for (auto& asset : w.cache.user_assets()) {
+            for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
                 if (asset.name.substr(0, asset.name.find(separator)) == group) {
                     auto short_name = asset.name.substr(asset.name.find(separator) + 1);
 
-                    auto amount = get_asset_value(asset, w.cache);
+                    if (!started) {
+                        w << "<div class=\"asset_group\">";
+                        w << group;
+                        w << "</div>";
 
-                    if (amount) {
-                        if (!started) {
-                            w << "<div class=\"asset_group\">";
-                            w << group;
-                            w << "</div>";
-
-                            started = true;
-                        }
-
-                        w << R"=====(<div class="asset_row row">)=====";
-                        w << R"=====(<div class="asset_name col-md-8 col-xl-9 small">)=====";
-                        w << short_name;
-                        w << R"=====(</div>)=====";
-                        w << R"=====(<div class="asset_right col-md-4 col-xl-3 text-right small">)=====";
-                        w << R"=====(<span class="asset_amount">)=====";
-                        w << budget::to_string(amount) << " " << asset.currency;
-                        w << R"=====(</span>)=====";
-                        w << R"=====(<br />)=====";
-                        w << R"=====(</div>)=====";
-                        w << R"=====(</div>)=====";
+                        started = true;
                     }
+
+                    w << R"=====(<div class="asset_row row">)=====";
+                    w << R"=====(<div class="asset_name col-md-8 col-xl-9 small">)=====";
+                    w << short_name;
+                    w << R"=====(</div>)=====";
+                    w << R"=====(<div class="asset_right col-md-4 col-xl-3 text-right small">)=====";
+                    w << R"=====(<span class="asset_amount">)=====";
+                    w << budget::to_string(amount) << " " << asset.currency;
+                    w << R"=====(</span>)=====";
+                    w << R"=====(<br />)=====";
+                    w << R"=====(</div>)=====";
+                    w << R"=====(</div>)=====";
                 }
             }
         }
     } else {
         bool first = true;
 
-        for (auto& asset : w.cache.user_assets()) {
-            auto amount = get_asset_value(asset, w.cache);
-
-            if (amount) {
-                if (!first) {
-                    w << R"=====(<hr />)=====";
-                }
-
-                w << R"=====(<div class="row">)=====";
-                w << R"=====(<div class="col-md-8 col-xl-9 small">)=====";
-                w << asset.name;
-                w << R"=====(</div>)=====";
-                w << R"=====(<div class="col-md-4 col-xl-3 text-right small">)=====";
-                w << budget::to_string(amount) << " " << asset.currency;
-                w << R"=====(<br />)=====";
-                w << R"=====(</div>)=====";
-                w << R"=====(</div>)=====";
-
-                first = false;
+        for (const auto& [asset, amount] : w.cache.user_assets() | expand_value_conv(w.cache) | not_zero) {
+            if (!first) {
+                w << R"=====(<hr />)=====";
             }
+
+            w << R"=====(<div class="row">)=====";
+            w << R"=====(<div class="col-md-8 col-xl-9 small">)=====";
+            w << asset.name;
+            w << R"=====(</div>)=====";
+            w << R"=====(<div class="col-md-4 col-xl-3 text-right small">)=====";
+            w << budget::to_string(amount) << " " << asset.currency;
+            w << R"=====(<br />)=====";
+            w << R"=====(</div>)=====";
+            w << R"=====(</div>)=====";
+
+            first = false;
         }
     }
 
@@ -146,26 +132,22 @@ void budget::liabilities_card(budget::html_writer& w){
 
     bool first = true;
 
-    for (auto& liability : w.cache.liabilities()) {
-        auto amount = get_liability_value(liability, w.cache);
-
-        if (amount) {
-            if (!first) {
-                w << R"=====(<hr />)=====";
-            }
-
-            w << R"=====(<div class="row">)=====";
-            w << R"=====(<div class="col-md-8 col-xl-9 small">)=====";
-            w << liability.name;
-            w << R"=====(</div>)=====";
-            w << R"=====(<div class="col-md-4 col-xl-3 text-right small">)=====";
-            w << budget::to_string(amount) << " " << liability.currency;
-            w << R"=====(<br />)=====";
-            w << R"=====(</div>)=====";
-            w << R"=====(</div>)=====";
-
-            first = false;
+    for (const auto& [liability, amount] : w.cache.liabilities() | expand_value(w.cache) | not_zero) {
+        if (!first) {
+            w << R"=====(<hr />)=====";
         }
+
+        w << R"=====(<div class="row">)=====";
+        w << R"=====(<div class="col-md-8 col-xl-9 small">)=====";
+        w << liability.name;
+        w << R"=====(</div>)=====";
+        w << R"=====(<div class="col-md-4 col-xl-3 text-right small">)=====";
+        w << budget::to_string(amount) << " " << liability.currency;
+        w << R"=====(<br />)=====";
+        w << R"=====(</div>)=====";
+        w << R"=====(</div>)=====";
+
+        first = false;
     }
 
     w << R"=====(</div>)====="; //card-body
@@ -647,10 +629,8 @@ void budget::portfolio_allocation_page(html_writer& w) {
         while (date <= end_date) {
             budget::money sum;
 
-            for (auto & asset : w.cache.user_assets()) {
-                if (asset.portfolio) {
-                    sum += get_asset_value_conv(asset, date, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
-                }
+            for (auto & asset : w.cache.user_assets() | is_portfolio) {
+                sum += get_asset_value_conv(asset, date, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
             }
 
             ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
@@ -683,10 +663,8 @@ void budget::portfolio_allocation_page(html_writer& w) {
 
         budget::money sum;
 
-        for (auto & asset : w.cache.user_assets()) {
-            if (asset.portfolio) {
-                sum += get_asset_value_conv(asset, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
-            }
+        for (auto & asset : w.cache.user_assets() | is_portfolio) {
+            sum += get_asset_value_conv(asset, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
         }
 
         ss2 << budget::money_to_string(sum);
