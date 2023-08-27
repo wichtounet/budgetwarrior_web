@@ -419,9 +419,8 @@ void budget::add_liabilities_api(const httplib::Request& req, httplib::Response&
 
     liability.currency = req.get_param_value("input_currency");
 
-    add_liability(liability);
-
-    api_success(req, res, "Liability " + to_string(liability.id) + " has been created", to_string(liability.id));
+    const auto id = add_liability(liability);
+    api_success(req, res, "Liability " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_liabilities_api(const httplib::Request& req, httplib::Response& res) {

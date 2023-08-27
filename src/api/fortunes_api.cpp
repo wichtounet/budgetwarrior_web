@@ -29,9 +29,8 @@ void budget::add_fortunes_api(const httplib::Request& req, httplib::Response& re
     fortune.check_date = budget::date_from_string(req.get_param_value("input_date"));
     fortune.amount     = budget::money_from_string(req.get_param_value("input_amount"));
 
-    add_fortune(std::move(fortune));
-
-    api_success(req, res, "Fortune " + to_string(fortune.id) + " has been created", to_string(fortune.id));
+    const auto id = add_fortune(std::move(fortune));
+    api_success(req, res, "Fortune " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_fortunes_api(const httplib::Request& req, httplib::Response& res) {

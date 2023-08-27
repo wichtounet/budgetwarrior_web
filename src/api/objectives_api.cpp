@@ -32,9 +32,8 @@ void budget::add_objectives_api(const httplib::Request& req, httplib::Response& 
     objective.amount = budget::money_from_string(req.get_param_value("input_amount"));
     objective.date   = budget::local_day();
 
-    add_objective(std::move(objective));
-
-    api_success(req, res, "objective " + to_string(objective.id) + " has been created", to_string(objective.id));
+    const auto id = add_objective(std::move(objective));
+    api_success(req, res, "objective " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_objectives_api(const httplib::Request& req, httplib::Response& res) {

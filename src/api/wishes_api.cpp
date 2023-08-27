@@ -34,9 +34,8 @@ void budget::add_wishes_api(const httplib::Request& req, httplib::Response& res)
     wish.urgency     = budget::to_number<int>(req.get_param_value("input_urgency"));
     wish.amount      = budget::money_from_string(req.get_param_value("input_amount"));
 
-    add_wish(std::move(wish));
-
-    api_success(req, res, "wish " + to_string(wish.id) + " has been created", to_string(wish.id));
+    const auto id = add_wish(std::move(wish));
+    api_success(req, res, "wish " + to_string(id) + " has been created", to_string(id));
 }
 
 void budget::edit_wishes_api(const httplib::Request& req, httplib::Response& res) {
