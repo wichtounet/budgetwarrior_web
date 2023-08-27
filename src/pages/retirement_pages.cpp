@@ -17,11 +17,11 @@ using namespace budget;
 
 namespace {
 
-void add_percent_picker(budget::writer& w, const std::string& title, const std::string& name, double default_value = 0.0) {
+void add_percent_picker(budget::writer& w, std::string_view title, std::string_view name, double default_value = 0.0) {
     w << R"=====(<div class="form-group">)=====";
 
     w << "<label for=\"" << name << "\">" << title << "</label>";
-    w << "<input required type=\"number\" min=\"0\" max=\"100\" step=\"0.01\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+    w << R"(<input required type="number" min="0" max="100" step="0.01" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     w << " value=\"" << default_value << "\" ";
     w << R"=====(
             >

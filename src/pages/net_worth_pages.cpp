@@ -37,7 +37,7 @@ void budget::assets_card(budget::html_writer& w){
 
     // If one asset has no group, we disable grouping
     if (group_style) {
-        for (auto& asset : w.cache.user_assets()) {
+        for (const auto& asset : w.cache.user_assets()) {
             auto pos = asset.name.find(separator);
             if (pos == 0 || pos == std::string::npos) {
                 group_style = false;
@@ -49,7 +49,7 @@ void budget::assets_card(budget::html_writer& w){
     if (group_style) {
         std::vector<std::string> groups;
 
-        for (auto& asset : w.cache.user_assets()) {
+        for (const auto& asset : w.cache.user_assets()) {
             std::string group = asset.name.substr(0, asset.name.find(separator));
 
             if (!range_contains(groups, group)) {
@@ -260,7 +260,7 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
     }
 }
 
-void budget::asset_graph(budget::html_writer& w, const std::string style, const asset& asset) {
+void budget::asset_graph(budget::html_writer& w, const std::string& style, const asset& asset) {
     auto ss = start_time_chart(w, asset.name + "(" + asset.currency + ")", "area", "asset_graph", style);
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -295,7 +295,7 @@ void budget::asset_graph(budget::html_writer& w, const std::string style, const 
     end_chart(w, ss);
 }
 
-void budget::asset_graph_conv(budget::html_writer& w, const std::string style, const asset& asset) {
+void budget::asset_graph_conv(budget::html_writer& w, const std::string& style, const asset& asset) {
     auto ss = start_time_chart(w, asset.name + "(" + get_default_currency() + ")", "area", "asset_graph_conv", style);
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -411,13 +411,13 @@ void net_worth_graph(budget::html_writer& w, const std::string & title, const st
 
 }
 
-void budget::net_worth_graph(budget::html_writer& w, const std::string style, bool card) {
+void budget::net_worth_graph(budget::html_writer& w, const std::string& style, bool card) {
     ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::html_writer & w){
         return get_net_worth(d, w.cache);
     });
 }
 
-void budget::fi_net_worth_graph(budget::html_writer& w, const std::string style, bool card) {
+void budget::fi_net_worth_graph(budget::html_writer& w, const std::string& style, bool card) {
     ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::html_writer & w){
         return get_fi_net_worth(d, w.cache);
     });
@@ -450,12 +450,13 @@ void budget::net_worth_accrual_graph(budget::html_writer& w) {
     std::vector<std::string> dates;
 
     while (date <= end_date) {
-        budget::money sum;
+        budget::money const sum;
 
         auto start = get_net_worth(date.start_of_month(), w.cache);
         auto end   = get_net_worth(date.end_of_month(), w.cache);
 
-        std::string date_str = "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", 1)";
+        std::string const date_str =
+            "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", 1)";
         ss << "[" << date_str << " ," << budget::money_to_string(end - start) << "],";
 
         serie.emplace_back(end - start);
@@ -530,7 +531,7 @@ budget::money get_class_sum(data_cache & cache, budget::asset_class & clas, budg
     budget::money sum;
 
     // Add the value of the assets for this class
-    for (auto & asset : cache.user_assets()) {
+    for (const auto& asset : cache.user_assets()) {
         sum += get_asset_value_conv(asset, date, cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
     }
 
@@ -629,7 +630,7 @@ void budget::portfolio_allocation_page(html_writer& w) {
         while (date <= end_date) {
             budget::money sum;
 
-            for (auto & asset : w.cache.user_assets() | is_portfolio) {
+            for (const auto& asset : w.cache.user_assets() | is_portfolio) {
                 sum += get_asset_value_conv(asset, date, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
             }
 
@@ -663,7 +664,7 @@ void budget::portfolio_allocation_page(html_writer& w) {
 
         budget::money sum;
 
-        for (auto & asset : w.cache.user_assets() | is_portfolio) {
+        for (const auto& asset : w.cache.user_assets() | is_portfolio) {
             sum += get_asset_value_conv(asset, w.cache) * (float(get_asset_class_allocation(asset, clas)) / 100.0f);
         }
 
@@ -682,7 +683,7 @@ void budget::portfolio_allocation_page(html_writer& w) {
 void budget::net_worth_currency_page(html_writer& w) {
     std::set<std::string> currencies;
 
-    for (auto& asset : w.cache.user_assets()) {
+    for (const auto& asset : w.cache.user_assets()) {
         currencies.insert(asset.currency);
     }
 
@@ -697,7 +698,7 @@ void budget::net_worth_currency_page(html_writer& w) {
 
     ss << "series: [";
 
-    for (auto& currency : currencies) {
+    for (const auto& currency : currencies) {
         ss << "{ name: '" << currency << "',";
         ss << "data: [";
 
@@ -705,15 +706,8 @@ void budget::net_worth_currency_page(html_writer& w) {
         auto end_date = budget::local_day();
 
         while (date <= end_date) {
-            budget::money sum;
-
-            for (const auto & asset : w.cache.user_assets() | filter_by_currency(currency)) {
-                sum += get_asset_value_conv(asset, date, w.cache);
-            }
-
-            for (const auto & liability : w.cache.liabilities() | filter_by_currency(currency)) {
-                sum -= get_liability_value_conv(liability, date, w.cache);
-            }
+            const auto sum = fold_left_auto(w.cache.user_assets() | filter_by_currency(currency) | to_value_conv(w.cache, date))
+                             - fold_left_auto(w.cache.liabilities() | filter_by_currency(currency) | to_value_conv(w.cache, date));
 
             ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 
@@ -729,10 +723,10 @@ void budget::net_worth_currency_page(html_writer& w) {
 
     // 2. Display the value in each currency
 
-    for (auto& currency : currencies) {
+    for (const auto& currency : currencies) {
         budget::money net_worth;
 
-        for (auto & asset : w.cache.user_assets()) {
+        for (const auto& asset : w.cache.user_assets()) {
             net_worth += get_asset_value_conv(asset, currency, w.cache);
         }
 
@@ -755,7 +749,7 @@ void budget::net_worth_currency_page(html_writer& w) {
     ss2 << "colorByPoint: true,";
     ss2 << "data: [";
 
-    for (auto& currency : currencies) {
+    for (const auto& currency : currencies) {
         ss2 << "{ name: '" << currency << "',";
         ss2 << "y: ";
 
@@ -792,7 +786,7 @@ void budget::portfolio_status_page(html_writer& w) {
 void budget::portfolio_currency_page(html_writer& w) {
     std::set<std::string> currencies;
 
-    for (auto& asset : w.cache.user_assets()) {
+    for (const auto& asset : w.cache.user_assets()) {
         if (asset.portfolio) {
             currencies.insert(asset.currency);
         }
@@ -809,7 +803,7 @@ void budget::portfolio_currency_page(html_writer& w) {
 
     ss << "series: [";
 
-    for (auto& currency : currencies) {
+    for (const auto& currency : currencies) {
         ss << "{ name: '" << currency << "',";
         ss << "data: [";
 
@@ -819,7 +813,7 @@ void budget::portfolio_currency_page(html_writer& w) {
         while (date <= end_date) {
             budget::money sum;
 
-            for (auto & asset : w.cache.user_assets()) {
+            for (const auto& asset : w.cache.user_assets()) {
                 if (asset.portfolio && asset.currency == currency) {
                     sum += get_asset_value_conv(asset, date, w.cache);
                 }
@@ -849,13 +843,13 @@ void budget::portfolio_currency_page(html_writer& w) {
     ss2 << "colorByPoint: true,";
     ss2 << "data: [";
 
-    for (auto& currency : currencies) {
+    for (const auto& currency : currencies) {
         ss2 << "{ name: '" << currency << "',";
         ss2 << "y: ";
 
         budget::money sum;
 
-        for (auto & asset : w.cache.user_assets()) {
+        for (const auto& asset : w.cache.user_assets()) {
             if (asset.portfolio && asset.currency == currency) {
                 sum += get_asset_value_conv(asset, w.cache);
             }
@@ -895,7 +889,7 @@ void budget::portfolio_graph_page(html_writer& w) {
     while (date <= end_date) {
         budget::money sum;
 
-        for (auto & asset : w.cache.user_assets()) {
+        for (const auto& asset : w.cache.user_assets()) {
             if (asset.portfolio) {
                 sum += get_asset_value_conv(asset, date, w.cache);
             }
@@ -930,7 +924,7 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     std::map<size_t, budget::money> asset_amounts;
 
-    for (auto& asset : w.cache.user_assets() | is_portfolio) {
+    for (const auto& asset : w.cache.user_assets() | is_portfolio) {
         if (nocash && asset.is_cash()) {
             continue;
         }
@@ -942,13 +936,13 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     std::map<size_t, size_t> colors;
 
-    for (auto& asset : w.cache.user_assets()) {
+    for (const auto& asset : w.cache.user_assets()) {
         if (nocash && asset.is_cash()) {
             continue;
         }
 
         if (asset.portfolio && (asset_amounts[asset.id] || asset.portfolio_alloc)) {
-            if (!colors.count(asset.id)) {
+            if (!colors.contains(asset.id)) {
                 auto c           = colors.size();
                 colors[asset.id] = c;
             }
@@ -1021,7 +1015,7 @@ void rebalance_page_base(html_writer& w, bool nocash) {
     desired_ss << "var desired_pie_colors = (function () {";
     desired_ss << "var colors = [];";
 
-    for (auto& asset : w.cache.user_assets()) {
+    for (const auto& asset : w.cache.user_assets()) {
         if (asset.portfolio && asset.portfolio_alloc) {
             desired_ss << "colors.push(desired_base_colors[" << colors[asset.id] << "]);";
         }
@@ -1043,7 +1037,7 @@ void rebalance_page_base(html_writer& w, bool nocash) {
     ss2 << "colors: desired_pie_colors,";
     ss2 << "data: [";
 
-    for (auto& asset : w.cache.user_assets()) {
+    for (const auto& asset : w.cache.user_assets()) {
         if (asset.portfolio && asset.portfolio_alloc) {
             ss2 << "{ name: '" << asset.name << "',";
             ss2 << "y: ";
