@@ -236,11 +236,5 @@ void budget::api_success_content(const httplib::Request& /*req*/, httplib::Respo
 }
 
 bool budget::parameters_present(const httplib::Request& req, const std::vector<const char*>& parameters) {
-    for (const auto& param : parameters) {
-        if (!req.has_param(param)) {
-            return false;
-        }
-    }
-
-    return true;
+    return std::ranges::all_of(parameters, [&req](const auto & param) { return req.has_param(param); });
 }

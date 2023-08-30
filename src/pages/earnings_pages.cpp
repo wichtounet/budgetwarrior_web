@@ -115,8 +115,8 @@ void budget::time_graph_income_page(html_writer & w) {
             budget::year const year = j;
 
             auto sm = start_month(w.cache, year);
-            auto last = 13;
 
+            unsigned short last = 13;
             if(year == budget::local_day().year()){
                 last = budget::local_day().month() + 1;
             }
@@ -170,8 +170,8 @@ void budget::time_graph_income_page(html_writer & w) {
             budget::year const year = j;
 
             auto sm = start_month(w.cache, year);
-            auto last = 13;
 
+            unsigned short last = 13;
             if (year == budget::local_day().year()) {
                 last = budget::local_day().month() + 1;
             }
@@ -224,8 +224,8 @@ void budget::time_graph_earnings_page(html_writer & w) {
         budget::year const year = j;
 
         auto sm = start_month(w.cache, year);
-        auto last = 13;
 
+        unsigned short last = 13;
         if(year == budget::local_day().year()){
             last = budget::local_day().month() + 1;
         }
