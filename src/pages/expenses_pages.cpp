@@ -21,7 +21,8 @@ namespace {
 std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::string, budget::money> & expense_sum, size_t max) {
     std::vector<std::pair<std::string, budget::money>> sorted_expenses;
 
-    for (auto& [name, amount] : expense_sum) {
+    sorted_expenses.reserve(expense_sum.size());
+    for (const auto& [name, amount] : expense_sum) {
         sorted_expenses.emplace_back(name, amount);
     }
 
@@ -149,7 +150,7 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, std::string_
 
     // standard breakdown per group
     if (!mono) {
-        std::string separator = config_value("aggregate_separator", "/");
+        std::string const separator = config_value("aggregate_separator", "/");
 
         auto ss = start_chart_base(w, "pie", "month_breakdown_expenses_group_graph", style);
 
@@ -244,17 +245,17 @@ void budget::time_graph_expenses_page(html_writer& w) {
     auto sy = start_year(w.cache);
 
     for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
-        budget::year year = j;
+        budget::year const year = j;
 
         auto sm = start_month(w.cache, year);
-        auto last = 13;
+        unsigned short last = 13;
 
         if(year == budget::local_day().year()){
             last = budget::local_day().month() + 1;
         }
 
         for(unsigned short i = sm; i < last; ++i){
-            budget::month month = i;
+            budget::month const month = i;
 
             budget::money sum;
 
@@ -262,7 +263,8 @@ void budget::time_graph_expenses_page(html_writer& w) {
                 sum += expense.amount;
             }
 
-            std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            std::string const date =
+                "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
 
             serie.push_back(sum);
             dates.push_back(date);
@@ -299,17 +301,17 @@ void budget::time_graph_expenses_page(html_writer& w) {
         std::vector<std::string> dates;
 
         for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-            budget::year year = j;
+            budget::year const year = j;
 
             auto sm   = start_month(w.cache, year);
-            auto last = 13;
+            unsigned short last = 13;
 
             if (year == budget::local_day().year()) {
                 last = budget::local_day().month() + 1;
             }
 
             for (unsigned short i = sm; i < last; ++i) {
-                budget::month month = i;
+                budget::month const month = i;
 
                 budget::money sum;
 
@@ -319,7 +321,8 @@ void budget::time_graph_expenses_page(html_writer& w) {
                     }
                 }
 
-                std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                std::string const date =
+                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
 
                 serie.push_back(sum);
                 dates.push_back(date);
@@ -440,7 +443,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
     }
 
     {
-        std::string separator = config_value("aggregate_separator", "/");
+        std::string const separator = config_value("aggregate_separator", "/");
 
         auto aggregate_ss = start_chart(w, "Aggregate Expenses Breakdown", "pie", "aggregate_pie");
 
@@ -493,12 +496,13 @@ namespace {
 void add_quick_expense_action(budget::html_writer & w, size_t i, budget::expense & expense) {
     w << "<script>";
     w << "function quickAction" << i << "() {";
-    w << "  $(\"#input_name\").val(\"" << expense.name << "\");";
+    w << R"(  $("#input_name").val(")" << expense.name << "\");";
     w << "  $(\"#input_amount\").val(" << budget::to_string(expense.amount) << ");";
     w << "  $(\"#input_account\").val(" << expense.account << ");";
     w << "}";
     w << "</script>";
-    w << "<button class=\"btn btn-secondary\" onclick=\"quickAction" << i << "();\">" << expense.name << "</button>&nbsp;";
+    w << R"(<button class="btn btn-secondary" onclick="quickAction)" << i << "();\">" << expense.name
+      << "</button>&nbsp;";
 }
 
 } // end of anonymous namespace
@@ -518,7 +522,8 @@ void budget::add_expenses_page(html_writer& w) {
             last_expenses[expense.name] = expense;
         }
 
-        for (auto & [key, value] : counts) {
+        order.reserve(counts.size());
+        for (auto& [key, value] : counts) {
             order.emplace_back(key, value);
         }
 

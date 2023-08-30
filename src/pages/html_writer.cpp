@@ -60,27 +60,28 @@ std::string html_format(budget::html_writer& w, std::string_view v){
         auto value = v.substr(5);
 
         return "<span style=\"color:red;\">" + std::string(value) + "</span>";
-    } else if(v.substr(0, 6) == "::blue"){
+    }
+    if (v.substr(0, 6) == "::blue") {
         auto value = v.substr(6);
 
         return "<span style=\"color:blue;\">" + std::string(value) + "</span>";
-    } else if(v.substr(0, 7) == "::green"){
+    } else if (v.substr(0, 7) == "::green") {
         auto value = v.substr(7);
 
         return "<span style=\"color:green;\">" + std::string(value) + "</span>";
-    } else if(v.substr(0, 9) == "::success"){
+    } else if (v.substr(0, 9) == "::success") {
         auto value = v.substr(9);
         auto success = budget::to_number<unsigned long>(value);
         return success_to_string(success);
-    } else if(v.substr(0, 8) == "::edit::"){
+    } else if (v.substr(0, 8) == "::edit::") {
         auto value = v.substr(8);
 
-        if(value.find("::") == std::string::npos){
+        if (value.find("::") == std::string::npos) {
             return std::string(v);
         }
 
         auto module = value.substr(0, value.find("::"));
-        auto id     = value.substr(value.find("::") + 2, value.size());
+        auto id = value.substr(value.find("::") + 2, value.size());
 
         w.use_module("open-iconic");
 
@@ -212,9 +213,10 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
         next_year  = m.current_year;
     }
 
-    os << "<a aria-label=\"Previous\" href=\"/" << m.page << "/" << previous_year << "/" << previous_month.value << "/\"><span class=\"oi oi-arrow-thick-left\"></span></a>";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_year << "/" << previous_month.value
+       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
 
-    os << "<select aria-label=\"Month\" id=\"month_selector\">";
+    os << R"(<select aria-label="Month" id="month_selector">)";
     for (size_t i = 1; i < 13; ++i) {
         if (i == m.current_month) {
             os << "<option selected>" << i << "</option>";
@@ -224,7 +226,7 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
     }
     os << "</select>";
 
-    os << "<select aria-label=\"Year\" id=\"year_selector\">";
+    os << R"(<select aria-label="Year" id="year_selector">)";
 
     const auto years = active_years(m.current_year);
 
@@ -238,7 +240,8 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
 
     os << "</select>";
 
-    os << "<a aria-label=\"Next\" href=\"/" << m.page << "/" << next_year << "/" << next_month.value << "/\"><span class=\"oi oi-arrow-thick-right\"></span></a>";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_year << "/" << next_month.value
+       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -247,7 +250,8 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
     ss << "var update_page = function(){";
     ss << "var selected_year = $(\"#year_selector\").find(':selected');";
     ss << "var selected_month = $(\"#month_selector\").find(':selected');";
-    ss << "window.location = \"/" << m.page << "/" << "\" + selected_year.val() + \"/\" + selected_month.val() + \"/\";";
+    ss << "window.location = \"/" << m.page << "/"
+       << R"(" + selected_year.val() + "/" + selected_month.val() + "/";)";
     ss << "};";
     ss << "$('#year_selector').change(update_page);";
     ss << "$('#month_selector').change(update_page);";
@@ -272,8 +276,9 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
     auto previous_year = m.current_year - 1;
     auto next_year     = m.current_year + 1;
 
-    os << "<a aria-label=\"Previous\" href=\"/" << m.page << "/" << previous_year << "/\"><span class=\"oi oi-arrow-thick-left\"></span></a>";
-    os << "<select aria-label=\"Year\" id=\"year_selector\">";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_year
+       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
+    os << R"(<select aria-label="Year" id="year_selector">)";
 
     const auto years = active_years(m.current_year);
 
@@ -286,7 +291,8 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
     }
 
     os << "</select>";
-    os << "<a aria-label=\"Next\" href=\"/" << m.page << "/" << next_year << "/\"><span class=\"oi oi-arrow-thick-right\"></span></a>";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_year
+       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -294,7 +300,8 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
 
     ss << "$('#year_selector').change(function(){";
     ss << "var selected = $(this).find(':selected');";
-    ss << "window.location = \"/" << m.page << "/" << "\" + selected.val() + \"/\";";
+    ss << "window.location = \"/" << m.page << "/"
+       << R"(" + selected.val() + "/";)";
     ss << "})";
 
     defer_script(ss.str());
@@ -329,10 +336,11 @@ budget::writer& budget::html_writer::operator<<(const budget::asset_selector& m)
         }
     }
 
-    os << "<a aria-label=\"Previous\" href=\"/" << m.page << "/" << previous_asset << "/\"><span class=\"oi oi-arrow-thick-left\"></span></a>";
-    os << "<select aria-label=\"Year\" id=\"asset_selector\">";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_asset
+       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
+    os << R"(<select aria-label="Year" id="asset_selector">)";
 
-    for(auto asset : assets){
+    for (const auto& asset : assets) {
         if(asset.id == m.current_asset){
             os << "<option value=" << asset.id << " selected>" << asset.name << "</option>";
         } else {
@@ -341,7 +349,8 @@ budget::writer& budget::html_writer::operator<<(const budget::asset_selector& m)
     }
 
     os << "</select>";
-    os << "<a aria-label=\"Next\" href=\"/" << m.page << "/" << next_asset << "/\"><span class=\"oi oi-arrow-thick-right\"></span></a>";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_asset
+       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -349,7 +358,8 @@ budget::writer& budget::html_writer::operator<<(const budget::asset_selector& m)
 
     ss << "$('#asset_selector').change(function(){";
     ss << "var selected = $(this).find(':selected');";
-    ss << "window.location = \"/" << m.page << "/" << "\" + selected.val() + \"/\";";
+    ss << "window.location = \"/" << m.page << "/"
+       << R"(" + selected.val() + "/";)";
     ss << "})";
 
     defer_script(ss.str());
@@ -384,10 +394,11 @@ budget::writer& budget::html_writer::operator<<(const budget::active_asset_selec
         }
     }
 
-    os << "<a aria-label=\"Previous\" href=\"/" << m.page << "/" << previous_asset << "/\"><span class=\"oi oi-arrow-thick-left\"></span></a>";
-    os << "<select aria-label=\"Year\" id=\"asset_selector\">";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_asset
+       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
+    os << R"(<select aria-label="Year" id="asset_selector">)";
 
-    for(auto asset : assets){
+    for (const auto& asset : assets) {
         if(asset.id == m.current_asset){
             os << "<option value=" << asset.id << " selected>" << asset.name << "</option>";
         } else {
@@ -396,7 +407,8 @@ budget::writer& budget::html_writer::operator<<(const budget::active_asset_selec
     }
 
     os << "</select>";
-    os << "<a aria-label=\"Next\" href=\"/" << m.page << "/" << next_asset << "/\"><span class=\"oi oi-arrow-thick-right\"></span></a>";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_asset
+       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -404,7 +416,8 @@ budget::writer& budget::html_writer::operator<<(const budget::active_asset_selec
 
     ss << "$('#asset_selector').change(function(){";
     ss << "var selected = $(this).find(':selected');";
-    ss << "window.location = \"/" << m.page << "/" << "\" + selected.val() + \"/\";";
+    ss << "window.location = \"/" << m.page << "/"
+       << R"(" + selected.val() + "/";)";
     ss << "})";
 
     defer_script(ss.str());
@@ -484,7 +497,7 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
         }
     }
 
-    bool small = columns.empty(); // TODO Improve this heuristic!
+    const bool small = columns.empty();  // TODO Improve this heuristic!
 
     if(small){
         os << "<div class=\"row\">";
@@ -498,7 +511,7 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
 
     // Display the header
 
-    if (columns.size()) {
+    if (!columns.empty()) {
         os << "<thead>";
         os << "<tr>";
 
@@ -541,11 +554,11 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
         os << "<tr>";
 
         for(size_t j = 0; j < row.size(); ++j){
-            if (columns.size() && groups == 1 && columns[j] == "ID") {
+            if (!columns.empty() && groups == 1 && columns[j] == "ID") {
                 continue;
             }
 
-            std::string value = html_format(*this, row[j]);
+            std::string const value = html_format(*this, row[j]);
 
             if(value.empty()){
                 os << "<td>&nbsp;</td>";
@@ -572,11 +585,11 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
             os << "<tr>";
 
             for (size_t j = 0; j < row.size(); ++j) {
-                if (columns.size() && groups == 1 && columns[j] == "ID") {
+                if (!columns.empty() && groups == 1 && columns[j] == "ID") {
                     continue;
                 }
 
-                std::string value = html_format(*this, row[j]);
+                std::string const value = html_format(*this, row[j]);
 
                 if (value.empty()) {
                     os << "<td>&nbsp;</td>";

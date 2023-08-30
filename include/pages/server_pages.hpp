@@ -65,11 +65,11 @@ void add_integer_picker(budget::writer& w, std::string_view title, std::string_v
 
 // Charts
 std::stringstream start_chart_base(budget::html_writer& w, std::string_view chart_type,
-                                   std::string_view id = "container", std::string style = "");
+                                   std::string_view id = "container", std::string_view style = "");
 std::stringstream start_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                              std::string_view id = "container", std::string style = "");
+                              std::string_view id = "container", std::string_view style = "");
 std::stringstream start_time_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                                   std::string_view id = "container", std::string style = "");
+                                   std::string_view id = "container", std::string_view style = "");
 void end_chart(budget::html_writer& w, std::stringstream& ss);
 void add_average_12_serie(std::stringstream& ss,
                          std::vector<budget::money> serie,

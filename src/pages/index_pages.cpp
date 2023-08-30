@@ -96,7 +96,7 @@ void cash_flow_card(budget::html_writer& w){
 } // namespace
 
 void budget::index_page(html_writer & w) {
-    bool left_column = !no_assets() && !no_asset_values();
+    const bool left_column = !no_assets() && !no_asset_values();
 
     if (left_column) {
         // A. The left column

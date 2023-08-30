@@ -5,31 +5,29 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
+#include <condition_variable>
 #include <set>
 #include <thread>
-#include <thread>
-#include <condition_variable>
 
-#include "expenses.hpp"
-#include "earnings.hpp"
 #include "accounts.hpp"
-#include "incomes.hpp"
-#include "assets.hpp"
-#include "liabilities.hpp"
-#include "config.hpp"
-#include "objectives.hpp"
-#include "wishes.hpp"
-#include "fortune.hpp"
-#include "recurring.hpp"
-#include "debts.hpp"
-#include "currency.hpp"
-#include "share.hpp"
-#include "http.hpp"
-#include "logging.hpp"
-#include "data.hpp"
-
 #include "api/server_api.hpp"
+#include "assets.hpp"
+#include "config.hpp"
+#include "currency.hpp"
+#include "data.hpp"
+#include "debts.hpp"
+#include "earnings.hpp"
+#include "expenses.hpp"
+#include "fortune.hpp"
+#include "http.hpp"
+#include "incomes.hpp"
+#include "liabilities.hpp"
+#include "logging.hpp"
+#include "objectives.hpp"
 #include "pages/server_pages.hpp"
+#include "recurring.hpp"
+#include "share.hpp"
+#include "wishes.hpp"
 
 using namespace budget;
 
@@ -54,19 +52,19 @@ void server_signal_handler(int signum) {
 }
 
 void install_signal_handler() {
-    struct sigaction action;
+    struct sigaction action {};
     sigemptyset(&action.sa_mask);
     action.sa_flags = 0;
     action.sa_handler = server_signal_handler;
-    sigaction(SIGTERM, &action, NULL);
-    sigaction(SIGINT, &action, NULL);
+    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGINT, &action, nullptr);
 
     LOG_F(INFO, "Installed the signal handler");
 }
 
 bool start_server(){
     // Name the thread
-    pthread_t self = pthread_self();
+    const pthread_t self = pthread_self();
     pthread_setname_np(self, "server thread");
     loguru::set_thread_name("server thread");
 
@@ -96,7 +94,7 @@ bool start_server(){
 
 void start_cron_loop(){
     // Name the thread
-    pthread_t self = pthread_self();
+    const pthread_t self = pthread_self();
     pthread_setname_np(self, "cron thread");
     loguru::set_thread_name("cron thread");
 
@@ -158,7 +156,7 @@ void load(){
 } //end of anonymous namespace
 
 int main(int argc, char** argv){
-    std::locale global_locale("");
+    std::locale const global_locale("");
     std::locale::global(global_locale);
 
     // Initialize logging for the server

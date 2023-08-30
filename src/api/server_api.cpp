@@ -235,8 +235,8 @@ void budget::api_success_content(const httplib::Request& /*req*/, httplib::Respo
     res.set_content(content, "text/plain");
 }
 
-bool budget::parameters_present(const httplib::Request& req, std::vector<const char*> parameters) {
-    for (auto& param : parameters) {
+bool budget::parameters_present(const httplib::Request& req, const std::vector<const char*>& parameters) {
+    for (const auto& param : parameters) {
         if (!req.has_param(param)) {
             return false;
         }

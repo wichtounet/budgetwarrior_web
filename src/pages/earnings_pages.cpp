@@ -112,7 +112,7 @@ void budget::time_graph_income_page(html_writer & w) {
         auto sy = start_year(w.cache);
 
         for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
-            budget::year year = j;
+            budget::year const year = j;
 
             auto sm = start_month(w.cache, year);
             auto last = 13;
@@ -122,7 +122,7 @@ void budget::time_graph_income_page(html_writer & w) {
             }
 
             for(unsigned short i = sm; i < last; ++i){
-                budget::month month = i;
+                budget::month const month = i;
 
                 budget::money sum = get_base_income(w.cache, budget::date(year, month, 2));
 
@@ -130,7 +130,8 @@ void budget::time_graph_income_page(html_writer & w) {
                     sum += earning.amount;
                 }
 
-                std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                std::string const date =
+                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
 
                 serie.push_back(sum);
                 dates.push_back(date);
@@ -166,7 +167,7 @@ void budget::time_graph_income_page(html_writer & w) {
         auto sy = start_year(w.cache);
 
         for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
-            budget::year year = j;
+            budget::year const year = j;
 
             auto sm = start_month(w.cache, year);
             auto last = 13;
@@ -178,7 +179,7 @@ void budget::time_graph_income_page(html_writer & w) {
             budget::money sum;
 
             for (unsigned short i = sm; i < last; ++i) {
-                budget::month month = i;
+                budget::month const month = i;
 
                 sum += get_base_income(w.cache, budget::date(year, month, 2));
 
@@ -187,7 +188,7 @@ void budget::time_graph_income_page(html_writer & w) {
                 }
             }
 
-            std::string date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(1) + ", 1)";
+            std::string const date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(1) + ", 1)";
 
             serie.push_back(sum);
             dates.push_back(date);
@@ -220,7 +221,7 @@ void budget::time_graph_earnings_page(html_writer & w) {
     auto sy = start_year(w.cache);
 
     for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
-        budget::year year = j;
+        budget::year const year = j;
 
         auto sm = start_month(w.cache, year);
         auto last = 13;
@@ -230,7 +231,7 @@ void budget::time_graph_earnings_page(html_writer & w) {
         }
 
         for(unsigned short i = sm; i < last; ++i){
-            budget::month month = i;
+            budget::month const month = i;
 
             budget::money sum;
 
@@ -254,12 +255,13 @@ namespace {
 void add_quick_earning_action(budget::html_writer & w, size_t i, budget::earning & earning) {
     w << "<script>";
     w << "function quickAction" << i << "() {";
-    w << "  $(\"#input_name\").val(\"" << earning.name << "\");";
+    w << R"(  $("#input_name").val(")" << earning.name << "\");";
     w << "  $(\"#input_amount\").val(" << budget::to_string(earning.amount) << ");";
     w << "  $(\"#input_account\").val(" << earning.account << ");";
     w << "}";
     w << "</script>";
-    w << "<button class=\"btn btn-secondary\" onclick=\"quickAction" << i << "();\">" << earning.name << "</button>&nbsp;";
+    w << R"(<button class="btn btn-secondary" onclick="quickAction)" << i << "();\">" << earning.name
+      << "</button>&nbsp;";
 }
 
 } // end of anonymous namespace
@@ -279,7 +281,8 @@ void budget::add_earnings_page(html_writer& w) {
             last_earnings[earning.name] = earning;
         }
 
-        for (auto & [key, value] : counts) {
+        order.reserve(counts.size());
+        for (auto& [key, value] : counts) {
             order.emplace_back(key, value);
         }
 

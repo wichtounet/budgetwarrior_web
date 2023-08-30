@@ -5,21 +5,21 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
-#include <set>
-#include <numeric>
-
 #include <openssl/md5.h>
 
-#include "cpp_utils/string.hpp"
+#include <numeric>
+#include <set>
+#include <utility>
 
+#include "budget_exception.hpp"
 #include "config.hpp"
+#include "cpp_utils/string.hpp"
+#include "currency.hpp"
+#include "logging.hpp"
 #include "overview.hpp"
+#include "pages/html_writer.hpp"
 #include "summary.hpp"
 #include "version.hpp"
-#include "pages/html_writer.hpp"
-#include "currency.hpp"
-#include "budget_exception.hpp"
-#include "logging.hpp"
 
 // Include all the pages
 #include "pages/assets_pages.hpp"
@@ -50,7 +50,7 @@ using namespace budget;
 
 namespace {
 
-static constexpr const char new_line = '\n';
+constexpr const char new_line = '\n';
 
 std::string header(std::string_view title, bool menu = true) {
     std::stringstream stream;
@@ -192,7 +192,7 @@ std::string header(std::string_view title, bool menu = true) {
 
     stream << R"=====(<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">)=====";
 
-    stream << "<a class=\"navbar-brand\" href=\"#\">" << budget::get_version() << "</a>";
+    stream << R"(<a class="navbar-brand" href="#">)" << budget::get_version() << "</a>";
 
     if (menu) {
         stream << R"=====(
@@ -673,13 +673,13 @@ void budget::load_pages(httplib::Server& server) {
 
 namespace {
 
-std::string md5_to_string(unsigned char * h) {
+std::string md5_to_string(const unsigned char* h) {
     std::stringstream ss;
 
     ss << std::hex << std::setfill('0');
 
     for (size_t i = 0; i < MD5_DIGEST_LENGTH; ++i) {
-        long c = h[i];
+        const long c = h[i];
         ss << std::setw(2) << c;
     }
 
@@ -696,18 +696,19 @@ std::string md5_direct(const std::string & base) {
 
 void ask_for_digest(httplib::Response& res) {
     // The opaque value
-    std::string opaque = "budgetwarrior";
+    std::string const opaque = "budgetwarrior";
 
     // Generate the random nonce
     std::random_device rd;
     std::mt19937_64 g(rd());
-    std::string nonce = std::to_string(g());
+    std::string const nonce = std::to_string(g());
 
     auto nonce_str  = "nonce=\"" + md5_direct(opaque) + "\"";
     auto opaque_str = "opaque=\"" + md5_direct(nonce) + "\"";
 
     res.status = 401;
-    res.set_header("WWW-Authenticate", "Digest realm=\"budgetwarrior\", qop=\"auth,auth-int\"," + nonce_str + "," + opaque_str);
+    res.set_header("WWW-Authenticate",
+                   R"(Digest realm="budgetwarrior", qop="auth,auth-int",)" + nonce_str + "," + opaque_str);
 }
 
 } // end of anonymous namespace
@@ -777,9 +778,10 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             // At this stage, we have to compute the nonce, like the client, and
             // compare to what the client answered
 
-            std::string response_final = md5_direct(md5_direct(get_web_user() + ":" + dict["realm"] + ":" + get_web_password())
-                                                    + ":" + dict["nonce"] + ":" + dict["nc"] + ":" + dict["cnonce"] + ":" + dict["qop"] + ":"
-                                                    + md5_direct(req.method + ":" + dict["uri"]));
+            std::string const response_final =
+                md5_direct(md5_direct(get_web_user() + ":" + dict["realm"] + ":" + get_web_password()) + ":" +
+                           dict["nonce"] + ":" + dict["nc"] + ":" + dict["cnonce"] + ":" + dict["qop"] + ":" +
+                           md5_direct(req.method + ":" + dict["uri"]));
 
             if (dict["response"] != response_final) {
                 ask_for_digest(res);
@@ -792,13 +794,12 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             LOG_F(INFO, "Valid authentication for {} ({})", username, req.path);
 
             return true;
-        } else {
-            ask_for_digest(res);
-
-            LOG_F(WARNING, "Unauthorized Access: No authentication ({})", req.path, req.path);
-
-            return false;
         }
+        ask_for_digest(res);
+
+        LOG_F(WARNING, "Unauthorized Access: No authentication ({})", req.path, req.path);
+
+        return false;
     }
 
     return true;
@@ -820,7 +821,7 @@ bool budget::page_start(const httplib::Request& req, httplib::Response& res, std
 }
 
 bool budget::validate_parameters(html_writer& w, const httplib::Request& req, std::vector<const char*> parameters) {
-    if(!parameters_present(req, parameters)){
+    if (!parameters_present(req, std::move(parameters))) {
         display_error_message(w, "Invalid parameter for the request");
 
         return false;
@@ -902,9 +903,9 @@ void budget::add_text_picker(budget::writer& w, std::string_view title, std::str
     w << "<label for=\"" << name << "\">" << title << "</label>";
 
     if (required) {
-        w << "<input required type=\"text\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input required type="text" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     } else {
-        w << "<input type=\"text\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input type="text" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     }
 
     if (default_value.empty()) {
@@ -925,9 +926,9 @@ void budget::add_password_picker(budget::writer& w, std::string_view title, std:
     w << "<label for=\"" << name << "\">" << title << "</label>";
 
     if (required) {
-        w << "<input required type=\"password\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input required type="password" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     } else {
-        w << "<input type=\"password\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input type="password" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     }
 
     if (default_value.empty()) {
@@ -998,7 +999,7 @@ void budget::add_date_picker(budget::writer& w, std::string_view default_value, 
     if (one_line) {
         w << R"=====(<div class="form-group row">)=====";
 
-        w << "<label class=\"col-sm-4 col-form-label\" for=\"input_date\">Date</label>";
+        w << R"(<label class="col-sm-4 col-form-label" for="input_date">Date</label>)";
 
         w << R"=====(<div class="col-sm-4">)=====";
     } else {
@@ -1039,7 +1040,8 @@ void budget::add_date_picker(budget::writer& w, std::string_view default_value, 
     }
 }
 
-std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_view chart_type, std::string_view id, std::string style) {
+std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_view chart_type, std::string_view id,
+                                           std::string_view style) {
     w.use_module("highcharts");
 
     w << R"=====(<div id=")=====";
@@ -1071,7 +1073,7 @@ std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_v
 }
 
 std::stringstream budget::start_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                                      std::string_view id, std::string style) {
+                                      std::string_view id, std::string_view style) {
     auto ss = start_chart_base(w, chart_type, id, style);
 
     ss << R"=====(title: {text: ')=====";
@@ -1082,7 +1084,7 @@ std::stringstream budget::start_chart(budget::html_writer& w, std::string_view t
 }
 
 std::stringstream budget::start_time_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                                           std::string_view id, std::string style) {
+                                           std::string_view id, std::string_view style) {
     // Note: Not nice but we are simply injecting zoomType here
     auto ss = start_chart_base(w, std::string(chart_type) + "', zoomType: 'x", id, style);
 
@@ -1174,11 +1176,11 @@ void budget::add_account_picker(budget::writer& w, budget::date day, std::string
 
 void budget::add_account_picker_by_name(
         budget::writer& w, budget::date day, std::string_view title, std::string_view default_value, std::string_view input, bool allow_empty) {
-    w << "<div class=\"form-group\"><label for=\"" << input << "\">" << title << "</label>";
-    w << "<select class=\"form-control\" id=\"" << input << "\" name=\"" << input << "\">";
+    w << R"(<div class="form-group"><label for=")" << input << "\">" << title << "</label>";
+    w << R"(<select class="form-control" id=")" << input << "\" name=\"" << input << "\">";
 
     if (allow_empty) {
-        if ("" == default_value) {
+        if (default_value.empty()) {
             w << "<option selected value=\"\"></option>";
         } else {
             w << "<option value=\"\"></option>";
@@ -1203,7 +1205,7 @@ void budget::add_share_asset_picker(budget::writer& w, std::string_view default_
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& asset : w.cache.user_assets() | share_based_only) {
+    for (const auto& asset : w.cache.user_assets() | share_based_only) {
         if (budget::to_string(asset.id) == default_value) {
             w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
         } else {
@@ -1224,7 +1226,7 @@ void budget::add_value_asset_picker(budget::writer& w, std::string_view default_
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& asset : w.cache.user_assets() | not_share_based) {
+    for (const auto& asset : w.cache.user_assets() | not_share_based) {
         if (budget::to_string(asset.id) == default_value) {
             w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
         } else {
@@ -1308,9 +1310,11 @@ void budget::add_integer_picker(budget::writer& w, std::string_view title, std::
     w << "<label for=\"" << name << "\">" << title << "</label>";
 
     if (negative) {
-        w << "<input required type=\"number\" step=\"1\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input required type="number" step="1" class="form-control" id=")" << name << "\" name=\"" << name
+          << "\" ";
     } else {
-        w << "<input required type=\"number\" min=\"0\" step=\"1\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input required type="number" min="0" step="1" class="form-control" id=")" << name << "\" name=\""
+          << name << "\" ";
     }
 
     if (default_value.empty()) {
@@ -1333,7 +1337,7 @@ void budget::add_money_picker(budget::writer& w, std::string_view title, std::st
     if (one_line) {
         w << R"=====(<div class="form-group row">)=====";
 
-        w << "<label class=\"col-sm-4 col-form-label\" for=\"" << name << "\">" << title << "</label>";
+        w << R"(<label class="col-sm-4 col-form-label" for=")" << name << "\">" << title << "</label>";
 
         w << R"=====(<div class="col-sm-4">)=====";
     } else {
@@ -1343,9 +1347,10 @@ void budget::add_money_picker(budget::writer& w, std::string_view title, std::st
     }
 
     if (required) {
-        w << "<input required type=\"number\" step=\"0.01\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input required type="number" step="0.01" class="form-control" id=")" << name << "\" name=\"" << name
+          << "\" ";
     } else {
-        w << "<input type=\"number\" step=\"0.01\" class=\"form-control\" id=\"" << name << "\" name=\"" << name << "\" ";
+        w << R"(<input type="number" step="0.01" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     }
 
     if (default_value.empty()) {

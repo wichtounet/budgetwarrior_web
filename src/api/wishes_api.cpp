@@ -52,7 +52,7 @@ void budget::edit_wishes_api(const httplib::Request& req, httplib::Response& res
         return;
     }
 
-    bool paid = req.get_param_value("input_paid") == "yes";
+    const bool paid = req.get_param_value("input_paid") == "yes";
 
     wish wish       = wish_get(budget::to_number<size_t>(id));
     wish.name       = req.get_param_value("input_name");

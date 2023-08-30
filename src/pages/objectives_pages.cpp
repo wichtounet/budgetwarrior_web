@@ -150,8 +150,7 @@ void budget::objectives_card(budget::html_writer& w){
         ss << R"=====(yAxis: { min: 0, max: 100, lineWidth: 0, tickPositions: [], },)=====";
 
         std::string status;
-        std::string success;
-        int success_int;
+        int success_int = 0;
 
         if (objective.type == "yearly") {
             status      = budget::get_status(year_status, objective);
