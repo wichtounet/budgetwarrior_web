@@ -55,25 +55,32 @@ std::string edit_to_string(std::string_view module, std::string_view id){
     return ss.str();
 }
 
-std::string html_format(budget::html_writer& w, std::string_view v){
-    if(v.substr(0, 5) == "::red"){
+std::string html_format(budget::html_writer& w, std::string_view v) {
+    if (v.substr(0, 5) == "::red") {
         auto value = v.substr(5);
 
         return "<span style=\"color:red;\">" + std::string(value) + "</span>";
     }
+
     if (v.substr(0, 6) == "::blue") {
         auto value = v.substr(6);
 
         return "<span style=\"color:blue;\">" + std::string(value) + "</span>";
-    } else if (v.substr(0, 7) == "::green") {
+    }
+
+    if (v.substr(0, 7) == "::green") {
         auto value = v.substr(7);
 
         return "<span style=\"color:green;\">" + std::string(value) + "</span>";
-    } else if (v.substr(0, 9) == "::success") {
-        auto value = v.substr(9);
+    }
+
+    if (v.substr(0, 9) == "::success") {
+        auto value   = v.substr(9);
         auto success = budget::to_number<unsigned long>(value);
         return success_to_string(success);
-    } else if (v.substr(0, 8) == "::edit::") {
+    }
+
+    if (v.substr(0, 8) == "::edit::") {
         auto value = v.substr(8);
 
         if (value.find("::") == std::string::npos) {
@@ -81,7 +88,7 @@ std::string html_format(budget::html_writer& w, std::string_view v){
         }
 
         auto module = value.substr(0, value.find("::"));
-        auto id = value.substr(value.find("::") + 2, value.size());
+        auto id     = value.substr(value.find("::") + 2, value.size());
 
         w.use_module("open-iconic");
 
