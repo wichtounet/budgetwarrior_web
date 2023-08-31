@@ -31,10 +31,10 @@ void asset_graph_page(html_writer& w, const httplib::Request& req);
 // Net Worth utilities
 void assets_card(budget::html_writer& w);
 void liabilities_card(budget::html_writer& w);
-void net_worth_graph(budget::html_writer& w, const std::string& style = "", bool card = false);
-void fi_net_worth_graph(budget::html_writer& w, const std::string& style = "", bool card = false);
+void net_worth_graph(budget::html_writer& w, std::string_view style = "", bool card = false);
+void fi_net_worth_graph(budget::html_writer& w, std::string_view style = "", bool card = false);
 void net_worth_accrual_graph(budget::html_writer& w);
-void asset_graph(budget::html_writer& w, const std::string& style, const asset& asset);
-void asset_graph_conv(budget::html_writer& w, const std::string& style, const asset& asset);
+void asset_graph(budget::html_writer& w, std::string_view style, const asset& asset);
+void asset_graph_conv(budget::html_writer& w, std::string_view style, const asset& asset);
 
 } //end of namespace budget

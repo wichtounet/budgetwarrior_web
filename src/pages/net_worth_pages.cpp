@@ -260,7 +260,7 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
     }
 }
 
-void budget::asset_graph(budget::html_writer& w, const std::string& style, const asset& asset) {
+void budget::asset_graph(budget::html_writer& w, std::string_view style, const asset& asset) {
     auto ss = start_time_chart(w, asset.name + "(" + asset.currency + ")", "area", "asset_graph", style);
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -295,7 +295,7 @@ void budget::asset_graph(budget::html_writer& w, const std::string& style, const
     end_chart(w, ss);
 }
 
-void budget::asset_graph_conv(budget::html_writer& w, const std::string& style, const asset& asset) {
+void budget::asset_graph_conv(budget::html_writer& w, std::string_view style, const asset& asset) {
     auto ss = start_time_chart(w, asset.name + "(" + get_default_currency() + ")", "area", "asset_graph_conv", style);
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -333,7 +333,7 @@ void budget::asset_graph_conv(budget::html_writer& w, const std::string& style, 
 namespace {
 
 template <typename Functor>
-void net_worth_graph(budget::html_writer& w, const std::string & title, const std::string style, bool card, Functor nw_func) {
+void net_worth_graph(budget::html_writer& w, std::string_view title, std::string_view style, bool card, Functor nw_func) {
     // if the user does not use assets, this graph does not make sense
     if (no_assets() || no_asset_values()) {
         return;
@@ -409,15 +409,15 @@ void net_worth_graph(budget::html_writer& w, const std::string & title, const st
     }
 }
 
-}
+} // namespace
 
-void budget::net_worth_graph(budget::html_writer& w, const std::string& style, bool card) {
+void budget::net_worth_graph(budget::html_writer& w, std::string_view style, bool card) {
     ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::html_writer & w){
         return get_net_worth(d, w.cache);
     });
 }
 
-void budget::fi_net_worth_graph(budget::html_writer& w, const std::string& style, bool card) {
+void budget::fi_net_worth_graph(budget::html_writer& w, std::string_view style, bool card) {
     ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::html_writer & w){
         return get_fi_net_worth(d, w.cache);
     });
