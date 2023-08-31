@@ -15,7 +15,7 @@ using namespace budget;
 
 namespace {
 
-void add_direction_picker(budget::writer& w, const std::string& default_value = "") {
+void add_direction_picker(budget::writer& w, std::string_view default_value = "") {
     w << R"=====(
             <div class="form-group">
                 <label for="input_direction">Direction</label>

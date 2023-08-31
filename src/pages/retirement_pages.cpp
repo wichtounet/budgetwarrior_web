@@ -88,11 +88,9 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
         auto end_date = budget::local_day();
 
         while (date <= end_date) {
-            auto ratio = budget::fi_ratio(date, w.cache);
+            const auto ratio = budget::fi_ratio(date, w.cache);
 
-            const std::string datestr =
-                    "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", " + std::to_string(date.day().value) + ")";
-            ss << "[" << datestr << "," << budget::to_string(100 * ratio) << "],";
+            ss << std::format("[Date.UTC({},{},{}), {}]", date.year().value, date.month().value - 1, date.day().value, 100 * ratio);
 
             date += days(1);
         }
@@ -110,12 +108,9 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
         auto end_date = budget::local_day();
 
         while (date <= end_date) {
-            auto ratio = budget::fixed_fi_ratio(date, w.cache, fixed_expenses);
+            const auto ratio = budget::fixed_fi_ratio(date, w.cache, fixed_expenses);
 
-            const std::string datestr = "Date.UTC(" + std::to_string(date.year()) + "," +
-                                        std::to_string(date.month().value - 1) + ", " +
-                                        std::to_string(date.day().value) + ")";
-            ss << "[" << datestr << "," << budget::to_string(100 * ratio) << "],";
+            ss << std::format("[Date.UTC({},{},{}), {}]", date.year().value, date.month().value - 1, date.day().value, 100 * ratio);
 
             date += days(1);
         }

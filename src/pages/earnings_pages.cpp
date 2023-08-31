@@ -17,7 +17,7 @@
 
 using namespace budget;
 
-void budget::month_breakdown_income_graph(budget::html_writer& w, const std::string& title, budget::month month, budget::year year, bool mono, const std::string& style) {
+void budget::month_breakdown_income_graph(budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, std::string_view style) {
     if (mono) {
         w.defer_script(R"=====(
             breakdown_income_colors = (function () {

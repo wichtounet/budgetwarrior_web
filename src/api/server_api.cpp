@@ -91,6 +91,37 @@ auto api_wrapper(void (*api_function)(const httplib::Request &, httplib::Respons
     };
 }
 
+std::string encode_url(std::string_view s) {
+  std::string result;
+
+  for (auto i = 0; s[i]; i++) {
+    switch (s[i]) {
+    case ' ': result += "%20"; break;
+    case '+': result += "%2B"; break;
+    case '\r': result += "%0D"; break;
+    case '\n': result += "%0A"; break;
+    case '\'': result += "%27"; break;
+    case ',': result += "%2C"; break;
+    case ':': result += "%3A"; break;
+    case ';': result += "%3B"; break;
+    default:
+      auto c = static_cast<uint8_t>(s[i]);
+      if (c >= 0x80) {
+        result += '%';
+        char hex[4];
+        size_t len = snprintf(hex, sizeof(hex) - 1, "%02X", c);
+        assert(len == 2);
+        result.append(hex, len);
+      } else {
+        result += s[i];
+      }
+      break;
+    }
+  }
+
+  return result;
+}
+
 } //end of anonymous namespace
 
 void budget::load_api(httplib::Server& server) {
@@ -180,49 +211,49 @@ bool budget::api_start(const httplib::Request& req, httplib::Response& res) {
     return authenticate(req, res);
 }
 
-void budget::api_error(const httplib::Request& req, httplib::Response& res, const std::string& message) {
+void budget::api_error(const httplib::Request& req, httplib::Response& res, std::string_view message) {
     if (req.has_param("server")) {
         auto back_page = html_base64_decode(req.get_param_value("back_page"));
 
         std::string url;
         if (back_page.find('?') == std::string::npos) {
-            url = back_page + "?error=true&message=" + httplib::detail::encode_url(message);
+            url = std::format("{}?error=true&message={}", back_page,  encode_url(message));
         } else {
-            url = back_page + "&error=true&message=" + httplib::detail::encode_url(message);
+            url = std::format("{}&error=true&message={}", back_page,  encode_url(message));
         }
 
         res.set_redirect(url.c_str());
     } else {
-        res.set_content("Error: " + message, "text/plain");
+        res.set_content(std::format("Error: {}", message), "text/plain");
     }
 }
 
-void budget::api_success(const httplib::Request& req, httplib::Response& res, const std::string& message) {
+void budget::api_success(const httplib::Request& req, httplib::Response& res, std::string_view message) {
     if (req.has_param("server")) {
         auto back_page = html_base64_decode(req.get_param_value("back_page"));
 
         std::string url;
         if (back_page.find('?') == std::string::npos) {
-            url = back_page + "?success=true&message=" + httplib::detail::encode_url(message);
+            url = std::format("{}?success=true&message={}", back_page,  encode_url(message));
         } else {
-            url = back_page + "&success=true&message=" + httplib::detail::encode_url(message);
+            url = std::format("{}&success=true&message={}", back_page,  encode_url(message));
         }
 
         res.set_redirect(url.c_str());
     } else {
-        res.set_content("Success: " + message, "text/plain");
+        res.set_content(std::format("Success: {}", message), "text/plain");
     }
 }
 
-void budget::api_success(const httplib::Request& req, httplib::Response& res, const std::string& message, const std::string& content) {
+void budget::api_success(const httplib::Request& req, httplib::Response& res, std::string_view message, const std::string& content) {
     if (req.has_param("server")) {
         auto back_page = html_base64_decode(req.get_param_value("back_page"));
 
         std::string url;
         if (back_page.find('?') == std::string::npos) {
-            url = back_page + "?success=true&message=" + httplib::detail::encode_url(message);
+            url = std::format("{}?success=true&message={}", back_page,  encode_url(message));
         } else {
-            url = back_page + "&success=true&message=" + httplib::detail::encode_url(message);
+            url = std::format("{}&success=true&message={}", back_page,  encode_url(message));
         }
 
         res.set_redirect(url.c_str());

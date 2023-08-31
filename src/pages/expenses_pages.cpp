@@ -40,7 +40,7 @@ std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::
 
 } // end of anonymous namespace
 
-void budget::month_breakdown_expenses_graph(budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, const std::string& style) {
+void budget::month_breakdown_expenses_graph(budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, std::string_view style) {
     if (mono) {
         w.defer_script(R"=====(
             breakdown_expense_colors = (function () {

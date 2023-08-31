@@ -686,23 +686,24 @@ std::string md5_to_string(const unsigned char* h) {
     return ss.str();
 }
 
-std::string md5_direct(const std::string & base) {
+std::string md5_direct(std::string_view base) {
     unsigned char hash[MD5_DIGEST_LENGTH];
 
-    MD5((unsigned char*) base.c_str(), base.size(), hash);
+    MD5((unsigned char*) base.data(), base.size(), hash);
 
     return md5_to_string(hash);
 }
 
 void ask_for_digest(httplib::Response& res) {
     // The opaque value
-    std::string const opaque = "budgetwarrior";
+    const std::string_view opaque = "budgetwarrior";
 
     // Generate the random nonce
     std::random_device rd;
     std::mt19937_64 g(rd());
-    std::string const nonce = std::to_string(g());
+    const std::string nonce = std::to_string(g());
 
+    // TODO: Optimize without all these copies
     auto nonce_str  = "nonce=\"" + md5_direct(opaque) + "\"";
     auto opaque_str = "opaque=\"" + md5_direct(nonce) + "\"";
 

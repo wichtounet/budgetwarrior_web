@@ -17,7 +17,7 @@ using namespace budget;
 
 namespace {
 
-bool yes_or_no(const std::string& value) {
+bool yes_or_no(std::string_view value) {
     return value == "yes" || value == "no";
 }
 

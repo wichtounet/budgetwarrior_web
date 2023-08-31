@@ -15,7 +15,7 @@ using namespace budget;
 
 namespace {
 
-void add_frequencypicker(budget::writer& w, const std::string& default_value = "") {
+void add_frequencypicker(budget::writer& w, std::string_view default_value = "") {
     w << R"=====(
             <div class="form-group">
                 <label for="input_recurs">Recurrence</label>
@@ -40,7 +40,7 @@ void add_frequencypicker(budget::writer& w, const std::string& default_value = "
     )=====";
 }
 
-void add_type_picker(budget::writer& w, const std::string& default_value = "") {
+void add_type_picker(budget::writer& w, std::string_view default_value = "") {
     w << R"=====(
             <div class="form-group">
                 <label for="input_type">Type</label>

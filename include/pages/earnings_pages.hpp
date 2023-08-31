@@ -19,8 +19,8 @@ void earnings_page(html_writer & w, const httplib::Request& req);
 void search_earnings_page(html_writer & w, const httplib::Request& req);
 void all_earnings_page(html_writer & w);
 
-void month_breakdown_income_graph(budget::html_writer& w, const std::string& title,
+void month_breakdown_income_graph(budget::html_writer& w, std::string_view title,
                                   budget::month month, budget::year year, bool mono = false,
-                                  const std::string& style = "");
+                                  std::string_view style = "");
 
 } //end of namespace budget

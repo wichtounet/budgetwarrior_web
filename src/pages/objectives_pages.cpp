@@ -14,7 +14,7 @@ using namespace budget;
 
 namespace {
 
-void add_objective_operator_picker(budget::writer& w, const std::string& default_value = "") {
+void add_objective_operator_picker(budget::writer& w, std::string_view default_value = "") {
     w << R"=====(
             <div class="form-group">
                 <label for="input_operator">Operator</label>
@@ -39,7 +39,7 @@ void add_objective_operator_picker(budget::writer& w, const std::string& default
     )=====";
 }
 
-void add_objective_type_picker(budget::writer& w, const std::string& default_value = "") {
+void add_objective_type_picker(budget::writer& w, std::string_view default_value = "") {
     w << R"=====(
             <div class="form-group">
                 <label for="input_type">Type</label>
@@ -64,7 +64,7 @@ void add_objective_type_picker(budget::writer& w, const std::string& default_val
     )=====";
 }
 
-void add_objective_source_picker(budget::writer& w, const std::string& default_value = "") {
+void add_objective_source_picker(budget::writer& w, std::string_view default_value = "") {
     w << R"=====(
             <div class="form-group">
                 <label for="input_source">Source</label>
