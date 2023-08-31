@@ -35,8 +35,8 @@ std::string success_to_string(int success) {
 std::string edit_to_string(std::string_view module, std::string_view id){
     std::stringstream ss;
 
-    auto delete_url = "/api/" + std::string(module) + "/delete/?server=yes&back_page=__budget_this_page__&input_id=" + std::string(id);
-    auto edit_url = "/" + std::string(module) + "/edit/?server=yes&back_page=__budget_this_page__&input_id=" + std::string(id);
+    auto delete_url = std::format("/api/{}/delete/?server=yes&back_page=__budget_this_page__&input_id={}", module, id);
+    auto edit_url   = std::format("/{}/edit/?server=yes&back_page=__budget_this_page__&input_id={}", module, id);
 
     // Add the delete button
     ss << R"=====(<a href=")=====";
@@ -57,21 +57,15 @@ std::string edit_to_string(std::string_view module, std::string_view id){
 
 std::string html_format(budget::html_writer& w, std::string_view v) {
     if (v.substr(0, 5) == "::red") {
-        auto value = v.substr(5);
-
-        return "<span style=\"color:red;\">" + std::string(value) + "</span>";
+        return std::format("<span style=\"color:red;\">{}</span>", v.substr(5));
     }
 
     if (v.substr(0, 6) == "::blue") {
-        auto value = v.substr(6);
-
-        return "<span style=\"color:blue;\">" + std::string(value) + "</span>";
+        return std::format("<span style=\"color:blue;\">{}</span>", v.substr(6));
     }
 
     if (v.substr(0, 7) == "::green") {
-        auto value = v.substr(7);
-
-        return "<span style=\"color:green;\">" + std::string(value) + "</span>";
+        return std::format("<span style=\"color:green;\">{}</span>", v.substr(7));
     }
 
     if (v.substr(0, 9) == "::success") {
