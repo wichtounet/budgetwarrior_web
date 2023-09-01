@@ -334,6 +334,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
         ss << "]},";
 
         add_average_12_serie(ss, serie, dates);
+        add_average_24_serie(ss, serie, dates);
 
         ss << "]";
 
