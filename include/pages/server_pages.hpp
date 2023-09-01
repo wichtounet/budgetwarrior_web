@@ -72,8 +72,11 @@ std::stringstream start_time_chart(budget::html_writer& w, std::string_view titl
                                    std::string_view id = "container", std::string_view style = "");
 void end_chart(budget::html_writer& w, std::stringstream& ss);
 void add_average_12_serie(std::stringstream& ss,
-                         std::vector<budget::money> serie,
-                         std::vector<std::string> dates);
+                         const std::vector<budget::money> & serie,
+                         const std::vector<std::string> & dates);
+void add_average_24_serie(std::stringstream& ss,
+                         const std::vector<budget::money>&  serie,
+                         const std::vector<std::string> & dates);
 void add_average_5_serie(std::stringstream& ss,
                          std::vector<budget::money> serie,
                          std::vector<std::string> dates);

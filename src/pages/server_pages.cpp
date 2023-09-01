@@ -1104,29 +1104,46 @@ void budget::end_chart(budget::html_writer& w, std::stringstream& ss) {
     w.defer_script(ss.str());
 }
 
-void budget::add_average_12_serie(std::stringstream& ss,
-                                 std::vector<budget::money> serie,
-                                 std::vector<std::string> dates) {
-    ss << "{ type: 'line', name: '12 months average',";
+namespace {
+
+template <size_t N>
+void add_average_n_serie(std::stringstream& ss,
+                                 const std::vector<budget::money> & serie,
+                                 const std::vector<std::string> & dates) {
+    ss << "{ type: 'line', name: '" << N << " months average',";
     ss << "data: [";
 
-    std::array<budget::money, 12> average_12;
+    std::array<budget::money, N> average_12;
 
     for (size_t i = 0; i < serie.size(); ++i) {
-        average_12[i % 12] = serie[i];
+        average_12[i % N] = serie[i];
 
         auto average = std::accumulate(average_12.begin(), average_12.end(), budget::money());
 
-        if (i < 12) {
+        if (i < N) {
             average = average / int(i + 1);
         } else {
-            average = average / 12;
+            average = average / int(N);
         }
 
         ss << "[" << dates[i] << "," << budget::money_to_string(average) << "],";
     }
 
     ss << "]},";
+}
+
+} // namespace
+
+void budget::add_average_12_serie(std::stringstream& ss,
+                                 const std::vector<budget::money> & serie,
+                                 const std::vector<std::string> & dates) {
+    add_average_n_serie<12>(ss, serie, dates);
+}
+
+void budget::add_average_24_serie(std::stringstream& ss,
+                                 const std::vector<budget::money> & serie,
+                                 const std::vector<std::string> & dates) {
+    add_average_n_serie<24>(ss, serie, dates);
 }
 
 void budget::add_average_5_serie(std::stringstream& ss,
