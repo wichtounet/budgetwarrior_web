@@ -19,8 +19,7 @@ using namespace budget;
 
 void budget::add_earnings_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_name", "input_date", "input_amount", "input_account"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     earning earning;
@@ -37,15 +36,13 @@ void budget::add_earnings_api(const httplib::Request& req, httplib::Response& re
 
 void budget::edit_earnings_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_name", "input_date", "input_amount", "input_account"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::earning_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Earning " + id + " does not exist");
-        return;
+        return api_error(req, res, "Earning " + id + " does not exist");
     }
 
     earning earning = earning_get(budget::to_number<size_t>(id));
@@ -61,15 +58,13 @@ void budget::edit_earnings_api(const httplib::Request& req, httplib::Response& r
 
 void budget::delete_earnings_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::earning_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The earning " + id + " does not exit");
-        return;
+        return api_error(req, res, "The earning " + id + " does not exit");
     }
 
     budget::earning_delete(budget::to_number<size_t>(id));

@@ -19,8 +19,7 @@ using namespace budget;
 
 void budget::add_accounts_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_name", "input_amount"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     account account;
@@ -37,15 +36,13 @@ void budget::add_accounts_api(const httplib::Request& req, httplib::Response& re
 
 void budget::edit_accounts_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_name", "input_amount"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::account_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "account " + id + " does not exist");
-        return;
+        return api_error(req, res, "account " + id + " does not exist");
     }
 
     account account = get_account(budget::to_number<size_t>(id));
@@ -59,15 +56,13 @@ void budget::edit_accounts_api(const httplib::Request& req, httplib::Response& r
 
 void budget::delete_accounts_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::account_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The account " + id + " does not exit");
-        return;
+        return api_error(req, res, "The account " + id + " does not exit");
     }
 
     budget::account_delete(budget::to_number<size_t>(id));

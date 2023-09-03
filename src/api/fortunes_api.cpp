@@ -20,8 +20,7 @@ using namespace budget;
 
 void budget::add_fortunes_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_amount") || !req.has_param("input_date")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     fortune fortune;
@@ -35,15 +34,13 @@ void budget::add_fortunes_api(const httplib::Request& req, httplib::Response& re
 
 void budget::edit_fortunes_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_id") || !req.has_param("input_amount") || !req.has_param("input_date")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::fortune_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Fortune " + id + " does not exist");
-        return;
+        return api_error(req, res, "Fortune " + id + " does not exist");
     }
 
     fortune fortune    = fortune_get(budget::to_number<size_t>(id));
@@ -57,15 +54,13 @@ void budget::edit_fortunes_api(const httplib::Request& req, httplib::Response& r
 
 void budget::delete_fortunes_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_id")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::fortune_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The fortune " + id + " does not exit");
-        return;
+        return api_error(req, res, "The fortune " + id + " does not exit");
     }
 
     budget::fortune_delete(budget::to_number<size_t>(id));

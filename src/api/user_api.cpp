@@ -33,13 +33,11 @@ void budget::user_config_api(const httplib::Request& req, httplib::Response& res
                              "input_sh_prefix",
                              "input_user",
                              "input_password"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     if (!yes_or_no(req.get_param_value("input_enable_fortune")) || !yes_or_no(req.get_param_value("input_enable_debts"))) {
-        api_error(req, res, "Invalid parameter value");
-        return;
+        return api_error(req, res, "Invalid parameter value");
     }
 
     auto disable_fortune = req.get_param_value("input_enable_fortune") == "no";

@@ -42,8 +42,7 @@ void server_version_api(const httplib::Request& req, httplib::Response& res) {
 
 void server_version_support_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"version"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto client_version = req.get_param_value("version");
@@ -57,8 +56,7 @@ void server_version_support_api(const httplib::Request& req, httplib::Response& 
 
 void retirement_configure_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_wrate", "input_roi"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     // Save the configuration

@@ -22,8 +22,7 @@ using namespace budget;
 
 void budget::add_assets_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_name", "input_portfolio", "input_alloc", "input_share_based", "input_ticker"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     asset asset;
@@ -52,14 +51,12 @@ void budget::add_assets_api(const httplib::Request& req, httplib::Response& res)
         asset.ticker = req.get_param_value("input_ticker");
 
         if (asset.ticker.empty()) {
-            api_error(req, res, "The ticker cannot be empty for a shared-based asset");
-            return;
+            return api_error(req, res, "The ticker cannot be empty for a shared-based asset");
         }
     }
 
     if (asset.total_allocation() != money(100)) {
-        api_error(req, res, "The total allocation of the asset is not 100%");
-        return;
+        return api_error(req, res, "The total allocation of the asset is not 100%");
     }
 
     asset.active = req.get_param_value("input_active") == "yes";
@@ -71,15 +68,13 @@ void budget::add_assets_api(const httplib::Request& req, httplib::Response& res)
 
 void budget::edit_assets_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_name", "input_portfolio", "input_alloc", "input_share_based", "input_ticker"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "asset " + id + " does not exist");
-        return;
+        return api_error(req, res, "asset " + id + " does not exist");
     }
 
     asset asset = get_asset(budget::to_number<size_t>(id));
@@ -101,8 +96,7 @@ void budget::edit_assets_api(const httplib::Request& req, httplib::Response& res
     asset.active          = req.get_param_value("input_active") == "yes";
 
     if (asset.total_allocation() != money(100)) {
-        api_error(req, res, "The total allocation of the asset is not 100%");
-        return;
+        return api_error(req, res, "The total allocation of the asset is not 100%");
     }
 
     edit_asset(asset);
@@ -112,8 +106,7 @@ void budget::edit_assets_api(const httplib::Request& req, httplib::Response& res
 
 void budget::delete_assets_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
@@ -142,8 +135,7 @@ void budget::list_assets_api(const httplib::Request& req, httplib::Response& res
 
 void budget::add_asset_values_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_asset", "input_date", "input_amount"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     asset_value asset_value;
@@ -160,15 +152,13 @@ void budget::add_asset_values_api(const httplib::Request& req, httplib::Response
 
 void budget::edit_asset_values_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_asset", "input_date", "input_amount"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_value_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Asset value " + id + " does not exist");
-        return;
+        return api_error(req, res, "Asset value " + id + " does not exist");
     }
 
     asset_value asset_value = get_asset_value(budget::to_number<size_t>(id));
@@ -184,15 +174,13 @@ void budget::edit_asset_values_api(const httplib::Request& req, httplib::Respons
 
 void budget::delete_asset_values_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_value_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The asset value " + id + " does not exit");
-        return;
+        return api_error(req, res, "The asset value " + id + " does not exit");
     }
 
     budget::asset_value_delete(budget::to_number<size_t>(id));
@@ -248,8 +236,7 @@ void budget::batch_asset_values_api(const httplib::Request& req, httplib::Respon
 
 void budget::add_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_asset", "input_shares", "input_price", "input_date"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     asset_share asset_share;
@@ -266,15 +253,13 @@ void budget::add_asset_shares_api(const httplib::Request& req, httplib::Response
 
 void budget::edit_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_asset", "input_shares", "input_price", "input_date"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_share_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Asset share " + id + " does not exist");
-        return;
+        return api_error(req, res, "Asset share " + id + " does not exist");
     }
 
     asset_share asset_share = get_asset_share(budget::to_number<size_t>(id));
@@ -290,15 +275,13 @@ void budget::edit_asset_shares_api(const httplib::Request& req, httplib::Respons
 
 void budget::delete_asset_shares_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_share_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The asset share " + id + " does not exit");
-        return;
+        return api_error(req, res, "The asset share " + id + " does not exit");
     }
 
     budget::asset_share_delete(budget::to_number<size_t>(id));
@@ -322,8 +305,7 @@ void budget::list_asset_shares_api(const httplib::Request& req, httplib::Respons
 
 void budget::add_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_name"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     asset_class asset_class;
@@ -338,15 +320,13 @@ void budget::add_asset_classes_api(const httplib::Request& req, httplib::Respons
 
 void budget::edit_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_name"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_class_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Asset class " + id + " does not exist");
-        return;
+        return api_error(req, res, "Asset class " + id + " does not exist");
     }
 
     asset_class asset_class = get_asset_class(budget::to_number<size_t>(id));
@@ -360,23 +340,20 @@ void budget::edit_asset_classes_api(const httplib::Request& req, httplib::Respon
 
 void budget::delete_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::asset_class_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The asset class " + id + " does not exit");
-        return;
+        return api_error(req, res, "The asset class " + id + " does not exit");
     }
 
     auto clas = get_asset_class(budget::to_number<size_t>(id));
 
     for (auto& asset : all_assets()) {
         if (get_asset_class_allocation(asset, clas)) {
-            api_error(req, res, "Cannot delete an asset class that is still used");
-            return;
+            return api_error(req, res, "Cannot delete an asset class that is still used");
         }
     }
 
@@ -401,8 +378,7 @@ void budget::list_asset_classes_api(const httplib::Request& req, httplib::Respon
 
 void budget::add_liabilities_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_name", "input_currency"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     liability liability;
@@ -425,15 +401,13 @@ void budget::add_liabilities_api(const httplib::Request& req, httplib::Response&
 
 void budget::edit_liabilities_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_name", "input_currency"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::liability_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Liability " + id + " does not exist");
-        return;
+        return api_error(req, res, "Liability " + id + " does not exist");
     }
 
     liability liability = get_liability(budget::to_number<size_t>(id));
@@ -456,15 +430,13 @@ void budget::edit_liabilities_api(const httplib::Request& req, httplib::Response
 
 void budget::delete_liabilities_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::liability_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The Liability " + id + " does not exit");
-        return;
+        return api_error(req, res, "The Liability " + id + " does not exit");
     }
 
     budget::liability_delete(budget::to_number<size_t>(id));

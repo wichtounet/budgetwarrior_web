@@ -21,8 +21,7 @@ using namespace budget;
 void budget::add_recurrings_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_account") || !req.has_param("input_recurs")
         || !req.has_param("input_type")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return  api_error(req, res, "Invalid parameters");
     }
 
     recurring recurring;
@@ -50,15 +49,13 @@ void budget::add_recurrings_api(const httplib::Request& req, httplib::Response& 
 void budget::edit_recurrings_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_id") || !req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_account")
         || !req.has_param("input_recurs")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!recurring_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "recurring " + id + " does not exist");
-        return;
+        return api_error(req, res, "recurring " + id + " does not exist");
     }
 
     auto recurring          = recurring_get(budget::to_number<size_t>(id));
@@ -70,8 +67,7 @@ void budget::edit_recurrings_api(const httplib::Request& req, httplib::Response&
     recurring.recurs  = req.get_param_value("input_recurs");
 
     if (recurring.recurs != "monthly" && recurring.recurs != "weekly") {
-        api_error(req, res, "Invalid recurring frequency");
-        return;
+        return api_error(req, res, "Invalid recurring frequency");
     }
 
     edit_recurring(recurring, previous_recurring);
@@ -81,15 +77,13 @@ void budget::edit_recurrings_api(const httplib::Request& req, httplib::Response&
 
 void budget::delete_recurrings_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_id")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!recurring_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The recurring " + id + " does not exit");
-        return;
+        return api_error(req, res, "The recurring " + id + " does not exit");
     }
 
     recurring_delete(budget::to_number<size_t>(id));

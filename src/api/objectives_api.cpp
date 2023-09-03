@@ -19,8 +19,7 @@ using namespace budget;
 
 void budget::add_objectives_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_name", "input_type", "input_type", "input_source", "input_operator", "input_amount"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     objective objective;
@@ -38,15 +37,13 @@ void budget::add_objectives_api(const httplib::Request& req, httplib::Response& 
 
 void budget::edit_objectives_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id", "input_name", "input_type", "input_type", "input_source", "input_operator", "input_amount"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::objective_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "objective " + id + " does not exist");
-        return;
+        return api_error(req, res, "objective " + id + " does not exist");
     }
 
     objective objective = objective_get(budget::to_number<size_t>(id));
@@ -63,15 +60,13 @@ void budget::edit_objectives_api(const httplib::Request& req, httplib::Response&
 
 void budget::delete_objectives_api(const httplib::Request& req, httplib::Response& res) {
     if (!parameters_present(req, {"input_id"})) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::objective_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The objective " + id + " does not exit");
-        return;
+        return api_error(req, res, "The objective " + id + " does not exit");
     }
 
     budget::objective_delete(budget::to_number<size_t>(id));

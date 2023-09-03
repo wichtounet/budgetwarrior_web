@@ -20,8 +20,7 @@ using namespace budget;
 
 void budget::add_debts_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_title") || !req.has_param("input_direction")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     debt debt;
@@ -41,15 +40,13 @@ void budget::add_debts_api(const httplib::Request& req, httplib::Response& res) 
 void budget::edit_debts_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_id") || !req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_title")
         || !req.has_param("input_direction") || !req.has_param("input_paid")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::debt_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "Debt " + id + " does not exist");
-        return;
+        return api_error(req, res, "Debt " + id + " does not exist");
     }
 
     debt debt      = debt_get(budget::to_number<size_t>(id));
@@ -66,15 +63,13 @@ void budget::edit_debts_api(const httplib::Request& req, httplib::Response& res)
 
 void budget::delete_debts_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_id")) {
-        api_error(req, res, "Invalid parameters");
-        return;
+        return api_error(req, res, "Invalid parameters");
     }
 
     auto id = req.get_param_value("input_id");
 
     if (!budget::debt_exists(budget::to_number<size_t>(id))) {
-        api_error(req, res, "The debt " + id + " does not exit");
-        return;
+        return api_error(req, res, "The debt " + id + " does not exit");
     }
 
     budget::debt_delete(budget::to_number<size_t>(id));
