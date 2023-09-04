@@ -35,13 +35,11 @@ void budget::retirement_status_page(html_writer & w) {
     w << title_begin << "Retirement status" << title_end;
 
     if(!internal_config_contains("withdrawal_rate")){
-        display_error_message(w, "Not enough information, please configure Retirement Options first");
-        return;
+        return display_error_message(w, "Not enough information, please configure Retirement Options first");
     }
 
     if(!internal_config_contains("expected_roi")){
-        display_error_message(w, "Not enough information, please configure Retirement Options first");
-        return;
+        return display_error_message(w, "Not enough information, please configure Retirement Options first");
     }
 
     budget::retirement_status(w);

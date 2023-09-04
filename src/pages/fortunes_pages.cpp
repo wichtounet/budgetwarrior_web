@@ -73,19 +73,19 @@ void budget::edit_fortunes_page(html_writer & w, const httplib::Request& req) {
     auto input_id = req.get_param_value("input_id");
 
     if (!fortune_exists(budget::to_number<size_t>(input_id))) {
-        display_error_message(w, "The fortune {} does not exist", input_id);
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit fortune " << input_id << title_end;
-
-        form_begin_edit(w, "/api/fortunes/edit/", back_page, input_id);
-
-        auto fortune = fortune_get(budget::to_number<size_t>(input_id));
-
-        add_date_picker(w, budget::to_string(fortune.check_date));
-        add_amount_picker(w, budget::money_to_string(fortune.amount));
-
-        form_end(w);
+        return display_error_message(w, "The fortune {} does not exist", input_id);
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit fortune " << input_id << title_end;
+
+    form_begin_edit(w, "/api/fortunes/edit/", back_page, input_id);
+
+    auto fortune = fortune_get(budget::to_number<size_t>(input_id));
+
+    add_date_picker(w, budget::to_string(fortune.check_date));
+    add_amount_picker(w, budget::money_to_string(fortune.amount));
+
+    form_end(w);
 }

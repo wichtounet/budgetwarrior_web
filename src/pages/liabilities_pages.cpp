@@ -52,24 +52,24 @@ void budget::edit_liabilities_page(html_writer& w, const httplib::Request& req) 
     auto id = budget::to_number<size_t>(input_id);
 
     if (!liability_exists(id)) {
-        display_error_message(w, "The liability {} does not exist", input_id);
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit liability " << input_id << title_end;
-
-        form_begin_edit(w, "/api/liabilities/edit/", back_page, input_id);
-
-        auto liability = get_liability(id);
-
-        add_name_picker(w, liability.name);
-
-        for (auto & clas : all_asset_classes()) {
-            add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), budget::money_to_string(get_asset_class_allocation(liability, clas)));
-        }
-
-        add_currency_picker(w, liability.currency);
-
-        form_end(w);
+        return display_error_message(w, "The liability {} does not exist", input_id);
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit liability " << input_id << title_end;
+
+    form_begin_edit(w, "/api/liabilities/edit/", back_page, input_id);
+
+    auto liability = get_liability(id);
+
+    add_name_picker(w, liability.name);
+
+    for (auto& clas : all_asset_classes()) {
+        add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), budget::money_to_string(get_asset_class_allocation(liability, clas)));
+    }
+
+    add_currency_picker(w, liability.currency);
+
+    form_end(w);
 }

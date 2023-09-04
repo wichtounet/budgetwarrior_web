@@ -557,27 +557,27 @@ void budget::add_expenses_page(html_writer& w) {
 
 void budget::edit_expenses_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
-        display_error_message(w, "Invalid parameter for the request");
-    } else {
-        auto input_id = req.get_param_value("input_id");
-
-        if (!expense_exists(budget::to_number<size_t>(input_id))) {
-            display_error_message(w, "The expense {} does not exist", input_id);
-        } else {
-            auto back_page = req.get_param_value("back_page");
-
-            w << title_begin << "Edit Expense " << input_id << title_end;
-
-            form_begin_edit(w, "/api/expenses/edit/", back_page, input_id);
-
-            auto expense = expense_get(budget::to_number<size_t>(input_id));
-
-            add_date_picker(w, budget::to_string(expense.date));
-            add_name_picker(w, expense.name);
-            add_amount_picker(w, budget::money_to_string(expense.amount));
-            add_account_picker(w, expense.date, budget::to_string(expense.account));
-
-            form_end(w);
-        }
+        return display_error_message(w, "Invalid parameter for the request");
     }
+
+    auto input_id = req.get_param_value("input_id");
+
+    if (!expense_exists(budget::to_number<size_t>(input_id))) {
+        return display_error_message(w, "The expense {} does not exist", input_id);
+    }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit Expense " << input_id << title_end;
+
+    form_begin_edit(w, "/api/expenses/edit/", back_page, input_id);
+
+    auto expense = expense_get(budget::to_number<size_t>(input_id));
+
+    add_date_picker(w, budget::to_string(expense.date));
+    add_name_picker(w, expense.name);
+    add_amount_picker(w, budget::money_to_string(expense.amount));
+    add_account_picker(w, expense.date, budget::to_string(expense.account));
+
+    form_end(w);
 }

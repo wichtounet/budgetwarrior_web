@@ -89,27 +89,27 @@ void budget::add_recurrings_page(html_writer& w) {
 
 void budget::edit_recurrings_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
-        display_error_message(w, "Invalid parameter for the request");
-    } else {
-        auto input_id = req.get_param_value("input_id");
-
-        if (!recurring_exists(budget::to_number<size_t>(input_id))) {
-            display_error_message(w, "The recurring expense {} does not exist", input_id);
-        } else {
-            auto back_page = req.get_param_value("back_page");
-
-            w << title_begin << "Edit Recurring Expense " << input_id << title_end;
-
-            form_begin_edit(w, "/api/recurrings/edit/", back_page, input_id);
-
-            auto recurring = recurring_get(budget::to_number<size_t>(input_id));
-
-            add_name_picker(w, recurring.name);
-            add_amount_picker(w, budget::money_to_string(recurring.amount));
-            add_account_picker(w, budget::local_day(), budget::to_string(recurring.account));
-            add_frequencypicker(w, recurring.recurs);
-
-            form_end(w);
-        }
+        return display_error_message(w, "Invalid parameter for the request");
     }
+
+    auto input_id = req.get_param_value("input_id");
+
+    if (!recurring_exists(budget::to_number<size_t>(input_id))) {
+        return display_error_message(w, "The recurring expense {} does not exist", input_id);
+    }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit Recurring Expense " << input_id << title_end;
+
+    form_begin_edit(w, "/api/recurrings/edit/", back_page, input_id);
+
+    auto recurring = recurring_get(budget::to_number<size_t>(input_id));
+
+    add_name_picker(w, recurring.name);
+    add_amount_picker(w, budget::money_to_string(recurring.amount));
+    add_account_picker(w, budget::local_day(), budget::to_string(recurring.account));
+    add_frequencypicker(w, recurring.recurs);
+
+    form_end(w);
 }
