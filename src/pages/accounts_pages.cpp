@@ -38,27 +38,27 @@ void budget::add_accounts_page(html_writer & w) {
 
 void budget::edit_accounts_page(html_writer & w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
-        display_error_message(w, "Invalid parameter for the request");
-    } else {
-        auto input_id = req.get_param_value("input_id");
-
-        if (!account_exists(budget::to_number<size_t>(input_id))) {
-            display_error_message(w, "The account " + input_id + " does not exist");
-        } else {
-            auto back_page = req.get_param_value("back_page");
-
-            w << title_begin << "Edit account " << input_id << title_end;
-
-            form_begin_edit(w, "/api/accounts/edit/", back_page, input_id);
-
-            auto account = get_account(budget::to_number<size_t>(input_id));
-
-            add_name_picker(w, account.name);
-            add_amount_picker(w, budget::money_to_string(account.amount));
-
-            form_end(w);
-        }
+        return display_error_message(w, "Invalid parameter for the request");
     }
+
+    auto input_id = req.get_param_value("input_id");
+
+    if (!account_exists(budget::to_number<size_t>(input_id))) {
+        return display_error_message(w, std::format("The account {} does not exist", input_id));
+    }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit account " << input_id << title_end;
+
+    form_begin_edit(w, "/api/accounts/edit/", back_page, input_id);
+
+    auto account = get_account(budget::to_number<size_t>(input_id));
+
+    add_name_picker(w, account.name);
+    add_amount_picker(w, budget::money_to_string(account.amount));
+
+    form_end(w);
 }
 
 void budget::archive_accounts_month_page(html_writer & w) {

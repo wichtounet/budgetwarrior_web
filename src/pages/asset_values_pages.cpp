@@ -40,22 +40,22 @@ void budget::edit_asset_values_page(html_writer& w, const httplib::Request& req)
     auto input_id = req.get_param_value("input_id");
 
     if (!asset_value_exists(budget::to_number<size_t>(input_id))) {
-        display_error_message(w, "The asset value " + input_id + " does not exist");
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit asset " << input_id << title_end;
-
-        form_begin_edit(w, "/api/asset_values/edit/", back_page, input_id);
-
-        auto asset_value = get_asset_value(budget::to_number<size_t>(input_id));
-
-        add_value_asset_picker(w, budget::to_string(asset_value.asset_id));
-        add_amount_picker(w, budget::money_to_string(asset_value.amount));
-        add_date_picker(w, budget::to_string(asset_value.set_date));
-
-        form_end(w);
+        return display_error_message(w, std::format("The asset value {} does not exist", input_id));
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit asset " << input_id << title_end;
+
+    form_begin_edit(w, "/api/asset_values/edit/", back_page, input_id);
+
+    auto asset_value = get_asset_value(budget::to_number<size_t>(input_id));
+
+    add_value_asset_picker(w, budget::to_string(asset_value.asset_id));
+    add_amount_picker(w, budget::money_to_string(asset_value.amount));
+    add_date_picker(w, budget::to_string(asset_value.set_date));
+
+    form_end(w);
 }
 
 void budget::full_batch_asset_values_page(html_writer& w) {
@@ -66,14 +66,12 @@ void budget::full_batch_asset_values_page(html_writer& w) {
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
     auto assets = w.cache.user_assets();
-    std::sort(assets.begin(), assets.end(), [](auto& lhs, auto & rhs) {
+    std::sort(assets.begin(), assets.end(), [](const auto& lhs, const auto & rhs) {
         return lhs.name <= rhs.name;
     });
 
-    for (auto& asset : assets | not_share_based) {
-        budget::money const amount = get_asset_value(asset, w.cache);
-
-        add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
+    for (const auto& [asset, amount] : assets | not_share_based | expand_value(w.cache)) {
+        add_money_picker(w, asset.name, std::format("input_amount_{}", asset.id), budget::money_to_string(amount), true, true, asset.currency);
     }
 
     form_end(w);
@@ -87,16 +85,12 @@ void budget::current_batch_asset_values_page(html_writer& w) {
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
     auto assets = w.cache.user_assets();
-    std::sort(assets.begin(), assets.end(), [](auto& lhs, auto & rhs) {
+    std::sort(assets.begin(), assets.end(), [](const auto& lhs, const auto & rhs) {
         return lhs.name <= rhs.name;
     });
 
-    for (auto& asset : assets | not_share_based) {
-        budget::money const amount = get_asset_value(asset, w.cache);
-
-        if (amount) {
-            add_money_picker(w, asset.name, "input_amount_" + budget::to_string(asset.id), budget::money_to_string(amount), true, true, asset.currency);
-        }
+    for (const auto& [asset, amount] : assets | not_share_based | expand_value(w.cache) | not_zero) {
+        add_money_picker(w, asset.name, std::format("input_amount_{}", asset.id), budget::money_to_string(amount), true, true, asset.currency);
     }
 
     form_end(w);

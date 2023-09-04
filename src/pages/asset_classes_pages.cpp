@@ -47,19 +47,19 @@ void budget::edit_asset_classes_page(html_writer & w, const httplib::Request& re
     auto id = budget::to_number<size_t>(input_id);
 
     if (!asset_class_exists(id)) {
-        display_error_message(w, "The asset class " + input_id + " does not exist");
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit asset class " << input_id << title_end;
-
-        form_begin_edit(w, "/api/asset_classes/edit/", back_page, input_id);
-
-        auto asset_class = get_asset_class(id);
-
-        add_name_picker(w, asset_class.name);
-        add_fi_picker(w, asset_class.fi);
-
-        form_end(w);
+        return display_error_message(w, std::format("The asset class {} does not exist", input_id));
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit asset class " << input_id << title_end;
+
+    form_begin_edit(w, "/api/asset_classes/edit/", back_page, input_id);
+
+    auto asset_class = get_asset_class(id);
+
+    add_name_picker(w, asset_class.name);
+    add_fi_picker(w, asset_class.fi);
+
+    form_end(w);
 }

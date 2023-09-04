@@ -41,21 +41,21 @@ void budget::edit_asset_shares_page(html_writer & w, const httplib::Request& req
     auto id = budget::to_number<size_t>(input_id);
 
     if (!asset_share_exists(id)) {
-        display_error_message(w, "The asset share " + input_id + " does not exist");
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit asset share " << input_id << title_end;
-
-        form_begin_edit(w, "/api/asset_shares/edit/", back_page, input_id);
-
-        auto asset_share = get_asset_share(id);
-
-        add_share_asset_picker(w, budget::to_string(asset_share.asset_id));
-        add_integer_picker(w, "shares", "input_shares", true, budget::to_string(asset_share.shares));
-        add_money_picker(w, "price", "input_price", budget::to_string(asset_share.price));
-        add_date_picker(w, budget::to_string(asset_share.date));
-
-        form_end(w);
+        return display_error_message(w, std::format("The asset share {} does not exist", input_id));
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit asset share " << input_id << title_end;
+
+    form_begin_edit(w, "/api/asset_shares/edit/", back_page, input_id);
+
+    auto asset_share = get_asset_share(id);
+
+    add_share_asset_picker(w, budget::to_string(asset_share.asset_id));
+    add_integer_picker(w, "shares", "input_shares", true, budget::to_string(asset_share.shares));
+    add_money_picker(w, "price", "input_price", budget::to_string(asset_share.price));
+    add_date_picker(w, budget::to_string(asset_share.date));
+
+    form_end(w);
 }

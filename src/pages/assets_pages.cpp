@@ -47,7 +47,7 @@ void budget::add_assets_page(html_writer& w) {
     add_name_picker(w);
 
     for (auto & clas : all_asset_classes()) {
-        add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), "");
+        add_money_picker(w, clas.name + " (%)", std::format("input_class_{}", clas.id), "");
     }
 
     add_currency_picker(w);
@@ -62,35 +62,34 @@ void budget::add_assets_page(html_writer& w) {
 
 void budget::edit_assets_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
-        display_error_message(w, "Invalid parameter for the request");
-    } else {
-        auto input_id = req.get_param_value("input_id");
-
-        if (!asset_exists(budget::to_number<size_t>(input_id))) {
-            display_error_message(w, "The asset " + input_id + " does not exist");
-        } else {
-            auto back_page = req.get_param_value("back_page");
-
-            w << title_begin << "Edit asset " << input_id << title_end;
-
-            form_begin_edit(w, "/api/assets/edit/", back_page, input_id);
-
-            auto asset = get_asset(budget::to_number<size_t>(input_id));
-
-            add_name_picker(w, asset.name);
-
-            for (auto & clas : all_asset_classes()) {
-                add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), budget::money_to_string(get_asset_class_allocation(asset, clas)));
-            }
-
-            add_currency_picker(w, asset.currency);
-            add_portfolio_picker(w, asset.portfolio);
-            add_money_picker(w, "Percent of portfolio (%)", "input_alloc", budget::money_to_string(asset.portfolio_alloc));
-            add_share_based_picker(w, asset.share_based);
-            add_text_picker(w, "Ticker", "input_ticker", asset.ticker, false);
-            add_active_picker(w, asset.active);
-
-            form_end(w);
-        }
+        return display_error_message(w, "Invalid parameter for the request");
     }
+    auto input_id = req.get_param_value("input_id");
+
+    if (!asset_exists(budget::to_number<size_t>(input_id))) {
+        return display_error_message(w, std::format("The asset {} does not exist", input_id));
+    }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit asset " << input_id << title_end;
+
+    form_begin_edit(w, "/api/assets/edit/", back_page, input_id);
+
+    auto asset = get_asset(budget::to_number<size_t>(input_id));
+
+    add_name_picker(w, asset.name);
+
+    for (auto& clas : all_asset_classes()) {
+        add_money_picker(w, clas.name + " (%)", std::format("input_class_{}", clas.id), budget::money_to_string(get_asset_class_allocation(asset, clas)));
+    }
+
+    add_currency_picker(w, asset.currency);
+    add_portfolio_picker(w, asset.portfolio);
+    add_money_picker(w, "Percent of portfolio (%)", "input_alloc", budget::money_to_string(asset.portfolio_alloc));
+    add_share_based_picker(w, asset.share_based);
+    add_text_picker(w, "Ticker", "input_ticker", asset.ticker, false);
+    add_active_picker(w, asset.active);
+
+    form_end(w);
 }
