@@ -47,7 +47,7 @@ void budget::edit_asset_classes_page(html_writer & w, const httplib::Request& re
     auto id = budget::to_number<size_t>(input_id);
 
     if (!asset_class_exists(id)) {
-        return display_error_message(w, std::format("The asset class {} does not exist", input_id));
+        return display_error_message(w, "The asset class {} does not exist", input_id);
     }
 
     auto back_page = req.get_param_value("back_page");

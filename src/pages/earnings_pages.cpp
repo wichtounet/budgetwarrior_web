@@ -320,7 +320,7 @@ void budget::edit_earnings_page(html_writer & w, const httplib::Request& req) {
         auto input_id = req.get_param_value("input_id");
 
         if (!earning_exists(budget::to_number<size_t>(input_id))) {
-            display_error_message(w, "The earning " + input_id + " does not exist");
+            display_error_message(w, "The earning {} does not exist", input_id);
         } else {
             auto back_page = req.get_param_value("back_page");
 

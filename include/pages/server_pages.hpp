@@ -31,7 +31,12 @@ bool page_start(const httplib::Request& req, httplib::Response& res, std::string
 void page_end(budget::html_writer& w, const httplib::Request& req, httplib::Response& res);
 bool validate_parameters(html_writer& w, const httplib::Request& req, std::vector<const char*> parameters);
 
-void display_error_message(budget::writer& w, std::string_view message);
+void display_error_message_string(budget::writer& w, std::string_view message);
+
+template <typename... Args>
+inline void display_error_message(budget::writer& w, std::format_string<Args...> fmt, Args&&... args) {
+    return display_error_message_string(w, std::format(fmt, std::forward<Args>(args)...));
+}
 
 void make_tables_sortable(budget::html_writer& w);
 

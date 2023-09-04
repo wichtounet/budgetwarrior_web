@@ -41,7 +41,7 @@ void budget::edit_asset_shares_page(html_writer & w, const httplib::Request& req
     auto id = budget::to_number<size_t>(input_id);
 
     if (!asset_share_exists(id)) {
-        return display_error_message(w, std::format("The asset share {} does not exist", input_id));
+        return display_error_message(w, "The asset share {} does not exist", input_id);
     }
 
     auto back_page = req.get_param_value("back_page");

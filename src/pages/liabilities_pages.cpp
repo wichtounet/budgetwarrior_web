@@ -52,7 +52,7 @@ void budget::edit_liabilities_page(html_writer& w, const httplib::Request& req) 
     auto id = budget::to_number<size_t>(input_id);
 
     if (!liability_exists(id)) {
-        display_error_message(w, "The liability " + input_id + " does not exist");
+        display_error_message(w, "The liability {} does not exist", input_id);
     } else {
         auto back_page = req.get_param_value("back_page");
 

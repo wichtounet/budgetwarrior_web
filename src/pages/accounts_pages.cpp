@@ -44,7 +44,7 @@ void budget::edit_accounts_page(html_writer & w, const httplib::Request& req) {
     auto input_id = req.get_param_value("input_id");
 
     if (!account_exists(budget::to_number<size_t>(input_id))) {
-        return display_error_message(w, std::format("The account {} does not exist", input_id));
+        return display_error_message(w, "The account {} does not exist", input_id);
     }
 
     auto back_page = req.get_param_value("back_page");

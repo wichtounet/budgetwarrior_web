@@ -499,11 +499,11 @@ auto render_wrapper(const char* title, T render_function) {
 
             page_end(w, req, res);
         } catch (const budget_exception& e) {
-            display_error_message(w, "Exception occured: " + e.message());
+            display_error_message(w, "Exception occured: {}", e.message());
             LOG_F(ERROR, "budget_exception occured in render({}): {}", req.path, e.message());
             page_end(w, req, res);
         } catch (const date_exception& e) {
-            display_error_message(w, "Exception occured: " + e.message());
+            display_error_message(w, "Exception occured: {}", e.message());
             LOG_F(ERROR, "date_exception occured in render({}): {}", req.path, e.message());
             page_end(w, req, res);
         } catch (...) {
@@ -856,7 +856,7 @@ void budget::make_tables_sortable(budget::html_writer& w){
     w.use_module("datatables");
 }
 
-void budget::display_error_message(budget::writer& w, std::string_view message) {
+void budget::display_error_message_string(budget::writer& w, std::string_view message) {
     w << R"=====(<div class="alert alert-danger" role="alert">)=====";
     w << message;
     w << R"=====(</div>)=====";

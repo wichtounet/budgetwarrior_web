@@ -40,7 +40,7 @@ void budget::edit_asset_values_page(html_writer& w, const httplib::Request& req)
     auto input_id = req.get_param_value("input_id");
 
     if (!asset_value_exists(budget::to_number<size_t>(input_id))) {
-        return display_error_message(w, std::format("The asset value {} does not exist", input_id));
+        return display_error_message(w, "The asset value {} does not exist", input_id);
     }
 
     auto back_page = req.get_param_value("back_page");
