@@ -247,12 +247,8 @@ void budget::time_graph_expenses_page(html_writer& w) {
     for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
         budget::year const year = j;
 
-        auto sm = start_month(w.cache, year);
-        unsigned short last = 13;
-
-        if(year == budget::local_day().year()){
-            last = budget::local_day().month() + 1;
-        }
+        const auto sm   = start_month(w.cache, year);
+        const auto last = last_month(year);
 
         for(unsigned short i = sm; i < last; ++i){
             budget::month const month = i;
@@ -304,12 +300,8 @@ void budget::time_graph_expenses_page(html_writer& w) {
         for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
             budget::year const year = j;
 
-            auto sm   = start_month(w.cache, year);
-            unsigned short last = 13;
-
-            if (year == budget::local_day().year()) {
-                last = budget::local_day().month() + 1;
-            }
+            const auto sm   = start_month(w.cache, year);
+            const auto last = last_month(year);
 
             for (unsigned short i = sm; i < last; ++i) {
                 budget::month const month = i;

@@ -1391,3 +1391,11 @@ void budget::add_money_picker(budget::writer& w, std::string_view title, std::st
         w << "</div>";
     }
 }
+
+unsigned short budget::last_month(unsigned short year) {
+    if (year == budget::local_day().year()) {
+        return budget::local_day().month() + 1;
+    }
+
+    return 13;
+}

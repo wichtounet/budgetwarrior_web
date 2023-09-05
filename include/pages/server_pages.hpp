@@ -86,4 +86,6 @@ void add_average_5_serie(std::stringstream& ss,
                          std::vector<budget::money> serie,
                          std::vector<std::string> dates);
 
+unsigned short last_month(unsigned short year);
+
 } //end of namespace budget
