@@ -14,6 +14,7 @@
 #include "pages/earnings_pages.hpp"
 #include "http.hpp"
 #include "config.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -92,7 +93,6 @@ void budget::month_breakdown_income_graph(budget::html_writer& w, std::string_vi
     end_chart(w, ss);
 }
 
-
 void budget::time_graph_income_page(html_writer & w) {
     {
         auto ss = start_time_chart(w, "Income over time", "line", "income_time_graph", "");
@@ -120,14 +120,9 @@ void budget::time_graph_income_page(html_writer & w) {
             for(unsigned short i = sm; i < last; ++i){
                 budget::month const month = i;
 
-                budget::money sum = get_base_income(w.cache, budget::date(year, month, 2));
+                auto sum = get_base_income(w.cache, budget::date(year, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
 
-                for (auto& earning : all_earnings_month(w.cache, year, month)) {
-                    sum += earning.amount;
-                }
-
-                std::string const date =
-                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 
                 serie.push_back(sum);
                 dates.push_back(date);
@@ -172,16 +167,10 @@ void budget::time_graph_income_page(html_writer & w) {
             budget::money sum;
 
             for (unsigned short i = sm; i < last; ++i) {
-                budget::month const month = i;
-
-                sum += get_base_income(w.cache, budget::date(year, month, 2));
-
-                for (auto& earning : all_earnings_month(w.cache, year, month)) {
-                    sum += earning.amount;
-                }
+                sum += get_base_income(w.cache, budget::date(year, i, 2)) + fold_left_auto(all_earnings_month(w.cache, year, i) | to_amount);
             }
 
-            std::string const date = "Date.UTC(" + std::to_string(year) + "," + std::to_string(1) + ", 1)";
+            const std::string date = std::format("Date.UTC({},1,1)", year.value);
 
             serie.push_back(sum);
             dates.push_back(date);
@@ -222,11 +211,7 @@ void budget::time_graph_earnings_page(html_writer & w) {
         for(unsigned short i = sm; i < last; ++i){
             budget::month const month = i;
 
-            budget::money sum;
-
-            for (auto& earning : all_earnings_month(w.cache, year, month)) {
-                sum += earning.amount;
-            }
+            const auto sum = fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
 
             ss << "[Date.UTC(" << year << "," << month.value - 1 << ", 1) ," << budget::money_to_string(sum) << "],";
         }
@@ -275,7 +260,7 @@ void budget::add_earnings_page(html_writer& w) {
             order.emplace_back(key, value);
         }
 
-        std::sort(order.begin(), order.end(), [] (auto & a, auto & b) { return a.second > b.second; });
+        std::sort(order.begin(), order.end(), [] (const auto & a, const auto & b) { return a.second > b.second; });
 
         w << "<div>";
         w << "Quick Fill: ";
@@ -303,29 +288,28 @@ void budget::add_earnings_page(html_writer& w) {
 
 void budget::edit_earnings_page(html_writer & w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
-        display_error_message(w, "Invalid parameter for the request");
-    } else {
-        auto input_id = req.get_param_value("input_id");
-
-        if (!earning_exists(budget::to_number<size_t>(input_id))) {
-            display_error_message(w, "The earning {} does not exist", input_id);
-        } else {
-            auto back_page = req.get_param_value("back_page");
-
-            w << title_begin << "Edit earning " << input_id << title_end;
-
-            form_begin_edit(w, "/api/earnings/edit/", back_page, input_id);
-
-            auto earning = earning_get(budget::to_number<size_t>(input_id));
-
-            add_date_picker(w, budget::to_string(earning.date));
-            add_name_picker(w, earning.name);
-            add_amount_picker(w, budget::money_to_string(earning.amount));
-            add_account_picker(w, earning.date, budget::to_string(earning.account));
-
-            form_end(w);
-        }
+        return display_error_message(w, "Invalid parameter for the request");
     }
+
+    auto input_id = req.get_param_value("input_id");
+    if (!earning_exists(budget::to_number<size_t>(input_id))) {
+        return display_error_message(w, "The earning {} does not exist", input_id);
+    }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit earning " << input_id << title_end;
+
+    form_begin_edit(w, "/api/earnings/edit/", back_page, input_id);
+
+    auto earning = earning_get(budget::to_number<size_t>(input_id));
+
+    add_date_picker(w, budget::to_string(earning.date));
+    add_name_picker(w, earning.name);
+    add_amount_picker(w, budget::money_to_string(earning.amount));
+    add_account_picker(w, earning.date, budget::to_string(earning.account));
+
+    form_end(w);
 }
 
 void budget::earnings_page(html_writer & w, const httplib::Request& req) {
