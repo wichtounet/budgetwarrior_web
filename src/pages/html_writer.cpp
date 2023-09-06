@@ -104,7 +104,7 @@ std::vector<budget::year> active_years(budget::year extra){
 
     // Convert to a sorted vector
     std::vector<budget::year> vec{years.begin(), years.end()};
-    std::sort(vec.begin(), vec.end());
+    std::ranges::sort(vec);
     return vec;
 }
 

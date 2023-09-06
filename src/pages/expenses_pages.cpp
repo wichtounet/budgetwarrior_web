@@ -11,6 +11,7 @@
 #include "pages/expenses_pages.hpp"
 #include "http.hpp"
 #include "config.hpp"
+#include "views.hpp"
 
 #include <array>
 
@@ -26,7 +27,7 @@ std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::
         sorted_expenses.emplace_back(name, amount);
     }
 
-    std::sort(sorted_expenses.begin(), sorted_expenses.end(), [](auto& lhs, auto& rhs) {
+    std::ranges::sort(sorted_expenses, [](auto& lhs, auto& rhs) {
         return lhs.second > rhs.second;
     });
 
@@ -253,14 +254,9 @@ void budget::time_graph_expenses_page(html_writer& w) {
         for(unsigned short i = sm; i < last; ++i){
             budget::month const month = i;
 
-            budget::money sum;
+            budget::money sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
 
-            for (auto& expense : all_expenses_month(w.cache, year, month)) {
-                sum += expense.amount;
-            }
-
-            std::string const date =
-                "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 
             serie.push_back(sum);
             dates.push_back(date);
@@ -314,8 +310,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
                     }
                 }
 
-                std::string const date =
-                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 
                 serie.push_back(sum);
                 dates.push_back(date);
@@ -521,7 +516,7 @@ void budget::add_expenses_page(html_writer& w) {
             order.emplace_back(key, value);
         }
 
-        std::sort(order.begin(), order.end(), [] (auto & a, auto & b) { return a.second > b.second; });
+        std::ranges::sort(order, [] (const auto & a, const auto & b) { return a.second > b.second; });
 
         w << "<div>";
         w << "Quick Fill: ";

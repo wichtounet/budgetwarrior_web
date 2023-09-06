@@ -260,7 +260,7 @@ void budget::add_earnings_page(html_writer& w) {
             order.emplace_back(key, value);
         }
 
-        std::sort(order.begin(), order.end(), [] (const auto & a, const auto & b) { return a.second > b.second; });
+        std::ranges::sort(order, [] (const auto & a, const auto & b) { return a.second > b.second; });
 
         w << "<div>";
         w << "Quick Fill: ";

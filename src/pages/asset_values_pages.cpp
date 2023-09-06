@@ -66,7 +66,7 @@ void budget::full_batch_asset_values_page(html_writer& w) {
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
     auto assets = w.cache.user_assets();
-    std::sort(assets.begin(), assets.end(), [](const auto& lhs, const auto & rhs) {
+    std::ranges::sort(assets, [](const auto& lhs, const auto & rhs) {
         return lhs.name <= rhs.name;
     });
 
@@ -85,7 +85,7 @@ void budget::current_batch_asset_values_page(html_writer& w) {
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
     auto assets = w.cache.user_assets();
-    std::sort(assets.begin(), assets.end(), [](const auto& lhs, const auto & rhs) {
+    std::ranges::sort(assets, [](const auto& lhs, const auto & rhs) {
         return lhs.name <= rhs.name;
     });
 

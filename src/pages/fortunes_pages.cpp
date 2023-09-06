@@ -32,7 +32,7 @@ void budget::graph_fortunes_page(html_writer & w) {
 
     auto sorted_fortunes = all_fortunes();
 
-    std::sort(sorted_fortunes.begin(), sorted_fortunes.end(),
+    std::ranges::sort(sorted_fortunes,
               [](const budget::fortune& a, const budget::fortune& b) { return a.check_date < b.check_date; });
 
     for (auto& value : sorted_fortunes) {
