@@ -6,6 +6,7 @@
 //=======================================================================
 
 #include "pages/index_pages.hpp"
+#include "incomes.hpp"
 #include "pages/earnings_pages.hpp"
 #include "pages/expenses_pages.hpp"
 #include "pages/objectives_pages.hpp"
@@ -13,46 +14,19 @@
 #include "pages/html_writer.hpp"
 #include "http.hpp"
 #include "config.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
 namespace {
 
 budget::money monthly_income(data_cache & cache, budget::month month, budget::year year) {
-    std::map<size_t, budget::money> account_sum;
-
-    for (auto& earning : cache.earnings()) {
-        if (earning.date.year() == year && earning.date.month() == month) {
-            account_sum[earning.account] += earning.amount;
-        }
-    }
-
     // TODO: This only work if monthly_income is called today
-    budget::money total = get_base_income(cache);
-
-    for (auto& [id, sum] : account_sum) {
-        total += sum;
-    }
-
-    return total;
+    return get_base_income(cache) + fold_left_auto(cache.earnings() | filter_by_date(year, month) | to_amount);
 }
 
-budget::money monthly_spending(budget::month month, budget::year year) {
-    std::map<size_t, budget::money> account_sum;
-
-    for (auto& expense : all_expenses()) {
-        if (expense.date.year() == year && expense.date.month() == month) {
-            account_sum[expense.account] += expense.amount;
-        }
-    }
-
-    budget::money total;
-
-    for (auto& [id, sum] : account_sum) {
-        total += sum;
-    }
-
-    return total;
+budget::money monthly_spending(data_cache & cache, budget::month month, budget::year year) {
+    return fold_left_auto(cache.expenses() | filter_by_date(year, month) | to_amount);
 }
 
 void cash_flow_card(budget::html_writer& w){
@@ -64,7 +38,7 @@ void cash_flow_card(budget::html_writer& w){
     w << R"=====(<div class="card">)=====";
 
     auto income = monthly_income(w.cache, m, y);
-    auto spending = monthly_spending(m, y);
+    auto spending = monthly_spending(w.cache, m, y);
 
     w << R"=====(<div class="card-header card-header-primary">)=====";
     w << R"=====(<div class="float-left">Cash Flow</div>)=====";
