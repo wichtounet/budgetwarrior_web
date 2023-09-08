@@ -120,8 +120,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
         for (budget::month month = start_month(w.cache, year); month < last; ++month) {
             auto sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
 
-            std::string const date =
-                "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
             ss << "[" << date << "," << budget::money_to_string(sum) << "],";
         }
 
@@ -134,8 +133,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
             for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
                 auto sum = fold_left_auto(all_expenses_month(w.cache, year - 1, month) | to_amount);
 
-                std::string const date =
-                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
             }
 
@@ -164,8 +162,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
         for (budget::month month = start_month(w.cache, year); month < last; ++month) {
             auto sum = get_base_income(w.cache, budget::date(year, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
 
-            std::string const date =
-                "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
             ss << "[" << date << "," << budget::money_to_string(sum) << "],";
         }
 
@@ -178,8 +175,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
             for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
                 auto sum = get_base_income(w.cache, budget::date(year - 1, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year - 1, month) | to_amount);
 
-                std::string const date =
-                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
             }
 
@@ -230,8 +226,7 @@ void budget::time_graph_savings_rate_page(html_writer & w) {
                 savings_rate = savings / status.income;
             }
 
-            std::string const date =
-                "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+            const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 
             serie.push_back(savings_rate);
             dates.push_back(date);
@@ -303,8 +298,7 @@ void budget::time_graph_tax_rate_page(html_writer & w) {
 
                 double tax_rate = status.taxes / status.income;
 
-                std::string const date =
-                    "Date.UTC(" + std::to_string(year) + "," + std::to_string(month.value - 1) + ", 1)";
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 
                 serie.push_back(tax_rate);
                 dates.push_back(date);
@@ -428,12 +422,13 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
 void budget::side_overview_page(html_writer & w, const httplib::Request& req) {
     if (!budget::is_side_hustle_enabled()) {
         w << "Side hustle is not configured";
+        return;
+    }
+
+    if (req.matches.size() == 3) {
+        display_side_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
-        if (req.matches.size() == 3) {
-            display_side_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
-        } else {
-            auto today = budget::local_day();
-            display_side_month_overview(today.month(), today.year(), w);
-        }
+        auto today = budget::local_day();
+        display_side_month_overview(today.month(), today.year(), w);
     }
 }

@@ -228,24 +228,23 @@ void budget::edit_objectives_page(html_writer& w, const httplib::Request& req) {
     }
 
     auto input_id = req.get_param_value("input_id");
-
     if (!objective_exists(budget::to_number<size_t>(input_id))) {
-        display_error_message(w, "The objective {} does not exist", input_id);
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit objective " << input_id << title_end;
-
-        form_begin_edit(w, "/api/objectives/edit/", back_page, input_id);
-
-        auto objective = objective_get(budget::to_number<size_t>(input_id));
-
-        add_name_picker(w, objective.name);
-        add_objective_type_picker(w, objective.type);
-        add_objective_source_picker(w, objective.source);
-        add_objective_operator_picker(w, objective.op);
-        add_amount_picker(w, budget::money_to_string(objective.amount));
-
-        form_end(w);
+        return display_error_message(w, "The objective {} does not exist", input_id);
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit objective " << input_id << title_end;
+
+    form_begin_edit(w, "/api/objectives/edit/", back_page, input_id);
+
+    auto objective = objective_get(budget::to_number<size_t>(input_id));
+
+    add_name_picker(w, objective.name);
+    add_objective_type_picker(w, objective.type);
+    add_objective_source_picker(w, objective.source);
+    add_objective_operator_picker(w, objective.op);
+    add_amount_picker(w, budget::money_to_string(objective.amount));
+
+    form_end(w);
 }

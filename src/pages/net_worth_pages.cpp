@@ -186,33 +186,31 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
         date first_date     = local_day();
         bool first_date_set = false;
 
-        for (auto& share : all_asset_shares()) {
-            if (share.asset_id == asset.id) {
-                if (share.is_buy()) {
-                    bought_shares += share.shares;
-                    current_shares += share.shares;
-                    buy_price += (float)share.shares * share.price;
-                }
+        for (auto& share : all_asset_shares() | filter_by_asset(asset.id)) {
+            if (share.is_buy()) {
+                bought_shares += share.shares;
+                current_shares += share.shares;
+                buy_price += (float) share.shares * share.price;
+            }
 
-                if (share.is_sell()) {
-                    sold_shares += -share.shares;
-                    current_shares += share.shares;
-                    sell_price += (float)-share.shares * share.price;
-                }
+            if (share.is_sell()) {
+                sold_shares += -share.shares;
+                current_shares += share.shares;
+                sell_price += (float) -share.shares * share.price;
+            }
 
-                if (!current_shares) {
-                    // If the price went down to zero, we need to reset the buying price
-                    last_bought_shares = bought_shares;
-                    last_buy_price     = buy_price;
+            if (!current_shares) {
+                // If the price went down to zero, we need to reset the buying price
+                last_bought_shares = bought_shares;
+                last_buy_price     = buy_price;
 
-                    bought_shares = 0;
-                    buy_price     = 0;
-                }
+                bought_shares = 0;
+                buy_price     = 0;
+            }
 
-                if (!first_date_set) {
-                    first_date     = share.date;
-                    first_date_set = true;
-                }
+            if (!first_date_set) {
+                first_date     = share.date;
+                first_date_set = true;
             }
         }
 
@@ -757,14 +755,10 @@ void budget::net_worth_currency_page(html_writer& w) {
         budget::money sum;
 
         // Add the assets in this currency
-        for (const auto & asset : w.cache.user_assets() | filter_by_currency(currency)) {
-            sum += get_asset_value_conv(asset, w.cache);
-        }
+        sum += fold_left_auto(w.cache.user_assets() | filter_by_currency(currency) | to_value_conv(w.cache));
 
         // Remove the liabilities in this currency
-        for (const auto & liability : w.cache.liabilities() | filter_by_currency(currency)) {
-            sum -= get_liability_value_conv(liability, w.cache);
-        }
+        sum -= fold_left_auto(w.cache.liabilities() | filter_by_currency(currency) | to_value_conv(w.cache));
 
         ss2 << budget::money_to_string(sum);
 
@@ -812,13 +806,7 @@ void budget::portfolio_currency_page(html_writer& w) {
         auto end_date = budget::local_day();
 
         while (date <= end_date) {
-            budget::money sum;
-
-            for (const auto& asset : w.cache.user_assets()) {
-                if (asset.portfolio && asset.currency == currency) {
-                    sum += get_asset_value_conv(asset, date, w.cache);
-                }
-            }
+            const auto sum = fold_left_auto(w.cache.user_assets() | filter_by_currency(currency) | is_portfolio | to_value_conv(w.cache, date));
 
             ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 
@@ -848,13 +836,7 @@ void budget::portfolio_currency_page(html_writer& w) {
         ss2 << "{ name: '" << currency << "',";
         ss2 << "y: ";
 
-        budget::money sum;
-
-        for (const auto& asset : w.cache.user_assets()) {
-            if (asset.portfolio && asset.currency == currency) {
-                sum += get_asset_value_conv(asset, w.cache);
-            }
-        }
+        const auto sum = fold_left_auto(w.cache.user_assets() | filter_by_currency(currency) | is_portfolio | to_value_conv(w.cache));
 
         ss2 << budget::money_to_string(sum);
 
@@ -888,13 +870,7 @@ void budget::portfolio_graph_page(html_writer& w) {
     auto end_date = budget::local_day();
 
     while (date <= end_date) {
-        budget::money sum;
-
-        for (const auto& asset : w.cache.user_assets()) {
-            if (asset.portfolio) {
-                sum += get_asset_value_conv(asset, date, w.cache);
-            }
-        }
+        const auto sum = fold_left_auto(w.cache.user_assets() | is_portfolio | to_value_conv(w.cache, date));
 
         ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 
