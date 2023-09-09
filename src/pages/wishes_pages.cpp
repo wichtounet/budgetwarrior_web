@@ -116,25 +116,24 @@ void budget::edit_wishes_page(html_writer & w, const httplib::Request& req) {
     }
 
     auto input_id = req.get_param_value("input_id");
-
     if (!wish_exists(budget::to_number<size_t>(input_id))) {
-        display_error_message(w, "The wish {} does not exist", input_id);
-    } else {
-        auto back_page = req.get_param_value("back_page");
-
-        w << title_begin << "Edit wish " << input_id << title_end;
-
-        form_begin_edit(w, "/api/wishes/edit/", back_page, input_id);
-
-        auto wish = wish_get(budget::to_number<size_t>(input_id));
-
-        add_name_picker(w, wish.name);
-        add_importance_picker(w, wish.importance);
-        add_urgency_picker(w, wish.urgency);
-        add_amount_picker(w, budget::money_to_string(wish.amount));
-        add_paid_picker(w, wish.paid);
-        add_paid_amount_picker(w, budget::money_to_string(wish.paid_amount));
-
-        form_end(w);
+        return display_error_message(w, "The wish {} does not exist", input_id);
     }
+
+    auto back_page = req.get_param_value("back_page");
+
+    w << title_begin << "Edit wish " << input_id << title_end;
+
+    form_begin_edit(w, "/api/wishes/edit/", back_page, input_id);
+
+    auto wish = wish_get(budget::to_number<size_t>(input_id));
+
+    add_name_picker(w, wish.name);
+    add_importance_picker(w, wish.importance);
+    add_urgency_picker(w, wish.urgency);
+    add_amount_picker(w, budget::money_to_string(wish.amount));
+    add_paid_picker(w, wish.paid);
+    add_paid_amount_picker(w, budget::money_to_string(wish.paid_amount));
+
+    form_end(w);
 }

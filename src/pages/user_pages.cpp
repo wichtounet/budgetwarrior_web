@@ -22,21 +22,21 @@ void budget::user_config_page(html_writer& w) {
     add_yes_no_picker(w, "Enable fortune module", "input_enable_fortune", !budget::is_fortune_disabled());
     add_yes_no_picker(w, "Enable debts module", "input_enable_debts", !budget::is_debts_disabled());
 
-    budget::date const today = budget::local_day();
+    const budget::date today = budget::local_day();
 
-    std::string const def = has_default_account() ? default_account().name : "";
+    const std::string def = has_default_account() ? default_account().name : "";
     add_account_picker_by_name(w, today, "Default account", def, "input_default_account");
 
-    std::string const taxes = has_taxes_account() ? taxes_account().name : "";
+    const std::string taxes = has_taxes_account() ? taxes_account().name : "";
     add_account_picker_by_name(w, today, "Taxes account", taxes, "input_taxes_account", true);
 
-    std::string const sh_account = user_config_value("side_category", "");
+    const std::string sh_account = user_config_value("side_category", "");
     add_account_picker_by_name(w, today, "Side Hustle Account", sh_account, "input_sh_account", true);
 
-    std::string const sh_prefix = user_config_value("side_prefix", "");
+    const std::string sh_prefix = user_config_value("side_prefix", "");
     add_text_picker(w, "Side Hustle Prefix", "input_sh_prefix", sh_prefix, false);
 
-    std::string const fi_expenses = user_config_value("fi_expenses", "");
+    const std::string fi_expenses = user_config_value("fi_expenses", "");
     add_text_picker(w, "FI Expenses", "input_fi_expenses", fi_expenses);
 
     add_text_picker(w, "User", "input_user", get_web_user());
