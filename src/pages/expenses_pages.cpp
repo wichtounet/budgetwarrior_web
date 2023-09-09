@@ -254,7 +254,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
         for(unsigned short i = sm; i < last; ++i){
             budget::month const month = i;
 
-            budget::money sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
+            budget::money const sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
 
             const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 

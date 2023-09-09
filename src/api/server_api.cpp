@@ -107,7 +107,7 @@ std::string encode_url(std::string_view s) {
       if (c >= 0x80) {
         result += '%';
         char hex[4];
-        size_t len = snprintf(hex, sizeof(hex) - 1, "%02X", c);
+        const size_t len = snprintf(hex, sizeof(hex) - 1, "%02X", c);
         assert(len == 2);
         result.append(hex, len);
       } else {
