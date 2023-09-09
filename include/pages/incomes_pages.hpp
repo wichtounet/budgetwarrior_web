@@ -11,7 +11,7 @@
 
 namespace budget {
 
-void incomes_page(html_writer & w);
-void set_incomes_page(html_writer & w);
+void incomes_page(html_writer& w);
+void set_incomes_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

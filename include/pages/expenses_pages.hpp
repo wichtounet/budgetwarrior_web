@@ -11,17 +11,16 @@
 
 namespace budget {
 
-void expenses_page(html_writer & w, const httplib::Request& req);
-void search_expenses_page(html_writer & w, const httplib::Request& req);
-void time_graph_expenses_page(html_writer & w);
-void all_expenses_page(html_writer & w);
-void month_breakdown_expenses_page(html_writer & w, const httplib::Request& req);
-void year_breakdown_expenses_page(html_writer & w, const httplib::Request& req);
-void add_expenses_page(html_writer & w);
-void edit_expenses_page(html_writer & w, const httplib::Request& req);
+void expenses_page(html_writer& w, const httplib::Request& req);
+void search_expenses_page(html_writer& w, const httplib::Request& req);
+void time_graph_expenses_page(html_writer& w);
+void all_expenses_page(html_writer& w);
+void month_breakdown_expenses_page(html_writer& w, const httplib::Request& req);
+void year_breakdown_expenses_page(html_writer& w, const httplib::Request& req);
+void add_expenses_page(html_writer& w);
+void edit_expenses_page(html_writer& w, const httplib::Request& req);
 
-void month_breakdown_expenses_graph(budget::html_writer& w, std::string_view title,
-                                    budget::month month, budget::year year, bool mono = false, 
-                                    std::string_view style = "");
+void month_breakdown_expenses_graph(
+        budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono = false, std::string_view style = "");
 
-} //end of namespace budget
+} // end of namespace budget

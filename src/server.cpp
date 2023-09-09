@@ -33,10 +33,10 @@ using namespace budget;
 
 namespace {
 
-httplib::Server * server_ptr = nullptr;
-volatile bool cron = true;
+httplib::Server* server_ptr = nullptr;
+volatile bool    cron       = true;
 
-std::mutex lock;
+std::mutex              lock;
 std::condition_variable cv;
 
 void server_signal_handler(int signum) {
@@ -54,7 +54,7 @@ void server_signal_handler(int signum) {
 void install_signal_handler() {
     struct sigaction action {};
     sigemptyset(&action.sa_mask);
-    action.sa_flags = 0;
+    action.sa_flags   = 0;
     action.sa_handler = server_signal_handler;
     sigaction(SIGTERM, &action, nullptr);
     sigaction(SIGINT, &action, nullptr);
@@ -62,7 +62,7 @@ void install_signal_handler() {
     LOG_F(INFO, "Installed the signal handler");
 }
 
-bool start_server(){
+bool start_server() {
     // Name the thread
     const pthread_t self = pthread_self();
     pthread_setname_np(self, "server thread");
@@ -77,9 +77,9 @@ bool start_server(){
 
     install_signal_handler();
 
-    auto port = get_server_port();
+    auto port   = get_server_port();
     auto listen = get_server_listen();
-    server_ptr = &server;
+    server_ptr  = &server;
 
     // Listen
     LOG_F(INFO, "Server is starting to listen on {}:{}", listen, port);
@@ -92,7 +92,7 @@ bool start_server(){
     return true;
 }
 
-void start_cron_loop(){
+void start_cron_loop() {
     // Name the thread
     const pthread_t self = pthread_self();
     pthread_setname_np(self, "cron thread");
@@ -101,7 +101,7 @@ void start_cron_loop(){
     LOG_F(INFO, "Started the cron thread");
     size_t hours = 0;
 
-    while(cron){
+    while (cron) {
         using namespace std::chrono_literals;
 
         {
@@ -138,7 +138,7 @@ void start_cron_loop(){
     LOG_F(INFO, "Cron thread has exited");
 }
 
-void load(){
+void load() {
     load_accounts();
     load_incomes();
     load_expenses();
@@ -153,9 +153,9 @@ void load(){
     load_wishes();
 }
 
-} //end of anonymous namespace
+} // end of anonymous namespace
 
-int main(int argc, char** argv){
+int main(int argc, char** argv) {
     std::locale const global_locale("");
     std::locale::global(global_locale);
 
@@ -208,8 +208,8 @@ int main(int argc, char** argv){
     }
 
     volatile bool success = false;
-    std::thread server_thread([&success](){ success = start_server(); });
-    std::thread cron_thread([](){ start_cron_loop(); });
+    std::thread   server_thread([&success]() { success = start_server(); });
+    std::thread   cron_thread([]() { start_cron_loop(); });
 
     server_thread.join();
 

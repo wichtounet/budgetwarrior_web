@@ -79,25 +79,25 @@ void add_urgency_picker(budget::writer& w, int urgency) {
 
 } // namespace
 
-void budget::wishes_list_page(html_writer & w) {
+void budget::wishes_list_page(html_writer& w) {
     budget::list_wishes(w);
 
     make_tables_sortable(w);
 }
 
-void budget::wishes_status_page(html_writer & w) {
+void budget::wishes_status_page(html_writer& w) {
     budget::status_wishes(w);
 
     make_tables_sortable(w);
 }
 
-void budget::wishes_estimate_page(html_writer & w) {
+void budget::wishes_estimate_page(html_writer& w) {
     budget::estimate_wishes(w);
 
     make_tables_sortable(w);
 }
 
-void budget::add_wishes_page(html_writer & w) {
+void budget::add_wishes_page(html_writer& w) {
     w << title_begin << "New Wish" << title_end;
 
     form_begin(w, "/api/wishes/add/", "/wishes/add/");
@@ -110,8 +110,8 @@ void budget::add_wishes_page(html_writer & w) {
     form_end(w);
 }
 
-void budget::edit_wishes_page(html_writer & w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+void budget::edit_wishes_page(html_writer& w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 

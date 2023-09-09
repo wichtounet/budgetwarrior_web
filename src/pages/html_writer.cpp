@@ -26,13 +26,14 @@ std::string success_to_string(int success) {
     std::stringstream ss;
 
     ss << R"=====(<div class="progress">)=====";
-    ss << R"=====(<div class="progress-bar" role="progressbar" style="width:)=====" << success << R"=====(%;" aria-valuenow=")=====" << success << R"=====(" aria-valuemin="0" aria-valuemax="100">)=====" << success << R"=====(%</div>)=====";
+    ss << R"=====(<div class="progress-bar" role="progressbar" style="width:)=====" << success << R"=====(%;" aria-valuenow=")=====" << success
+       << R"=====(" aria-valuemin="0" aria-valuemax="100">)=====" << success << R"=====(%</div>)=====";
     ss << R"=====(</div>)=====";
 
     return ss.str();
 }
 
-std::string edit_to_string(std::string_view module, std::string_view id){
+std::string edit_to_string(std::string_view module, std::string_view id) {
     std::stringstream ss;
 
     auto delete_url = std::format("/api/{}/delete/?server=yes&back_page=__budget_this_page__&input_id={}", module, id);
@@ -92,7 +93,7 @@ std::string html_format(budget::html_writer& w, std::string_view v) {
     return std::string(v);
 }
 
-std::vector<budget::year> active_years(budget::year extra){
+std::vector<budget::year> active_years(budget::year extra) {
     using namespace budget;
 
     std::unordered_set<budget::year> years;
@@ -108,18 +109,17 @@ std::vector<budget::year> active_years(budget::year extra){
     return vec;
 }
 
-
 } // end of anonymous namespace
 
 budget::html_writer::html_writer(std::stringstream& os) : os(os) {}
 
-budget::writer& budget::html_writer::operator<<(std::string_view value){
+budget::writer& budget::html_writer::operator<<(std::string_view value) {
     os << html_format(*this, value);
 
     return *this;
 }
 
-budget::writer& budget::html_writer::operator<<(double value){
+budget::writer& budget::html_writer::operator<<(double value) {
     os << value;
 
     return *this;
@@ -178,7 +178,7 @@ budget::writer& budget::html_writer::operator<<(const budget::title_end_t&) {
 
     title_started = false;
 
-    os << "</div>"; //end of the row
+    os << "</div>"; // end of the row
 
     return *this;
 }
@@ -194,9 +194,9 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
     os << R"======(<div class="col selector text-right">)======";
 
     auto previous_month = m.current_month;
-    auto previous_year = m.current_year;
-    auto next_month = m.current_month;
-    auto next_year = m.current_year;
+    auto previous_year  = m.current_year;
+    auto next_month     = m.current_month;
+    auto next_year      = m.current_year;
 
     if (m.current_month == 1) {
         previous_month = 12;
@@ -231,8 +231,8 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
 
     const auto years = active_years(m.current_year);
 
-    for(auto year : years){
-        if(year == m.current_year){
+    for (auto year : years) {
+        if (year == m.current_year) {
             os << "<option selected>" << year << "</option>";
         } else {
             os << "<option>" << year << "</option>";
@@ -277,14 +277,13 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
     auto previous_year = m.current_year - 1;
     auto next_year     = m.current_year + 1;
 
-    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_year
-       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_year << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
     os << R"(<select aria-label="Year" id="year_selector">)";
 
     const auto years = active_years(m.current_year);
 
-    for(auto year : years){
-        if(year == m.current_year){
+    for (auto year : years) {
+        if (year == m.current_year) {
             os << "<option selected>" << year << "</option>";
         } else {
             os << "<option>" << year << "</option>";
@@ -292,8 +291,7 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
     }
 
     os << "</select>";
-    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_year
-       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_year << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -325,24 +323,23 @@ budget::writer& budget::html_writer::operator<<(const budget::asset_selector& m)
     auto assets = cache.user_assets();
 
     size_t previous_asset = 0;
-    size_t next_asset = 0;
+    size_t next_asset     = 0;
 
     for (size_t i = 0; i < assets.size(); ++i) {
-        auto & asset = assets[i];
+        auto& asset = assets[i];
 
         if (asset.id == m.current_asset) {
-            next_asset = assets[(i + 1) % assets.size()].id;
+            next_asset     = assets[(i + 1) % assets.size()].id;
             previous_asset = assets[i > 0 ? i - 1 : assets.size() - 1].id;
             break;
         }
     }
 
-    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_asset
-       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_asset << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
     os << R"(<select aria-label="Year" id="asset_selector">)";
 
     for (const auto& asset : assets) {
-        if(asset.id == m.current_asset){
+        if (asset.id == m.current_asset) {
             os << "<option value=" << asset.id << " selected>" << asset.name << "</option>";
         } else {
             os << "<option value=" << asset.id << ">" << asset.name << "</option>";
@@ -350,8 +347,7 @@ budget::writer& budget::html_writer::operator<<(const budget::asset_selector& m)
     }
 
     os << "</select>";
-    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_asset
-       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_asset << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -383,24 +379,23 @@ budget::writer& budget::html_writer::operator<<(const budget::active_asset_selec
     auto assets = cache.active_user_assets();
 
     size_t previous_asset = 0;
-    size_t next_asset = 0;
+    size_t next_asset     = 0;
 
     for (size_t i = 0; i < assets.size(); ++i) {
-        auto & asset = assets[i];
+        auto& asset = assets[i];
 
         if (asset.id == m.current_asset) {
-            next_asset = assets[(i + 1) % assets.size()].id;
+            next_asset     = assets[(i + 1) % assets.size()].id;
             previous_asset = assets[i > 0 ? i - 1 : assets.size() - 1].id;
             break;
         }
     }
 
-    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_asset
-       << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
+    os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_asset << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
     os << R"(<select aria-label="Year" id="asset_selector">)";
 
     for (const auto& asset : assets) {
-        if(asset.id == m.current_asset){
+        if (asset.id == m.current_asset) {
             os << "<option value=" << asset.id << " selected>" << asset.name << "</option>";
         } else {
             os << "<option value=" << asset.id << ">" << asset.name << "</option>";
@@ -408,8 +403,7 @@ budget::writer& budget::html_writer::operator<<(const budget::active_asset_selec
     }
 
     os << "</select>";
-    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_asset
-       << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
+    os << R"(<a aria-label="Next" href="/)" << m.page << "/" << next_asset << R"(/"><span class="oi oi-arrow-thick-right"></span></a>)";
 
     os << "</div>";
 
@@ -458,7 +452,12 @@ budget::writer& budget::html_writer::operator<<(const budget::set_button& b) {
     return *this;
 }
 
-void budget::html_writer::display_table(std::vector<std::string>& columns, std::vector<std::vector<std::string>>& contents, size_t groups, std::vector<size_t> lines, size_t left, size_t foot){
+void budget::html_writer::display_table(std::vector<std::string>&              columns,
+                                        std::vector<std::vector<std::string>>& contents,
+                                        size_t                                 groups,
+                                        std::vector<size_t>                    lines,
+                                        size_t                                 left,
+                                        size_t                                 foot) {
     if (!groups) {
         throw budget_exception("Invaldid number of groups in display_table", true);
     }
@@ -478,7 +477,7 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
     }
 
     size_t extend = columns.size();
-    size_t edit = columns.size();
+    size_t edit   = columns.size();
 
     for (size_t i = 0; i < columns.size(); ++i) {
         for (auto& row : contents) {
@@ -498,9 +497,9 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
         }
     }
 
-    const bool small = columns.empty();  // TODO Improve this heuristic!
+    const bool small = columns.empty(); // TODO Improve this heuristic!
 
-    if(small){
+    if (small) {
         os << "<div class=\"row\">";
         os << "<div class=\"col-md-4\">&nbsp;</div>";
         os << "<div class=\"col-md-4\">";
@@ -519,18 +518,18 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
         for (size_t i = 0; i < columns.size(); ++i) {
             auto& column = columns[i];
 
-            if(column == "ID"){
+            if (column == "ID") {
                 continue;
             }
 
             std::string style;
 
             // TODO: This is only a bad hack, at best
-            if(i == extend){
+            if (i == extend) {
                 style = " class=\"extend-only\"";
             }
 
-            if(i == edit){
+            if (i == edit) {
                 style = " class=\"not-sortable\"";
             }
 
@@ -549,22 +548,22 @@ void budget::html_writer::display_table(std::vector<std::string>& columns, std::
 
     os << "<tbody>";
 
-    for(size_t i = 0; i < contents.size() - foot; ++i){
+    for (size_t i = 0; i < contents.size() - foot; ++i) {
         auto& row = contents[i];
 
         os << "<tr>";
 
-        for(size_t j = 0; j < row.size(); ++j){
+        for (size_t j = 0; j < row.size(); ++j) {
             if (!columns.empty() && groups == 1 && columns[j] == "ID") {
                 continue;
             }
 
             std::string const value = html_format(*this, row[j]);
 
-            if(value.empty()){
+            if (value.empty()) {
                 os << "<td>&nbsp;</td>";
             } else {
-                if(columns.empty() && j == 0){
+                if (columns.empty() && j == 0) {
                     os << "<th scope=\"row\">" << value << "</th>";
                 } else {
                     os << "<td>" << value << "</td>";
@@ -620,7 +619,10 @@ bool budget::html_writer::is_web() {
     return true;
 }
 
-void budget::html_writer::display_graph(const std::string& title, std::vector<std::string>& categories, std::vector<std::string> series_names, std::vector<std::vector<float>>& series_values){
+void budget::html_writer::display_graph(const std::string&               title,
+                                        std::vector<std::string>&        categories,
+                                        std::vector<std::string>         series_names,
+                                        std::vector<std::vector<float>>& series_values) {
     use_module("highcharts");
 
     os << R"=====(<div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>)=====";
@@ -643,11 +645,11 @@ void budget::html_writer::display_graph(const std::string& title, std::vector<st
 
     ss << "series: [";
 
-    for(size_t i = 0; i < series_names.size(); ++i){
+    for (size_t i = 0; i < series_names.size(); ++i) {
         ss << "{ name: '" << series_names[i] << "',";
         ss << "data: [";
 
-        for(auto& value : series_values[i]){
+        for (auto& value : series_values[i]) {
             ss << value << ",";
         }
 
@@ -661,7 +663,7 @@ void budget::html_writer::display_graph(const std::string& title, std::vector<st
     defer_script(ss.str());
 }
 
-void budget::html_writer::defer_script(const std::string& script){
+void budget::html_writer::defer_script(const std::string& script) {
     std::stringstream ss;
 
     ss << R"=====(<script>)=====" << '\n';
@@ -673,7 +675,7 @@ void budget::html_writer::defer_script(const std::string& script){
     scripts.emplace_back(ss.str());
 }
 
-void budget::html_writer::load_deferred_scripts(){
+void budget::html_writer::load_deferred_scripts() {
     // The javascript for Boostrap and JQuery
     os << R"=====(
             <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
@@ -711,12 +713,12 @@ void budget::html_writer::load_deferred_scripts(){
     }
 }
 
-void budget::html_writer::use_module(const std::string& module){
+void budget::html_writer::use_module(const std::string& module) {
     if (!range_contains(modules, module)) {
         modules.push_back(module);
     }
 }
 
-bool budget::html_writer::need_module(const std::string& module){
+bool budget::html_writer::need_module(const std::string& module) {
     return range_contains(modules, module);
 }

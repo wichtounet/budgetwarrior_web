@@ -18,7 +18,8 @@
 
 using namespace budget;
 
-void budget::month_breakdown_income_graph(budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, std::string_view style) {
+void budget::month_breakdown_income_graph(
+        budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, std::string_view style) {
     if (mono) {
         w.defer_script(R"=====(
             breakdown_income_colors = (function () {
@@ -93,7 +94,7 @@ void budget::month_breakdown_income_graph(budget::html_writer& w, std::string_vi
     end_chart(w, ss);
 }
 
-void budget::time_graph_income_page(html_writer & w) {
+void budget::time_graph_income_page(html_writer& w) {
     {
         auto ss = start_time_chart(w, "Income over time", "line", "income_time_graph", "");
 
@@ -107,17 +108,17 @@ void budget::time_graph_income_page(html_writer & w) {
         ss << "data: [";
 
         std::vector<budget::money> serie;
-        std::vector<std::string> dates;
+        std::vector<std::string>   dates;
 
         auto sy = start_year(w.cache);
 
-        for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
+        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
             budget::year const year = j;
 
             const auto sm   = start_month(w.cache, year);
             const auto last = last_month(year);
 
-            for(unsigned short i = sm; i < last; ++i){
+            for (unsigned short i = sm; i < last; ++i) {
                 budget::month const month = i;
 
                 auto sum = get_base_income(w.cache, budget::date(year, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
@@ -127,7 +128,7 @@ void budget::time_graph_income_page(html_writer & w) {
                 serie.push_back(sum);
                 dates.push_back(date);
 
-                ss << "[" << date <<  "," << budget::money_to_string(sum) << "],";
+                ss << "[" << date << "," << budget::money_to_string(sum) << "],";
             }
         }
 
@@ -154,11 +155,11 @@ void budget::time_graph_income_page(html_writer & w) {
         ss << "data: [";
 
         std::vector<budget::money> serie;
-        std::vector<std::string> dates;
+        std::vector<std::string>   dates;
 
         auto sy = start_year(w.cache);
 
-        for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
+        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
             budget::year const year = j;
 
             const auto sm   = start_month(w.cache, year);
@@ -175,7 +176,7 @@ void budget::time_graph_income_page(html_writer & w) {
             serie.push_back(sum);
             dates.push_back(date);
 
-            ss << "[" << date <<  "," << budget::money_to_string(sum) << "],";
+            ss << "[" << date << "," << budget::money_to_string(sum) << "],";
         }
 
         ss << "]},";
@@ -188,7 +189,7 @@ void budget::time_graph_income_page(html_writer & w) {
     }
 }
 
-void budget::time_graph_earnings_page(html_writer & w) {
+void budget::time_graph_earnings_page(html_writer& w) {
     auto ss = start_time_chart(w, "Earnings over time", "line", "earnings_time_graph", "");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -202,13 +203,13 @@ void budget::time_graph_earnings_page(html_writer & w) {
 
     auto sy = start_year(w.cache);
 
-    for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
+    for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
         budget::year const year = j;
 
         const auto sm   = start_month(w.cache, year);
         const auto last = last_month(year);
 
-        for(unsigned short i = sm; i < last; ++i){
+        for (unsigned short i = sm; i < last; ++i) {
             budget::month const month = i;
 
             const auto sum = fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
@@ -226,7 +227,7 @@ void budget::time_graph_earnings_page(html_writer & w) {
 
 namespace {
 
-void add_quick_earning_action(budget::html_writer & w, size_t i, budget::earning & earning) {
+void add_quick_earning_action(budget::html_writer& w, size_t i, budget::earning& earning) {
     w << "<script>";
     w << "function quickAction" << i << "() {";
     w << R"(  $("#input_name").val(")" << earning.name << "\");";
@@ -234,8 +235,7 @@ void add_quick_earning_action(budget::html_writer & w, size_t i, budget::earning
     w << "  $(\"#input_account\").val(" << earning.account << ");";
     w << "}";
     w << "</script>";
-    w << R"(<button class="btn btn-secondary" onclick="quickAction)" << i << "();\">" << earning.name
-      << "</button>&nbsp;";
+    w << R"(<button class="btn btn-secondary" onclick="quickAction)" << i << "();\">" << earning.name << "</button>&nbsp;";
 }
 
 } // end of anonymous namespace
@@ -246,9 +246,9 @@ void budget::add_earnings_page(html_writer& w) {
     static constexpr size_t quick_actions = 5;
 
     if (w.cache.earnings().size() > quick_actions) {
-        std::map<std::string, size_t> counts;
+        std::map<std::string, size_t>                    counts;
         std::unordered_map<std::string, budget::earning> last_earnings;
-        std::vector<std::pair<std::string, size_t>> order;
+        std::vector<std::pair<std::string, size_t>>      order;
 
         for (auto& earning : w.cache.sorted_earnings()) {
             ++counts[earning.name];
@@ -260,7 +260,7 @@ void budget::add_earnings_page(html_writer& w) {
             order.emplace_back(key, value);
         }
 
-        std::ranges::sort(order, [] (const auto & a, const auto & b) { return a.second > b.second; });
+        std::ranges::sort(order, [](const auto& a, const auto& b) { return a.second > b.second; });
 
         w << "<div>";
         w << "Quick Fill: ";
@@ -286,7 +286,7 @@ void budget::add_earnings_page(html_writer& w) {
     form_end(w);
 }
 
-void budget::edit_earnings_page(html_writer & w, const httplib::Request& req) {
+void budget::edit_earnings_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         return display_error_message(w, "Invalid parameter for the request");
     }
@@ -312,7 +312,7 @@ void budget::edit_earnings_page(html_writer & w, const httplib::Request& req) {
     form_end(w);
 }
 
-void budget::earnings_page(html_writer & w, const httplib::Request& req) {
+void budget::earnings_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
         show_earnings(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
@@ -322,20 +322,20 @@ void budget::earnings_page(html_writer & w, const httplib::Request& req) {
     make_tables_sortable(w);
 }
 
-void budget::all_earnings_page(html_writer & w) {
+void budget::all_earnings_page(html_writer& w) {
     budget::show_all_earnings(w);
 
     make_tables_sortable(w);
 }
 
-void budget::search_earnings_page(html_writer & w, const httplib::Request& req) {
+void budget::search_earnings_page(html_writer& w, const httplib::Request& req) {
     page_form_begin(w, "/earnings/search/");
 
     add_name_picker(w);
 
     form_end(w);
 
-    if(req.has_param("input_name")){
+    if (req.has_param("input_name")) {
         auto search = req.get_param_value("input_name");
 
         search_earnings(search, w);

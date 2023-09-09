@@ -11,6 +11,6 @@
 
 namespace budget {
 
-void index_page(html_writer & w);
+void index_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

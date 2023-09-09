@@ -12,7 +12,7 @@
 
 using namespace budget;
 
-void budget::report_page(html_writer & w) {
+void budget::report_page(html_writer& w) {
     auto today = budget::local_day();
     report(w, today.year(), false, "");
 }

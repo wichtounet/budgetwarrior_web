@@ -18,7 +18,7 @@
 
 using namespace budget;
 
-void budget::overview_page(html_writer & w, const httplib::Request& req) {
+void budget::overview_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
         display_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
     } else {
@@ -27,20 +27,20 @@ void budget::overview_page(html_writer & w, const httplib::Request& req) {
     }
 }
 
-void budget::overview_aggregate_all_page(html_writer & w) {
+void budget::overview_aggregate_all_page(html_writer& w) {
     // Configuration of the overview
-    const bool full = config_contains_and_true("aggregate_full");
-    const bool disable_groups = config_contains_and_true("aggregate_no_group");
-    std::string const separator = config_value("aggregate_separator", "/");
+    const bool        full           = config_contains_and_true("aggregate_full");
+    const bool        disable_groups = config_contains_and_true("aggregate_no_group");
+    std::string const separator      = config_value("aggregate_separator", "/");
 
     aggregate_all_overview(w, full, disable_groups, separator);
 }
 
-void budget::overview_aggregate_year_page(html_writer & w, const httplib::Request& req) {
+void budget::overview_aggregate_year_page(html_writer& w, const httplib::Request& req) {
     // Configuration of the overview
-    const bool full = config_contains_and_true("aggregate_full");
-    const bool disable_groups = config_contains_and_true("aggregate_no_group");
-    std::string const separator = config_value("aggregate_separator", "/");
+    const bool        full           = config_contains_and_true("aggregate_full");
+    const bool        disable_groups = config_contains_and_true("aggregate_no_group");
+    std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 2) {
         aggregate_year_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[1]));
@@ -50,11 +50,11 @@ void budget::overview_aggregate_year_page(html_writer & w, const httplib::Reques
     }
 }
 
-void budget::overview_aggregate_year_fv_page(html_writer & w, const httplib::Request& req) {
+void budget::overview_aggregate_year_fv_page(html_writer& w, const httplib::Request& req) {
     // Configuration of the overview
-    const bool full = config_contains_and_true("aggregate_full");
-    const bool disable_groups = config_contains_and_true("aggregate_no_group");
-    std::string const separator = config_value("aggregate_separator", "/");
+    const bool        full           = config_contains_and_true("aggregate_full");
+    const bool        disable_groups = config_contains_and_true("aggregate_no_group");
+    std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 2) {
         aggregate_year_fv_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[1]));
@@ -64,11 +64,11 @@ void budget::overview_aggregate_year_fv_page(html_writer & w, const httplib::Req
     }
 }
 
-void budget::overview_aggregate_year_month_page(html_writer & w, const httplib::Request& req) {
+void budget::overview_aggregate_year_month_page(html_writer& w, const httplib::Request& req) {
     // Configuration of the overview
-    const bool full = config_contains_and_true("aggregate_full");
-    const bool disable_groups = config_contains_and_true("aggregate_no_group");
-    std::string const separator = config_value("aggregate_separator", "/");
+    const bool        full           = config_contains_and_true("aggregate_full");
+    const bool        disable_groups = config_contains_and_true("aggregate_no_group");
+    std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 2) {
         aggregate_year_month_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[1]));
@@ -78,11 +78,11 @@ void budget::overview_aggregate_year_month_page(html_writer & w, const httplib::
     }
 }
 
-void budget::overview_aggregate_month_page(html_writer & w, const httplib::Request& req) {
+void budget::overview_aggregate_month_page(html_writer& w, const httplib::Request& req) {
     // Configuration of the overview
-    const bool full = config_contains_and_true("aggregate_full");
-    const bool disable_groups = config_contains_and_true("aggregate_no_group");
-    std::string const separator = config_value("aggregate_separator", "/");
+    const bool        full           = config_contains_and_true("aggregate_full");
+    const bool        disable_groups = config_contains_and_true("aggregate_no_group");
+    std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 3) {
         aggregate_month_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]));
@@ -92,7 +92,7 @@ void budget::overview_aggregate_month_page(html_writer & w, const httplib::Reque
     }
 }
 
-void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
+void budget::overview_year_page(html_writer& w, const httplib::Request& req) {
     budget::year year = budget::local_day().year();
     if (req.matches.size() == 2) {
         year = to_number<size_t>(req.matches[1]);
@@ -173,7 +173,8 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
             ss << "data: [";
 
             for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
-                auto sum = get_base_income(w.cache, budget::date(year - 1, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year - 1, month) | to_amount);
+                auto sum =
+                        get_base_income(w.cache, budget::date(year - 1, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year - 1, month) | to_amount);
 
                 const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
@@ -191,7 +192,7 @@ void budget::overview_year_page(html_writer & w, const httplib::Request& req) {
     display_year_overview(year, w);
 }
 
-void budget::time_graph_savings_rate_page(html_writer & w) {
+void budget::time_graph_savings_rate_page(html_writer& w) {
     auto ss = start_time_chart(w, "Savings rate over time", "line", "savings_time_graph", "");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -203,7 +204,7 @@ void budget::time_graph_savings_rate_page(html_writer & w) {
     ss << "{ name: 'Savings Rate',";
     ss << "data: [";
 
-    std::vector<float> serie;
+    std::vector<float>       serie;
     std::vector<std::string> dates;
 
     auto sy = start_year(w.cache);
@@ -219,7 +220,7 @@ void budget::time_graph_savings_rate_page(html_writer & w) {
 
             auto status = budget::compute_month_status(w.cache, year, month);
 
-            auto savings = status.income - status.expenses;
+            auto savings      = status.income - status.expenses;
             auto savings_rate = 0.0;
 
             if (savings.dollars() > 0) {
@@ -264,7 +265,7 @@ void budget::time_graph_savings_rate_page(html_writer & w) {
     end_chart(w, ss);
 }
 
-void budget::time_graph_tax_rate_page(html_writer & w) {
+void budget::time_graph_tax_rate_page(html_writer& w) {
     std::stringstream const content_stream;
 
     if (has_taxes_account()) {
@@ -353,19 +354,20 @@ void budget::time_graph_tax_rate_page(html_writer & w) {
 
 namespace {
 
-void display_side_month_overview(budget::month month, budget::year year, budget::writer& writer){
+void display_side_month_overview(budget::month month, budget::year year, budget::writer& writer) {
     auto accounts = all_accounts(writer.cache, year, month);
 
-    writer << title_begin << "Side Hustle Overview of " << month << " " << year << budget::year_month_selector{"side_hustle/overview", year, month} << title_end;
+    writer << title_begin << "Side Hustle Overview of " << month << " " << year << budget::year_month_selector{"side_hustle/overview", year, month}
+           << title_end;
 
     auto side_category = user_config_value("side_category", "");
     auto side_prefix   = user_config_value("side_prefix", "");
 
     std::vector<std::vector<std::string>> contents;
-    std::vector<money> total_expenses(1, budget::money());
-    std::vector<money> total_earnings(1, budget::money());
+    std::vector<money>                    total_expenses(1, budget::money());
+    std::vector<money>                    total_earnings(1, budget::money());
 
-    std::vector<std::string> columns = {side_category};
+    std::vector<std::string>                columns = {side_category};
     std::unordered_map<std::string, size_t> indexes = {{side_category, 0}};
 
     std::vector<budget::expense> side_expenses;
@@ -387,26 +389,26 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
         }
     }
 
-    //Expenses
+    // Expenses
     add_expenses_column(month, year, "Expenses", contents, indexes, columns.size(), side_expenses, total_expenses);
 
-    //Earnings
+    // Earnings
     contents.emplace_back(columns.size() * 3, "");
     add_earnings_column(month, year, "Earnings", contents, indexes, columns.size(), side_earnings, total_earnings);
 
     writer.display_table(columns, contents, 3);
 
-    auto income = total_earnings[0];
+    auto income             = total_earnings[0];
     auto total_all_expenses = total_expenses[0];
 
-    budget::money const savings = income - total_all_expenses;
-    double savings_rate = 0.0;
+    budget::money const savings      = income - total_all_expenses;
+    double              savings_rate = 0.0;
 
     if (savings.value > 0) {
         savings_rate = 100 * (savings / income);
     }
 
-    std::vector<std::string> second_columns;
+    std::vector<std::string>              second_columns;
     std::vector<std::vector<std::string>> second_contents;
 
     second_contents.emplace_back(std::vector<std::string>{"Total expenses", budget::to_string(total_all_expenses)});
@@ -419,7 +421,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
 
 } // end of anonymous namespace
 
-void budget::side_overview_page(html_writer & w, const httplib::Request& req) {
+void budget::side_overview_page(html_writer& w, const httplib::Request& req) {
     if (!budget::is_side_hustle_enabled()) {
         w << "Side hustle is not configured";
         return;

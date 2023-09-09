@@ -15,4 +15,4 @@ void recurrings_list_page(html_writer& w);
 void add_recurrings_page(html_writer& w);
 void edit_recurrings_page(html_writer& w, const httplib::Request& req);
 
-} //end of namespace budget
+} // end of namespace budget

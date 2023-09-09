@@ -115,7 +115,7 @@ void add_objective_source_picker(budget::writer& w, std::string_view default_val
 
 } // namespace
 
-void budget::objectives_card(budget::html_writer& w){
+void budget::objectives_card(budget::html_writer& w) {
     // if the user does not use objectives, this card does not make sense
     if (w.cache.objectives().empty()) {
         return;
@@ -126,7 +126,7 @@ void budget::objectives_card(budget::html_writer& w){
     const auto m = today.month();
     const auto y = today.year();
 
-    //Compute the year/month status
+    // Compute the year/month status
     auto year_status  = budget::compute_year_status(w.cache);
     auto month_status = budget::compute_month_status(w.cache, y, m);
 
@@ -150,7 +150,7 @@ void budget::objectives_card(budget::html_writer& w){
         ss << R"=====(yAxis: { min: 0, max: 100, lineWidth: 0, tickPositions: [], },)=====";
 
         std::string status;
-        int success_int = 0;
+        int         success_int = 0;
 
         if (objective.type == "yearly") {
             status      = budget::get_status(year_status, objective);
@@ -223,7 +223,7 @@ void budget::add_objectives_page(html_writer& w) {
 }
 
 void budget::edit_objectives_page(html_writer& w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 

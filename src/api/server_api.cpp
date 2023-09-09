@@ -68,7 +68,7 @@ void retirement_configure_api(const httplib::Request& req, httplib::Response& re
     api_success(req, res, "Retirement configuration was saved");
 }
 
-auto api_wrapper(void (*api_function)(const httplib::Request &, httplib::Response &)) {
+auto api_wrapper(void (*api_function)(const httplib::Request&, httplib::Response&)) {
     return [api_function](const httplib::Request& req, httplib::Response& res) {
         try {
             if (!api_start(req, res)) {
@@ -90,37 +90,53 @@ auto api_wrapper(void (*api_function)(const httplib::Request &, httplib::Respons
 }
 
 std::string encode_url(std::string_view s) {
-  std::string result;
+    std::string result;
 
-  for (auto i = 0; s[i]; i++) {
-    switch (s[i]) {
-    case ' ': result += "%20"; break;
-    case '+': result += "%2B"; break;
-    case '\r': result += "%0D"; break;
-    case '\n': result += "%0A"; break;
-    case '\'': result += "%27"; break;
-    case ',': result += "%2C"; break;
-    case ':': result += "%3A"; break;
-    case ';': result += "%3B"; break;
-    default:
-      auto c = static_cast<uint8_t>(s[i]);
-      if (c >= 0x80) {
-        result += '%';
-        char hex[4];
-        const size_t len = snprintf(hex, sizeof(hex) - 1, "%02X", c);
-        assert(len == 2);
-        result.append(hex, len);
-      } else {
-        result += s[i];
-      }
-      break;
+    for (auto i = 0; s[i]; i++) {
+        switch (s[i]) {
+        case ' ':
+            result += "%20";
+            break;
+        case '+':
+            result += "%2B";
+            break;
+        case '\r':
+            result += "%0D";
+            break;
+        case '\n':
+            result += "%0A";
+            break;
+        case '\'':
+            result += "%27";
+            break;
+        case ',':
+            result += "%2C";
+            break;
+        case ':':
+            result += "%3A";
+            break;
+        case ';':
+            result += "%3B";
+            break;
+        default:
+            auto c = static_cast<uint8_t>(s[i]);
+            if (c >= 0x80) {
+                result += '%';
+                char         hex[4];
+                const size_t len = snprintf(hex, sizeof(hex) - 1, "%02X", c);
+                assert(len == 2);
+                result.append(hex, len);
+            } else {
+                result += s[i];
+            }
+            break;
+        }
     }
-  }
 
-  return result;
+    return result;
 }
 
-} //end of anonymous namespace
+} // end of anonymous namespace
 
 void budget::load_api(httplib::Server& server) {
     server.Get("/api/server/up/", api_wrapper(&server_up_api));
@@ -215,9 +231,9 @@ void budget::api_error(const httplib::Request& req, httplib::Response& res, std:
 
         std::string url;
         if (back_page.find('?') == std::string::npos) {
-            url = std::format("{}?error=true&message={}", back_page,  encode_url(message));
+            url = std::format("{}?error=true&message={}", back_page, encode_url(message));
         } else {
-            url = std::format("{}&error=true&message={}", back_page,  encode_url(message));
+            url = std::format("{}&error=true&message={}", back_page, encode_url(message));
         }
 
         res.set_redirect(url.c_str());
@@ -232,9 +248,9 @@ void budget::api_success(const httplib::Request& req, httplib::Response& res, st
 
         std::string url;
         if (back_page.find('?') == std::string::npos) {
-            url = std::format("{}?success=true&message={}", back_page,  encode_url(message));
+            url = std::format("{}?success=true&message={}", back_page, encode_url(message));
         } else {
-            url = std::format("{}&success=true&message={}", back_page,  encode_url(message));
+            url = std::format("{}&success=true&message={}", back_page, encode_url(message));
         }
 
         res.set_redirect(url.c_str());
@@ -249,9 +265,9 @@ void budget::api_success(const httplib::Request& req, httplib::Response& res, st
 
         std::string url;
         if (back_page.find('?') == std::string::npos) {
-            url = std::format("{}?success=true&message={}", back_page,  encode_url(message));
+            url = std::format("{}?success=true&message={}", back_page, encode_url(message));
         } else {
-            url = std::format("{}&success=true&message={}", back_page,  encode_url(message));
+            url = std::format("{}&success=true&message={}", back_page, encode_url(message));
         }
 
         res.set_redirect(url.c_str());
@@ -265,5 +281,5 @@ void budget::api_success_content(const httplib::Request& /*req*/, httplib::Respo
 }
 
 bool budget::parameters_present(const httplib::Request& req, const std::vector<const char*>& parameters) {
-    return std::ranges::all_of(parameters, [&req](const auto & param) { return req.has_param(param); });
+    return std::ranges::all_of(parameters, [&req](const auto& param) { return req.has_param(param); });
 }

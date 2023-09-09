@@ -20,16 +20,16 @@ using namespace budget;
 
 namespace {
 
-budget::money monthly_income(data_cache & cache, budget::month month, budget::year year) {
+budget::money monthly_income(data_cache& cache, budget::month month, budget::year year) {
     // TODO: This only work if monthly_income is called today
     return get_base_income(cache) + fold_left_auto(cache.earnings() | filter_by_date(year, month) | to_amount);
 }
 
-budget::money monthly_spending(data_cache & cache, budget::month month, budget::year year) {
+budget::money monthly_spending(data_cache& cache, budget::month month, budget::year year) {
     return fold_left_auto(cache.expenses() | filter_by_date(year, month) | to_amount);
 }
 
-void cash_flow_card(budget::html_writer& w){
+void cash_flow_card(budget::html_writer& w) {
     const auto today = budget::local_day();
 
     const auto m = today.month();
@@ -37,7 +37,7 @@ void cash_flow_card(budget::html_writer& w){
 
     w << R"=====(<div class="card">)=====";
 
-    auto income = monthly_income(w.cache, m, y);
+    auto income   = monthly_income(w.cache, m, y);
     auto spending = monthly_spending(w.cache, m, y);
 
     w << R"=====(<div class="card-header card-header-primary">)=====";
@@ -45,7 +45,7 @@ void cash_flow_card(budget::html_writer& w){
     w << R"=====(<div class="float-right">)=====";
     w << income - spending << " __currency__";
 
-    if(income > spending){
+    if (income > spending) {
         w << " (" << 100.0f * ((income - spending) / income) << "%)";
     }
 
@@ -57,19 +57,19 @@ void cash_flow_card(budget::html_writer& w){
 
     w << R"=====(<div class="col-md-6 col-sm-12">)=====";
     month_breakdown_income_graph(w, "Income", m, y, true, "min-width:300px; height: 300px;");
-    w << R"=====(</div>)====="; //column
+    w << R"=====(</div>)====="; // column
 
     w << R"=====(<div class="col-md-6 col-sm-12">)=====";
     month_breakdown_expenses_graph(w, "Expenses", m, y, true, "min-width:300px; height: 300px;");
-    w << R"=====(</div>)====="; //column
+    w << R"=====(</div>)====="; // column
 
-    w << R"=====(</div>)====="; //card-body
-    w << R"=====(</div>)====="; //card
+    w << R"=====(</div>)====="; // card-body
+    w << R"=====(</div>)====="; // card
 }
 
 } // namespace
 
-void budget::index_page(html_writer & w) {
+void budget::index_page(html_writer& w) {
     const bool left_column = !no_assets() && !no_asset_values();
 
     if (left_column) {

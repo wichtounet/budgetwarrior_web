@@ -19,7 +19,7 @@ using namespace budget;
 
 namespace {
 
-std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::string, budget::money> & expense_sum, size_t max) {
+std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::string, budget::money>& expense_sum, size_t max) {
     std::vector<std::pair<std::string, budget::money>> sorted_expenses;
 
     sorted_expenses.reserve(expense_sum.size());
@@ -27,9 +27,7 @@ std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::
         sorted_expenses.emplace_back(name, amount);
     }
 
-    std::ranges::sort(sorted_expenses, [](auto& lhs, auto& rhs) {
-        return lhs.second > rhs.second;
-    });
+    std::ranges::sort(sorted_expenses, [](auto& lhs, auto& rhs) { return lhs.second > rhs.second; });
 
     if (sorted_expenses.size() > max) {
         sorted_expenses.resize(max);
@@ -38,10 +36,10 @@ std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::
     return sorted_expenses;
 }
 
-
 } // end of anonymous namespace
 
-void budget::month_breakdown_expenses_graph(budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, std::string_view style) {
+void budget::month_breakdown_expenses_graph(
+        budget::html_writer& w, std::string_view title, budget::month month, budget::year year, bool mono, std::string_view style) {
     if (mono) {
         w.defer_script(R"=====(
             breakdown_expense_colors = (function () {
@@ -201,7 +199,6 @@ void budget::month_breakdown_expenses_graph(budget::html_writer& w, std::string_
     }
 }
 
-
 void budget::expenses_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
         show_expenses(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
@@ -219,7 +216,7 @@ void budget::search_expenses_page(html_writer& w, const httplib::Request& req) {
 
     form_end(w);
 
-    if(req.has_param("input_name")){
+    if (req.has_param("input_name")) {
         auto search = req.get_param_value("input_name");
 
         search_expenses(search, w);
@@ -241,17 +238,17 @@ void budget::time_graph_expenses_page(html_writer& w) {
     ss << "data: [";
 
     std::vector<budget::money> serie;
-    std::vector<std::string> dates;
+    std::vector<std::string>   dates;
 
     auto sy = start_year(w.cache);
 
-    for(unsigned short j = sy; j <= budget::local_day().year(); ++j){
+    for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
         budget::year const year = j;
 
         const auto sm   = start_month(w.cache, year);
         const auto last = last_month(year);
 
-        for(unsigned short i = sm; i < last; ++i){
+        for (unsigned short i = sm; i < last; ++i) {
             budget::month const month = i;
 
             budget::money const sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
@@ -261,7 +258,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
             serie.push_back(sum);
             dates.push_back(date);
 
-            ss << "[" << date <<  "," << budget::money_to_string(sum) << "],";
+            ss << "[" << date << "," << budget::money_to_string(sum) << "],";
         }
     }
 
@@ -291,7 +288,7 @@ void budget::time_graph_expenses_page(html_writer& w) {
         ss << "data: [";
 
         std::vector<budget::money> serie;
-        std::vector<std::string> dates;
+        std::vector<std::string>   dates;
 
         for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
             budget::year const year = j;
@@ -482,7 +479,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
 
 namespace {
 
-void add_quick_expense_action(budget::html_writer & w, size_t i, budget::expense & expense) {
+void add_quick_expense_action(budget::html_writer& w, size_t i, budget::expense& expense) {
     w << "<script>";
     w << "function quickAction" << i << "() {";
     w << R"(  $("#input_name").val(")" << expense.name << "\");";
@@ -490,8 +487,7 @@ void add_quick_expense_action(budget::html_writer & w, size_t i, budget::expense
     w << "  $(\"#input_account\").val(" << expense.account << ");";
     w << "}";
     w << "</script>";
-    w << R"(<button class="btn btn-secondary" onclick="quickAction)" << i << "();\">" << expense.name
-      << "</button>&nbsp;";
+    w << R"(<button class="btn btn-secondary" onclick="quickAction)" << i << "();\">" << expense.name << "</button>&nbsp;";
 }
 
 } // end of anonymous namespace
@@ -502,9 +498,9 @@ void budget::add_expenses_page(html_writer& w) {
     static constexpr size_t quick_actions = 5;
 
     if (w.cache.expenses().size() > quick_actions) {
-        std::map<std::string, size_t> counts;
+        std::map<std::string, size_t>                    counts;
         std::unordered_map<std::string, budget::expense> last_expenses;
-        std::vector<std::pair<std::string, size_t>> order;
+        std::vector<std::pair<std::string, size_t>>      order;
 
         for (auto& expense : w.cache.sorted_expenses()) {
             ++counts[expense.name];
@@ -516,7 +512,7 @@ void budget::add_expenses_page(html_writer& w) {
             order.emplace_back(key, value);
         }
 
-        std::ranges::sort(order, [] (const auto & a, const auto & b) { return a.second > b.second; });
+        std::ranges::sort(order, [](const auto& a, const auto& b) { return a.second > b.second; });
 
         w << "<div>";
         w << "Quick Fill: ";

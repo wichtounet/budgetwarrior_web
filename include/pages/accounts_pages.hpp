@@ -18,4 +18,4 @@ void edit_accounts_page(html_writer& w, const httplib::Request& req);
 void archive_accounts_month_page(html_writer& w);
 void archive_accounts_year_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

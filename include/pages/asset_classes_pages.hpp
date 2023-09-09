@@ -16,4 +16,4 @@ void list_asset_classes_page(html_writer& w);
 void add_asset_classes_page(html_writer& w);
 void edit_asset_classes_page(html_writer& w, const httplib::Request& req);
 
-} //end of namespace budget
+} // end of namespace budget

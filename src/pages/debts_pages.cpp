@@ -68,7 +68,7 @@ void budget::add_debts_page(html_writer& w) {
 }
 
 void budget::edit_debts_page(html_writer& w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 

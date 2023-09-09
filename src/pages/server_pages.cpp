@@ -337,7 +337,7 @@ std::string header(std::string_view title, bool menu = true) {
 
         // Fortune
 
-        if(!budget::is_fortune_disabled()){
+        if (!budget::is_fortune_disabled()) {
             stream << R"=====(
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="dropdown06" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Fortune</a>
@@ -418,7 +418,7 @@ std::string header(std::string_view title, bool menu = true) {
     // The main component
 
     stream << R"=====(<main class="container-fluid">)=====" << new_line;
-    //stream << "<div>" << new_line;
+    // stream << "<div>" << new_line;
 
     return stream.str();
 }
@@ -457,27 +457,21 @@ void filter_html(std::string& html, const httplib::Request& req) {
     replace_all(html, "__currency__", get_default_currency());
 }
 
-//Note: This must be synchronized with page_end
+// Note: This must be synchronized with page_end
 std::string footer() {
     return "</main></body></html>";
 }
 
 bool parameters_present(const httplib::Request& req, std::vector<const char*> parameters) {
-    return !std::ranges::any_of(parameters, [&req] (const auto & param) { return req.has_param(param); } );
+    return !std::ranges::any_of(parameters, [&req](const auto& param) { return req.has_param(param); });
 }
 
-void call_render_function(html_writer&            w,
-                          const httplib::Request& req,
-                          httplib::Response&      res,
-                          void (*render_function)(html_writer&, const httplib::Request&)) {
+void call_render_function(html_writer& w, const httplib::Request& req, httplib::Response& res, void (*render_function)(html_writer&, const httplib::Request&)) {
     cpp_unused(res);
     render_function(w, req);
 }
 
-void call_render_function(html_writer&            w,
-                          const httplib::Request& req,
-                          httplib::Response&      res,
-                          void (*render_function)(html_writer&)) {
+void call_render_function(html_writer& w, const httplib::Request& req, httplib::Response& res, void (*render_function)(html_writer&)) {
     cpp_unused(req);
     cpp_unused(res);
     render_function(w);
@@ -514,7 +508,7 @@ auto render_wrapper(const char* title, T render_function) {
     };
 }
 
-} //end of anonymous namespace
+} // end of anonymous namespace
 
 void budget::load_pages(httplib::Server& server) {
     // Declare all the pages
@@ -523,7 +517,7 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/overview/year/", render_wrapper("Yearly Overview", &overview_year_page));
     server.Get(R"(/overview/year/(\d+)/)", render_wrapper("Yearly Overview", &overview_year_page));
     server.Get("/overview/", render_wrapper("Monthly Overview", &overview_page));
-    server.Get(R"(/overview/(\d+)/(\d+)/)", render_wrapper("Monthly Overview",&overview_page));
+    server.Get(R"(/overview/(\d+)/(\d+)/)", render_wrapper("Monthly Overview", &overview_page));
     server.Get("/overview/aggregate/year/", render_wrapper("Yearly Aggregate", &overview_aggregate_year_page));
     server.Get(R"(/overview/aggregate/year/(\d+)/)", render_wrapper("Yearly Aggregate", &overview_aggregate_year_page));
     server.Get("/overview/aggregate/year_month/", render_wrapper("Yearly Aggregate", &overview_aggregate_year_month_page));
@@ -700,16 +694,15 @@ void ask_for_digest(httplib::Response& res) {
 
     // Generate the random nonce
     std::random_device rd;
-    std::mt19937_64 g(rd());
-    const std::string nonce = std::to_string(g());
+    std::mt19937_64    g(rd());
+    const std::string  nonce = std::to_string(g());
 
     // TODO: Optimize without all these copies
     auto nonce_str  = "nonce=\"" + md5_direct(opaque) + "\"";
     auto opaque_str = "opaque=\"" + md5_direct(nonce) + "\"";
 
     res.status = 401;
-    res.set_header("WWW-Authenticate",
-                   R"(Digest realm="budgetwarrior", qop="auth,auth-int",)" + nonce_str + "," + opaque_str);
+    res.set_header("WWW-Authenticate", R"(Digest realm="budgetwarrior", qop="auth,auth-int",)" + nonce_str + "," + opaque_str);
 }
 
 } // end of anonymous namespace
@@ -731,9 +724,9 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             auto sub_authorization = authorization.substr(7, authorization.size());
 
             std::map<std::string, std::string> dict;
-            auto parts = split(sub_authorization, ',');
+            auto                               parts = split(sub_authorization, ',');
 
-            for (auto & part : parts) {
+            for (auto& part : parts) {
                 // Each part is supposed to be key=value
                 // Some of the values are in quotes
 
@@ -780,9 +773,8 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             // compare to what the client answered
 
             std::string const response_final =
-                md5_direct(md5_direct(get_web_user() + ":" + dict["realm"] + ":" + get_web_password()) + ":" +
-                           dict["nonce"] + ":" + dict["nc"] + ":" + dict["cnonce"] + ":" + dict["qop"] + ":" +
-                           md5_direct(req.method + ":" + dict["uri"]));
+                    md5_direct(md5_direct(get_web_user() + ":" + dict["realm"] + ":" + get_web_password()) + ":" + dict["nonce"] + ":" + dict["nc"] + ":"
+                               + dict["cnonce"] + ":" + dict["qop"] + ":" + md5_direct(req.method + ":" + dict["uri"]));
 
             if (dict["response"] != response_final) {
                 ask_for_digest(res);
@@ -831,7 +823,7 @@ bool budget::validate_parameters(html_writer& w, const httplib::Request& req, st
     return true;
 }
 
-void budget::page_end(budget::html_writer & w, const httplib::Request& req, httplib::Response& res) {
+void budget::page_end(budget::html_writer& w, const httplib::Request& req, httplib::Response& res) {
     w << "</main>";
     w.load_deferred_scripts();
     w << "</body></html>";
@@ -843,7 +835,7 @@ void budget::page_end(budget::html_writer & w, const httplib::Request& req, http
     res.set_content(result, "text/html");
 }
 
-void budget::make_tables_sortable(budget::html_writer& w){
+void budget::make_tables_sortable(budget::html_writer& w) {
     w.defer_script(R"=====(
         $(".table").DataTable({
          "columnDefs": [ {
@@ -944,7 +936,6 @@ void budget::add_password_picker(budget::writer& w, std::string_view title, std:
     )=====";
 }
 
-
 void budget::add_name_picker(budget::writer& w, std::string_view default_value) {
     add_text_picker(w, "Name", "input_name", default_value);
 }
@@ -1041,8 +1032,7 @@ void budget::add_date_picker(budget::writer& w, std::string_view default_value, 
     }
 }
 
-std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_view chart_type, std::string_view id,
-                                           std::string_view style) {
+std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_view chart_type, std::string_view id, std::string_view style) {
     w.use_module("highcharts");
 
     w << R"=====(<div id=")=====";
@@ -1073,8 +1063,8 @@ std::stringstream budget::start_chart_base(budget::html_writer& w, std::string_v
     return ss;
 }
 
-std::stringstream budget::start_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                                      std::string_view id, std::string_view style) {
+std::stringstream budget::start_chart(
+        budget::html_writer& w, std::string_view title, std::string_view chart_type, std::string_view id, std::string_view style) {
     auto ss = start_chart_base(w, chart_type, id, style);
 
     ss << R"=====(title: {text: ')=====";
@@ -1084,8 +1074,8 @@ std::stringstream budget::start_chart(budget::html_writer& w, std::string_view t
     return ss;
 }
 
-std::stringstream budget::start_time_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                                           std::string_view id, std::string_view style) {
+std::stringstream budget::start_time_chart(
+        budget::html_writer& w, std::string_view title, std::string_view chart_type, std::string_view id, std::string_view style) {
     // Note: Not nice but we are simply injecting zoomType here
     auto ss = start_chart_base(w, std::string(chart_type) + "', zoomType: 'x", id, style);
 
@@ -1107,9 +1097,7 @@ void budget::end_chart(budget::html_writer& w, std::stringstream& ss) {
 namespace {
 
 template <size_t N>
-void add_average_n_serie(std::stringstream& ss,
-                                 const std::vector<budget::money> & serie,
-                                 const std::vector<std::string> & dates) {
+void add_average_n_serie(std::stringstream& ss, const std::vector<budget::money>& serie, const std::vector<std::string>& dates) {
     ss << "{ type: 'line', name: '" << N << " months average',";
     ss << "data: [";
 
@@ -1134,21 +1122,15 @@ void add_average_n_serie(std::stringstream& ss,
 
 } // namespace
 
-void budget::add_average_12_serie(std::stringstream& ss,
-                                 const std::vector<budget::money> & serie,
-                                 const std::vector<std::string> & dates) {
+void budget::add_average_12_serie(std::stringstream& ss, const std::vector<budget::money>& serie, const std::vector<std::string>& dates) {
     add_average_n_serie<12>(ss, serie, dates);
 }
 
-void budget::add_average_24_serie(std::stringstream& ss,
-                                 const std::vector<budget::money> & serie,
-                                 const std::vector<std::string> & dates) {
+void budget::add_average_24_serie(std::stringstream& ss, const std::vector<budget::money>& serie, const std::vector<std::string>& dates) {
     add_average_n_serie<24>(ss, serie, dates);
 }
 
-void budget::add_average_5_serie(std::stringstream& ss,
-                                 std::vector<budget::money> serie,
-                                 std::vector<std::string> dates) {
+void budget::add_average_5_serie(std::stringstream& ss, std::vector<budget::money> serie, std::vector<std::string> dates) {
     ss << "{ name: '5 year average',";
     ss << "data: [";
 
@@ -1328,11 +1310,9 @@ void budget::add_integer_picker(budget::writer& w, std::string_view title, std::
     w << "<label for=\"" << name << "\">" << title << "</label>";
 
     if (negative) {
-        w << R"(<input required type="number" step="1" class="form-control" id=")" << name << "\" name=\"" << name
-          << "\" ";
+        w << R"(<input required type="number" step="1" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     } else {
-        w << R"(<input required type="number" min="0" step="1" class="form-control" id=")" << name << "\" name=\""
-          << name << "\" ";
+        w << R"(<input required type="number" min="0" step="1" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     }
 
     if (default_value.empty()) {
@@ -1346,9 +1326,14 @@ void budget::add_integer_picker(budget::writer& w, std::string_view title, std::
     w << "</div>";
 }
 
-void budget::add_money_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required,
-                              bool one_line, std::string_view currency) {
-    if(!currency.empty() && !one_line){
+void budget::add_money_picker(budget::writer&  w,
+                              std::string_view title,
+                              std::string_view name,
+                              std::string_view default_value,
+                              bool             required,
+                              bool             one_line,
+                              std::string_view currency) {
+    if (!currency.empty() && !one_line) {
         throw budget_exception("add_money_picker currency only works with one_line", true);
     }
 
@@ -1365,8 +1350,7 @@ void budget::add_money_picker(budget::writer& w, std::string_view title, std::st
     }
 
     if (required) {
-        w << R"(<input required type="number" step="0.01" class="form-control" id=")" << name << "\" name=\"" << name
-          << "\" ";
+        w << R"(<input required type="number" step="0.01" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     } else {
         w << R"(<input type="number" step="0.01" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
     }

@@ -13,4 +13,4 @@ namespace budget {
 
 void report_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

@@ -21,13 +21,13 @@ void add_fi_picker(budget::writer& w, bool active) {
 
 } // namespace
 
-void budget::list_asset_classes_page(html_writer & w) {
+void budget::list_asset_classes_page(html_writer& w) {
     budget::show_asset_classes(w);
 
     make_tables_sortable(w);
 }
 
-void budget::add_asset_classes_page(html_writer & w) {
+void budget::add_asset_classes_page(html_writer& w) {
     w << title_begin << "New asset class" << title_end;
 
     form_begin(w, "/api/asset_classes/add/", "/asset_classes/add/");
@@ -38,13 +38,13 @@ void budget::add_asset_classes_page(html_writer & w) {
     form_end(w);
 }
 
-void budget::edit_asset_classes_page(html_writer & w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+void budget::edit_asset_classes_page(html_writer& w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 
     auto input_id = req.get_param_value("input_id");
-    auto id = budget::to_number<size_t>(input_id);
+    auto id       = budget::to_number<size_t>(input_id);
 
     if (!asset_class_exists(id)) {
         return display_error_message(w, "The asset class {} does not exist", input_id);

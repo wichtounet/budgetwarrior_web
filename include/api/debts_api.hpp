@@ -10,7 +10,7 @@
 namespace httplib {
 struct Request;
 struct Response;
-};
+}; // namespace httplib
 
 namespace budget {
 
@@ -19,4 +19,4 @@ void edit_debts_api(const httplib::Request& req, httplib::Response& res);
 void delete_debts_api(const httplib::Request& req, httplib::Response& res);
 void list_debts_api(const httplib::Request& req, httplib::Response& res);
 
-} //end of namespace budget
+} // end of namespace budget

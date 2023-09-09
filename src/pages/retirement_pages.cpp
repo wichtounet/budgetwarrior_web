@@ -31,21 +31,21 @@ void add_percent_picker(budget::writer& w, std::string_view title, std::string_v
 
 } // namespace
 
-void budget::retirement_status_page(html_writer & w) {
+void budget::retirement_status_page(html_writer& w) {
     w << title_begin << "Retirement status" << title_end;
 
-    if(!internal_config_contains("withdrawal_rate")){
+    if (!internal_config_contains("withdrawal_rate")) {
         return display_error_message(w, "Not enough information, please configure Retirement Options first");
     }
 
-    if(!internal_config_contains("expected_roi")){
+    if (!internal_config_contains("expected_roi")) {
         return display_error_message(w, "Not enough information, please configure Retirement Options first");
     }
 
     budget::retirement_status(w);
 }
 
-void budget::retirement_configure_page(html_writer & w) {
+void budget::retirement_configure_page(html_writer& w) {
     w << title_begin << "Retirement Options" << title_end;
 
     form_begin(w, "/api/retirement/configure/", "/retirement/status/");
@@ -66,7 +66,7 @@ void budget::retirement_configure_page(html_writer & w) {
 }
 
 void budget::retirement_fi_ratio_over_time(html_writer& w) {
-    if (no_assets() || no_asset_values()){
+    if (no_assets() || no_asset_values()) {
         return;
     }
 

@@ -13,13 +13,13 @@
 
 using namespace budget;
 
-void budget::list_asset_shares_page(html_writer & w) {
+void budget::list_asset_shares_page(html_writer& w) {
     budget::list_asset_shares(w);
 
     make_tables_sortable(w);
 }
 
-void budget::add_asset_shares_page(html_writer & w) {
+void budget::add_asset_shares_page(html_writer& w) {
     w << title_begin << "New asset share" << title_end;
 
     form_begin(w, "/api/asset_shares/add/", "/asset_shares/add/");
@@ -32,13 +32,13 @@ void budget::add_asset_shares_page(html_writer & w) {
     form_end(w);
 }
 
-void budget::edit_asset_shares_page(html_writer & w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+void budget::edit_asset_shares_page(html_writer& w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 
     auto input_id = req.get_param_value("input_id");
-    auto id = budget::to_number<size_t>(input_id);
+    auto id       = budget::to_number<size_t>(input_id);
 
     if (!asset_share_exists(id)) {
         return display_error_message(w, "The asset share {} does not exist", input_id);

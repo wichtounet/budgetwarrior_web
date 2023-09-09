@@ -13,13 +13,13 @@
 
 using namespace budget;
 
-void budget::incomes_page(html_writer & w) {
+void budget::incomes_page(html_writer& w) {
     budget::show_incomes(w);
 
     make_tables_sortable(w);
 }
 
-void budget::set_incomes_page(html_writer & w) {
+void budget::set_incomes_page(html_writer& w) {
     w << title_begin << "Set income" << title_end;
 
     form_begin(w, "/api/incomes/add/", "/incomes/set/");

@@ -11,8 +11,8 @@
 
 namespace budget {
 
-void retirement_status_page(html_writer & w);
-void retirement_configure_page(html_writer & w);
-void retirement_fi_ratio_over_time(html_writer & w);
+void retirement_status_page(html_writer& w);
+void retirement_configure_page(html_writer& w);
+void retirement_fi_ratio_over_time(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

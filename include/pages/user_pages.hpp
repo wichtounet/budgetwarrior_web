@@ -13,4 +13,4 @@ namespace budget {
 
 void user_config_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

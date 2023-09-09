@@ -17,4 +17,4 @@ void all_debts_page(html_writer& w);
 void edit_debts_page(html_writer& w, const httplib::Request& req);
 void add_debts_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

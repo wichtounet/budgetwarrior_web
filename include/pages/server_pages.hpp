@@ -17,7 +17,7 @@ namespace httplib {
 struct Server;
 struct Response;
 struct Request;
-};
+}; // namespace httplib
 
 namespace budget {
 
@@ -63,29 +63,26 @@ void add_value_asset_picker(budget::writer& w, std::string_view default_value = 
 void add_active_share_asset_picker(budget::writer& w, std::string_view default_value = "");
 void add_active_value_asset_picker(budget::writer& w, std::string_view default_value = "");
 void add_liability_picker(budget::writer& w, std::string_view default_value = "");
-void add_money_picker(budget::writer& w, std::string_view title, std::string_view name,
-                      std::string_view default_value, bool required = true, bool one_line = false, std::string_view currency = "");
-void add_integer_picker(budget::writer& w, std::string_view title, std::string_view name, bool negative,
-                        std::string_view default_value = "");
+void add_money_picker(budget::writer&  w,
+                      std::string_view title,
+                      std::string_view name,
+                      std::string_view default_value,
+                      bool             required = true,
+                      bool             one_line = false,
+                      std::string_view currency = "");
+void add_integer_picker(budget::writer& w, std::string_view title, std::string_view name, bool negative, std::string_view default_value = "");
 
 // Charts
-std::stringstream start_chart_base(budget::html_writer& w, std::string_view chart_type,
-                                   std::string_view id = "container", std::string_view style = "");
-std::stringstream start_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                              std::string_view id = "container", std::string_view style = "");
-std::stringstream start_time_chart(budget::html_writer& w, std::string_view title, std::string_view chart_type,
-                                   std::string_view id = "container", std::string_view style = "");
+std::stringstream start_chart_base(budget::html_writer& w, std::string_view chart_type, std::string_view id = "container", std::string_view style = "");
+std::stringstream start_chart(
+        budget::html_writer& w, std::string_view title, std::string_view chart_type, std::string_view id = "container", std::string_view style = "");
+std::stringstream start_time_chart(
+        budget::html_writer& w, std::string_view title, std::string_view chart_type, std::string_view id = "container", std::string_view style = "");
 void end_chart(budget::html_writer& w, std::stringstream& ss);
-void add_average_12_serie(std::stringstream& ss,
-                         const std::vector<budget::money> & serie,
-                         const std::vector<std::string> & dates);
-void add_average_24_serie(std::stringstream& ss,
-                         const std::vector<budget::money>&  serie,
-                         const std::vector<std::string> & dates);
-void add_average_5_serie(std::stringstream& ss,
-                         std::vector<budget::money> serie,
-                         std::vector<std::string> dates);
+void add_average_12_serie(std::stringstream& ss, const std::vector<budget::money>& serie, const std::vector<std::string>& dates);
+void add_average_24_serie(std::stringstream& ss, const std::vector<budget::money>& serie, const std::vector<std::string>& dates);
+void add_average_5_serie(std::stringstream& ss, std::vector<budget::money> serie, std::vector<std::string> dates);
 
 unsigned short last_month(unsigned short year);
 
-} //end of namespace budget
+} // end of namespace budget

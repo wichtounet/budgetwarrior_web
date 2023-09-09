@@ -16,7 +16,7 @@ namespace httplib {
 struct Server;
 struct Request;
 struct Response;
-};
+}; // namespace httplib
 
 namespace budget {
 
@@ -31,4 +31,4 @@ void api_success(const httplib::Request& req, httplib::Response& res, std::strin
 void api_success_content(const httplib::Request& req, httplib::Response& res, const std::string& content);
 bool parameters_present(const httplib::Request& req, const std::vector<const char*>& parameters);
 
-} //end of namespace budget
+} // end of namespace budget

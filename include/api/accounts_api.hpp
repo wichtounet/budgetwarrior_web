@@ -10,7 +10,7 @@
 namespace httplib {
 struct Request;
 struct Response;
-};
+}; // namespace httplib
 
 namespace budget {
 
@@ -21,4 +21,4 @@ void list_accounts_api(const httplib::Request& req, httplib::Response& res);
 void archive_accounts_month_api(const httplib::Request& req, httplib::Response& res);
 void archive_accounts_year_api(const httplib::Request& req, httplib::Response& res);
 
-} //end of namespace budget
+} // end of namespace budget

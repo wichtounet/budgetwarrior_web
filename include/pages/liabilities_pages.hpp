@@ -15,4 +15,4 @@ void list_liabilities_page(html_writer& w);
 void add_liabilities_page(html_writer& w);
 void edit_liabilities_page(html_writer& w, const httplib::Request& req);
 
-} //end of namespace budget
+} // end of namespace budget

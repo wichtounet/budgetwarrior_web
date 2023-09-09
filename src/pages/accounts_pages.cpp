@@ -13,19 +13,19 @@
 
 using namespace budget;
 
-void budget::accounts_page(html_writer & w) {
+void budget::accounts_page(html_writer& w) {
     budget::show_accounts(w);
 
     make_tables_sortable(w);
 }
 
-void budget::all_accounts_page(html_writer & w) {
+void budget::all_accounts_page(html_writer& w) {
     budget::show_all_accounts(w);
 
     make_tables_sortable(w);
 }
 
-void budget::add_accounts_page(html_writer & w) {
+void budget::add_accounts_page(html_writer& w) {
     w << title_begin << "New account" << title_end;
 
     form_begin(w, "/api/accounts/add/", "/accounts/add/");
@@ -36,7 +36,7 @@ void budget::add_accounts_page(html_writer & w) {
     form_end(w);
 }
 
-void budget::edit_accounts_page(html_writer & w, const httplib::Request& req) {
+void budget::edit_accounts_page(html_writer& w, const httplib::Request& req) {
     if (!req.has_param("input_id") || !req.has_param("back_page")) {
         return display_error_message(w, "Invalid parameter for the request");
     }
@@ -61,7 +61,7 @@ void budget::edit_accounts_page(html_writer & w, const httplib::Request& req) {
     form_end(w);
 }
 
-void budget::archive_accounts_month_page(html_writer & w) {
+void budget::archive_accounts_month_page(html_writer& w) {
     w << title_begin << "Archive accounts from the beginning of the month" << title_end;
 
     form_begin(w, "/api/accounts/archive/month/", "/accounts/");
@@ -71,7 +71,7 @@ void budget::archive_accounts_month_page(html_writer & w) {
     form_end(w, "Confirm");
 }
 
-void budget::archive_accounts_year_page(html_writer & w) {
+void budget::archive_accounts_year_page(html_writer& w) {
     w << title_begin << "Archive accounts from the beginning of the year" << title_end;
 
     form_begin(w, "/api/accounts/archive/year/", "/accounts/");

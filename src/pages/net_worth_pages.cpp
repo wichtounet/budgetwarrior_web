@@ -17,7 +17,7 @@
 
 using namespace budget;
 
-void budget::assets_card(budget::html_writer& w){
+void budget::assets_card(budget::html_writer& w) {
     w << R"=====(<div class="card">)=====";
 
     w << R"=====(<div class="card-header card-header-primary">)=====";
@@ -108,11 +108,11 @@ void budget::assets_card(budget::html_writer& w){
         }
     }
 
-    w << R"=====(</div>)====="; //card-body
-    w << R"=====(</div>)====="; //card
+    w << R"=====(</div>)====="; // card-body
+    w << R"=====(</div>)====="; // card
 }
 
-void budget::liabilities_card(budget::html_writer& w){
+void budget::liabilities_card(budget::html_writer& w) {
     if (w.cache.liabilities().empty()) {
         return;
     }
@@ -150,14 +150,12 @@ void budget::liabilities_card(budget::html_writer& w){
         first = false;
     }
 
-    w << R"=====(</div>)====="; //card-body
-    w << R"=====(</div>)====="; //card
+    w << R"=====(</div>)====="; // card-body
+    w << R"=====(</div>)====="; // card
 }
 
-void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
-    auto asset = req.matches.size() == 2
-        ? get_asset(to_number<size_t>(req.matches[1]))
-        : *w.cache.active_user_assets().begin();
+void budget::asset_graph_page(html_writer& w, const httplib::Request& req) {
+    auto asset = req.matches.size() == 2 ? get_asset(to_number<size_t>(req.matches[1])) : *w.cache.active_user_assets().begin();
 
     if (req.matches.size() == 2) {
         w << title_begin << "Asset Graph" << budget::active_asset_selector{"assets/graph", to_number<size_t>(req.matches[1])} << title_end;
@@ -227,10 +225,10 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
                 buy_price /= bought_shares;
 
                 w << p_begin << "Average buy price: " << buy_price << p_end;
-                w << p_begin << "Invested: " << (float)bought_shares * buy_price << p_end;
+                w << p_begin << "Invested: " << (float) bought_shares * buy_price << p_end;
                 if (current_shares) {
-                    w << p_begin << "Value: " << (float)bought_shares * current_price << p_end;
-                    w << p_begin << "Current profit: " << (float)bought_shares * (current_price - buy_price) << p_end;
+                    w << p_begin << "Value: " << (float) bought_shares * current_price << p_end;
+                    w << p_begin << "Current profit: " << (float) bought_shares * (current_price - buy_price) << p_end;
                     w << p_begin << "ROI: " << (100.0f / (buy_price / current_price)) - 100.0f << "%" << p_end;
                 }
                 w << p_begin << "First Invested: " << budget::to_string(first_date) << p_end;
@@ -249,7 +247,7 @@ void budget::asset_graph_page(html_writer & w, const httplib::Request& req) {
                 w << p_begin << p_end;
                 w << p_begin << "Sold shares: " << sold_shares << p_end;
                 w << p_begin << "Average sold price: " << sell_price << p_end;
-                w << p_begin << "Realized profit: " << (float)sold_shares * (sell_price - buy_price) << p_end;
+                w << p_begin << "Realized profit: " << (float) sold_shares * (sell_price - buy_price) << p_end;
                 w << p_begin << "Realized ROI: " << (100.0f / (buy_price / sell_price)) - 100.0f << "%" << p_end;
             } else {
                 w << p_begin << "There is an issue with your average sell price! It should be positive" << p_end;
@@ -402,23 +400,19 @@ void net_worth_graph(budget::html_writer& w, std::string_view title, std::string
     end_chart(w, ss);
 
     if (card) {
-        w << R"=====(</div>)====="; //card-body
-        w << R"=====(</div>)====="; //card
+        w << R"=====(</div>)====="; // card-body
+        w << R"=====(</div>)====="; // card
     }
 }
 
 } // namespace
 
 void budget::net_worth_graph(budget::html_writer& w, std::string_view style, bool card) {
-    ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::html_writer & w){
-        return get_net_worth(d, w.cache);
-    });
+    ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::html_writer& w) { return get_net_worth(d, w.cache); });
 }
 
 void budget::fi_net_worth_graph(budget::html_writer& w, std::string_view style, bool card) {
-    ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::html_writer & w){
-        return get_fi_net_worth(d, w.cache);
-    });
+    ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::html_writer& w) { return get_fi_net_worth(d, w.cache); });
 }
 
 void budget::net_worth_accrual_graph(budget::html_writer& w) {
@@ -438,14 +432,14 @@ void budget::net_worth_accrual_graph(budget::html_writer& w) {
     ss << "{ type: 'column', name: 'Net Worth Growth', negativeColor: 'red',";
     ss << "data: [";
 
-    auto date      = budget::asset_start_date(w.cache);
-    auto end_date  = budget::local_day();
+    auto date     = budget::asset_start_date(w.cache);
+    auto end_date = budget::local_day();
 
     // We need to skip the first month
     date += months(1);
 
     std::vector<budget::money> serie;
-    std::vector<std::string> dates;
+    std::vector<std::string>   dates;
 
     while (date <= end_date) {
         budget::money const sum;
@@ -453,8 +447,7 @@ void budget::net_worth_accrual_graph(budget::html_writer& w) {
         auto start = get_net_worth(date.start_of_month(), w.cache);
         auto end   = get_net_worth(date.end_of_month(), w.cache);
 
-        std::string const date_str =
-            "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", 1)";
+        std::string const date_str = "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", 1)";
         ss << "[" << date_str << " ," << budget::money_to_string(end - start) << "],";
 
         serie.emplace_back(end - start);
@@ -473,7 +466,7 @@ void budget::net_worth_accrual_graph(budget::html_writer& w) {
     end_chart(w, ss);
 }
 
-void budget::net_worth_status_page(html_writer & w) {
+void budget::net_worth_status_page(html_writer& w) {
     budget::show_asset_values(w);
 }
 
@@ -526,7 +519,7 @@ void budget::fi_net_worth_graph_page(html_writer& w) {
 
 namespace {
 
-budget::money get_class_sum(data_cache & cache, budget::asset_class & clas, budget::date date) {
+budget::money get_class_sum(data_cache& cache, budget::asset_class& clas, budget::date date) {
     budget::money sum;
 
     // Add the value of the assets for this class
@@ -535,7 +528,7 @@ budget::money get_class_sum(data_cache & cache, budget::asset_class & clas, budg
     }
 
     // Remove the value of the liabilities for this class
-    for (auto & liability : cache.liabilities()) {
+    for (auto& liability : cache.liabilities()) {
         sum -= get_liability_value_conv(liability, date, cache) * (float(get_asset_class_allocation(liability, clas)) / 100.0f);
     }
 
@@ -556,7 +549,7 @@ void budget::net_worth_allocation_page(html_writer& w) {
 
     ss << "series: [";
 
-    for (auto & clas : w.cache.asset_classes()) {
+    for (auto& clas : w.cache.asset_classes()) {
         ss << "{ name: '" << clas.name << "',";
         ss << "data: [";
 
@@ -590,7 +583,7 @@ void budget::net_worth_allocation_page(html_writer& w) {
     ss2 << "colorByPoint: true,";
     ss2 << "data: [";
 
-    for (auto & clas : w.cache.asset_classes()) {
+    for (auto& clas : w.cache.asset_classes()) {
         ss2 << "{ name: '" << clas.name << "',";
         ss2 << "y: ";
 
@@ -619,7 +612,7 @@ void budget::portfolio_allocation_page(html_writer& w) {
 
     ss << "series: [";
 
-    for (auto & clas : w.cache.asset_classes()) {
+    for (auto& clas : w.cache.asset_classes()) {
         ss << "{ name: '" << clas.name << "',";
         ss << "data: [";
 
@@ -657,7 +650,7 @@ void budget::portfolio_allocation_page(html_writer& w) {
     ss2 << "colorByPoint: true,";
     ss2 << "data: [";
 
-    for (auto & clas : w.cache.asset_classes()) {
+    for (auto& clas : w.cache.asset_classes()) {
         ss2 << "{ name: '" << clas.name << "',";
         ss2 << "y: ";
 
@@ -729,7 +722,7 @@ void budget::net_worth_currency_page(html_writer& w) {
             net_worth += get_asset_value_conv(asset, currency, w.cache);
         }
 
-        for (auto & liability : w.cache.liabilities()) {
+        for (auto& liability : w.cache.liabilities()) {
             net_worth -= get_liability_value_conv(liability, currency, w.cache);
         }
 
@@ -930,7 +923,8 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     std::stringstream current_ss;
 
-    current_ss << R"=====(var current_base_colors = ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1", "red", "blue", "green"];)=====";
+    current_ss
+            << R"=====(var current_base_colors = ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1", "red", "blue", "green"];)=====";
 
     current_ss << "var current_pie_colors = (function () {";
     current_ss << "var colors = [];";
@@ -987,7 +981,8 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     std::stringstream desired_ss;
 
-    desired_ss << R"=====(var desired_base_colors = ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1", "red", "blue", "green"];)=====";
+    desired_ss
+            << R"=====(var desired_base_colors = ["#7cb5ec", "#434348", "#90ed7d", "#f7a35c", "#8085e9", "#f15c80", "#e4d354", "#2b908f", "#f45b5b", "#91e8e1", "red", "blue", "green"];)=====";
 
     desired_ss << "var desired_pie_colors = (function () {";
     desired_ss << "var colors = [];";

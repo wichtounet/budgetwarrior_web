@@ -33,7 +33,7 @@ void budget::add_asset_values_page(html_writer& w) {
 }
 
 void budget::edit_asset_values_page(html_writer& w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 
@@ -66,9 +66,7 @@ void budget::full_batch_asset_values_page(html_writer& w) {
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
     auto assets = w.cache.user_assets();
-    std::ranges::sort(assets, [](const auto& lhs, const auto & rhs) {
-        return lhs.name <= rhs.name;
-    });
+    std::ranges::sort(assets, [](const auto& lhs, const auto& rhs) { return lhs.name <= rhs.name; });
 
     for (const auto& [asset, amount] : assets | not_share_based | expand_value(w.cache)) {
         add_money_picker(w, asset.name, std::format("input_amount_{}", asset.id), budget::money_to_string(amount), true, true, asset.currency);
@@ -85,9 +83,7 @@ void budget::current_batch_asset_values_page(html_writer& w) {
     add_date_picker(w, budget::to_string(budget::local_day()), true);
 
     auto assets = w.cache.user_assets();
-    std::ranges::sort(assets, [](const auto& lhs, const auto & rhs) {
-        return lhs.name <= rhs.name;
-    });
+    std::ranges::sort(assets, [](const auto& lhs, const auto& rhs) { return lhs.name <= rhs.name; });
 
     for (const auto& [asset, amount] : assets | not_share_based | expand_value(w.cache) | not_zero) {
         add_money_picker(w, asset.name, std::format("input_amount_{}", asset.id), budget::money_to_string(amount), true, true, asset.currency);

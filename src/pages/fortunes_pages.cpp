@@ -13,13 +13,13 @@
 
 using namespace budget;
 
-void budget::list_fortunes_page(html_writer & w) {
+void budget::list_fortunes_page(html_writer& w) {
     budget::list_fortunes(w);
 
     make_tables_sortable(w);
 }
 
-void budget::graph_fortunes_page(html_writer & w) {
+void budget::graph_fortunes_page(html_writer& w) {
     auto ss = start_chart(w, "Fortune", "spline");
 
     ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
@@ -32,8 +32,7 @@ void budget::graph_fortunes_page(html_writer & w) {
 
     auto sorted_fortunes = all_fortunes();
 
-    std::ranges::sort(sorted_fortunes,
-              [](const budget::fortune& a, const budget::fortune& b) { return a.check_date < b.check_date; });
+    std::ranges::sort(sorted_fortunes, [](const budget::fortune& a, const budget::fortune& b) { return a.check_date < b.check_date; });
 
     for (auto& value : sorted_fortunes) {
         auto& date = value.check_date;
@@ -48,13 +47,13 @@ void budget::graph_fortunes_page(html_writer & w) {
     end_chart(w, ss);
 }
 
-void budget::status_fortunes_page(html_writer & w) {
+void budget::status_fortunes_page(html_writer& w) {
     budget::status_fortunes(w, false);
 
     make_tables_sortable(w);
 }
 
-void budget::add_fortunes_page(html_writer & w) {
+void budget::add_fortunes_page(html_writer& w) {
     w << title_begin << "New fortune" << title_end;
 
     form_begin(w, "/api/fortunes/add/", "/fortunes/add/");
@@ -65,8 +64,8 @@ void budget::add_fortunes_page(html_writer & w) {
     form_end(w);
 }
 
-void budget::edit_fortunes_page(html_writer & w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+void budget::edit_fortunes_page(html_writer& w, const httplib::Request& req) {
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 

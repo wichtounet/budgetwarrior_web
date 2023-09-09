@@ -10,10 +10,10 @@
 namespace httplib {
 struct Request;
 struct Response;
-};
+}; // namespace httplib
 
 namespace budget {
 
 void user_config_api(const httplib::Request& req, httplib::Response& res);
 
-} //end of namespace budget
+} // end of namespace budget

@@ -34,7 +34,7 @@ void budget::add_liabilities_page(html_writer& w) {
 
     add_name_picker(w);
 
-    for (auto & clas : all_asset_classes()) {
+    for (auto& clas : all_asset_classes()) {
         add_money_picker(w, clas.name + " (%)", "input_class_" + to_string(clas.id), "");
     }
 
@@ -44,12 +44,12 @@ void budget::add_liabilities_page(html_writer& w) {
 }
 
 void budget::edit_liabilities_page(html_writer& w, const httplib::Request& req) {
-    if (!validate_parameters(w, req, {"input_id", "back_page"})){
+    if (!validate_parameters(w, req, {"input_id", "back_page"})) {
         return;
     }
 
     auto input_id = req.get_param_value("input_id");
-    auto id = budget::to_number<size_t>(input_id);
+    auto id       = budget::to_number<size_t>(input_id);
 
     if (!liability_exists(id)) {
         return display_error_message(w, "The liability {} does not exist", input_id);

@@ -19,4 +19,4 @@ void full_batch_asset_values_page(html_writer& w);
 void current_batch_asset_values_page(html_writer& w);
 void add_asset_values_liability_page(html_writer& w);
 
-} //end of namespace budget
+} // end of namespace budget

@@ -10,7 +10,7 @@
 namespace httplib {
 struct Request;
 struct Response;
-};
+}; // namespace httplib
 
 namespace budget {
 
@@ -41,4 +41,4 @@ void list_liabilities_api(const httplib::Request& req, httplib::Response& res);
 
 void batch_asset_values_api(const httplib::Request& req, httplib::Response& res);
 
-} //end of namespace budget
+} // end of namespace budget

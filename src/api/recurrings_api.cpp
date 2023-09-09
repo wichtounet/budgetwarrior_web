@@ -21,7 +21,7 @@ using namespace budget;
 void budget::add_recurrings_api(const httplib::Request& req, httplib::Response& res) {
     if (!req.has_param("input_name") || !req.has_param("input_amount") || !req.has_param("input_account") || !req.has_param("input_recurs")
         || !req.has_param("input_type")) {
-        return  api_error(req, res, "Invalid parameters");
+        return api_error(req, res, "Invalid parameters");
     }
 
     recurring recurring;

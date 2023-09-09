@@ -46,7 +46,7 @@ void budget::add_assets_page(html_writer& w) {
 
     add_name_picker(w);
 
-    for (auto & clas : all_asset_classes()) {
+    for (auto& clas : all_asset_classes()) {
         add_money_picker(w, clas.name + " (%)", std::format("input_class_{}", clas.id), "");
     }
 

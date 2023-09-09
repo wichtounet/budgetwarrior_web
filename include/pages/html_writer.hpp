@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include<regex>
+#include <regex>
 
 #include "writer.hpp"
 
@@ -39,8 +39,16 @@ struct html_writer : writer {
 
     bool is_web() override;
 
-    void display_table(std::vector<std::string>& columns, std::vector<std::vector<std::string>>& contents, size_t groups = 1, std::vector<size_t> lines = {}, size_t left = 0, size_t foot = 0) override;
-    void display_graph(const std::string& title, std::vector<std::string>& categories, std::vector<std::string> series_names, std::vector<std::vector<float>>& series_values) override;
+    void display_table(std::vector<std::string>&              columns,
+                       std::vector<std::vector<std::string>>& contents,
+                       size_t                                 groups = 1,
+                       std::vector<size_t>                    lines  = {},
+                       size_t                                 left   = 0,
+                       size_t                                 foot   = 0) override;
+    void display_graph(const std::string&               title,
+                       std::vector<std::string>&        categories,
+                       std::vector<std::string>         series_names,
+                       std::vector<std::vector<float>>& series_values) override;
 
     void defer_script(const std::string& script);
     void load_deferred_scripts();
@@ -50,7 +58,7 @@ struct html_writer : writer {
 private:
     std::vector<std::string> scripts;
     std::vector<std::string> modules;
-    bool title_started = false;
+    bool                     title_started = false;
 
     bool need_module(const std::string& module);
 };
@@ -58,8 +66,8 @@ private:
 // Very small utility function necessary to convert regex matches (from httplib) to a number
 
 template <typename T, typename It>
-T to_number(const std::sub_match<It> & sm) {
+T to_number(const std::sub_match<It>& sm) {
     return to_number<T>(sm.str());
 }
 
-} //end of namespace budget
+} // end of namespace budget
