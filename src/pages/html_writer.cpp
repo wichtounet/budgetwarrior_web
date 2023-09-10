@@ -619,7 +619,7 @@ bool budget::html_writer::is_web() {
     return true;
 }
 
-void budget::html_writer::display_graph(const std::string&               title,
+void budget::html_writer::display_graph(std::string_view                 title,
                                         std::vector<std::string>&        categories,
                                         std::vector<std::string>         series_names,
                                         std::vector<std::vector<float>>& series_values) {

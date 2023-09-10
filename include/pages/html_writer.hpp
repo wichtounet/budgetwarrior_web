@@ -45,7 +45,7 @@ struct html_writer : writer {
                        std::vector<size_t>                    lines  = {},
                        size_t                                 left   = 0,
                        size_t                                 foot   = 0) override;
-    void display_graph(const std::string&               title,
+    void display_graph(std::string_view               title,
                        std::vector<std::string>&        categories,
                        std::vector<std::string>         series_names,
                        std::vector<std::vector<float>>& series_values) override;
