@@ -479,7 +479,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
 
 namespace {
 
-void add_quick_expense_action(budget::html_writer& w, size_t i, budget::expense& expense) {
+void add_quick_expense_action(budget::html_writer& w, size_t i, const budget::expense& expense) {
     w << "<script>";
     w << "function quickAction" << i << "() {";
     w << R"(  $("#input_name").val(")" << expense.name << "\");";

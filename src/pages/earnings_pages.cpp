@@ -227,7 +227,7 @@ void budget::time_graph_earnings_page(html_writer& w) {
 
 namespace {
 
-void add_quick_earning_action(budget::html_writer& w, size_t i, budget::earning& earning) {
+void add_quick_earning_action(budget::html_writer& w, size_t i, const budget::earning& earning) {
     w << "<script>";
     w << "function quickAction" << i << "() {";
     w << R"(  $("#input_name").val(")" << earning.name << "\");";

@@ -17,6 +17,7 @@
 #include "http.hpp"
 #include "data.hpp"
 #include "budget_exception.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -203,7 +204,7 @@ void budget::list_asset_values_api(const httplib::Request& req, httplib::Respons
 void budget::batch_asset_values_api(const httplib::Request& req, httplib::Response& res) {
     auto asset_values = all_asset_values();
 
-    for (auto& asset : all_assets()) {
+    for (const auto& asset : all_assets()) {
         auto input_name = "input_amount_" + budget::to_string(asset.id);
 
         if (req.has_param(input_name.c_str())) {
@@ -211,10 +212,8 @@ void budget::batch_asset_values_api(const httplib::Request& req, httplib::Respon
 
             budget::money current_amount;
 
-            for (auto& asset_value : asset_values) {
-                if (asset_value.asset_id == asset.id) {
-                    current_amount = asset_value.amount;
-                }
+            for (const auto& asset_value : asset_values | filter_by_asset(asset.id) | to_amount) {
+                current_amount = asset_value;
             }
 
             // If the amount changed, update it
@@ -351,7 +350,7 @@ void budget::delete_asset_classes_api(const httplib::Request& req, httplib::Resp
 
     auto clas = get_asset_class(budget::to_number<size_t>(id));
 
-    for (auto& asset : all_assets()) {
+    for (const auto& asset : all_assets()) {
         if (get_asset_class_allocation(asset, clas)) {
             return api_error(req, res, "Cannot delete an asset class that is still used");
         }
@@ -365,7 +364,7 @@ void budget::delete_asset_classes_api(const httplib::Request& req, httplib::Resp
 void budget::list_asset_classes_api(const httplib::Request& req, httplib::Response& res) {
     std::stringstream ss;
 
-    for (auto& asset_class : all_asset_classes()) {
+    for (const auto& asset_class : all_asset_classes()) {
         data_writer writer;
         asset_class.save(writer);
         ss << writer.to_string() << std::endl;
