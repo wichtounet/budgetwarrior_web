@@ -77,14 +77,14 @@ auto api_wrapper(void (*api_function)(const httplib::Request&, httplib::Response
 
             api_function(req, res);
         } catch (const budget_exception& e) {
-            api_error(req, res, "Exception occurred: " + e.message());
+            api_error(req, res, std::format("Exception occurred: ", e.message()));
             LOG_F(ERROR, "budget_exception occured in render({}): {}", req.path, e.message());
         } catch (const date_exception& e) {
-            api_error(req, res, "Exception occurred: " + e.message());
+            api_error(req, res, std::format("Exception occurred: ",  e.message()));
             LOG_F(ERROR, "date_exception occured in render({}): {}", req.path, e.message());
-        } catch (...) {
-            api_error(req, res, "Unknown Exception occurred");
-            LOG_F(FATAL, "unknown_exception occured in render({}): {}", req.path);
+        } catch (const std::exception & e) {
+            api_error(req, res, std::format("Exception occurred: {}", e.what()));
+            LOG_F(ERROR, "std_exception occured in render({}): {}", req.path, e.what());
         }
     };
 }
