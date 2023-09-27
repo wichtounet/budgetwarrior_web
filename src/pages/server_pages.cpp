@@ -723,7 +723,7 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             // Extract the part after Digest
             auto sub_authorization = authorization.substr(7, authorization.size());
 
-            std::map<std::string, std::string> dict;
+            std::map<std::string, std::string, std::less<>> dict;
             auto                               parts = split(sub_authorization, ',');
 
             for (auto& part : parts) {

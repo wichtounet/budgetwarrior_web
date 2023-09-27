@@ -19,7 +19,7 @@ using namespace budget;
 
 namespace {
 
-std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::string, budget::money>& expense_sum, size_t max) {
+std::vector<std::pair<std::string, budget::money>> sort_map(const std::map<std::string, budget::money, std::less<>>& expense_sum, size_t max) {
     std::vector<std::pair<std::string, budget::money>> sorted_expenses;
 
     sorted_expenses.reserve(expense_sum.size());
@@ -68,7 +68,7 @@ void budget::month_breakdown_expenses_graph(
         ss << "colorByPoint: true,";
         ss << "data: [";
 
-        std::map<size_t, budget::money> account_sum;
+        std::map<size_t, budget::money, std::less<>> account_sum;
 
         for (auto& expense : all_expenses_month(w.cache, year, month)) {
             account_sum[expense.account] += expense.amount;
@@ -121,7 +121,7 @@ void budget::month_breakdown_expenses_graph(
         ss << "colorByPoint: true,";
         ss << "data: [";
 
-        std::map<std::string, budget::money> expense_sum;
+        std::map<std::string, budget::money, std::less<>> expense_sum;
 
         for (auto& expense : all_expenses_month(w.cache, year, month)) {
             expense_sum[expense.name] += expense.amount;
@@ -161,7 +161,7 @@ void budget::month_breakdown_expenses_graph(
         ss << "colorByPoint: true,";
         ss << "data: [";
 
-        std::map<std::string, budget::money> expense_sum;
+        std::map<std::string, budget::money, std::less<>> expense_sum;
 
         for (auto& expense : all_expenses_month(w.cache, year, month)) {
             auto name = expense.name;
@@ -373,7 +373,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
         ss << "colorByPoint: true,";
         ss << "data: [";
 
-        std::map<std::string, budget::money> account_sum;
+        std::map<std::string, budget::money, std::less<>> account_sum;
 
         for (auto& expense : all_expenses_year(w.cache, year)) {
             account_sum[get_account(expense.account).name] += expense.amount;
@@ -406,7 +406,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
         breakdown_ss << "colorByPoint: true,";
         breakdown_ss << "data: [";
 
-        std::map<std::string, budget::money> expense_sum;
+        std::map<std::string, budget::money, std::less<>> expense_sum;
 
         for (auto& expense : all_expenses_year(w.cache, year)) {
             expense_sum[expense.name] += expense.amount;
@@ -443,7 +443,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
         aggregate_ss << "colorByPoint: true,";
         aggregate_ss << "data: [";
 
-        std::map<std::string, budget::money> expense_sum;
+        std::map<std::string, budget::money, std::less<>> expense_sum;
 
         for (auto& expense : all_expenses_year(w.cache, year)) {
             auto name = expense.name;
@@ -498,7 +498,7 @@ void budget::add_expenses_page(html_writer& w) {
     static constexpr size_t quick_actions = 5;
 
     if (w.cache.expenses().size() > quick_actions) {
-        std::map<std::string, size_t>                    counts;
+        std::map<std::string, size_t, std::less<>>                    counts;
         std::unordered_map<std::string, budget::expense> last_expenses;
         std::vector<std::pair<std::string, size_t>>      order;
 

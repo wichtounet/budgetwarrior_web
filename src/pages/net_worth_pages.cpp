@@ -673,7 +673,7 @@ void budget::portfolio_allocation_page(html_writer& w) {
 }
 
 void budget::net_worth_currency_page(html_writer& w) {
-    std::set<std::string> currencies;
+    std::set<std::string, std::less<>> currencies;
 
     for (const auto& asset : w.cache.user_assets()) {
         currencies.insert(asset.currency);
@@ -772,7 +772,7 @@ void budget::portfolio_status_page(html_writer& w) {
 }
 
 void budget::portfolio_currency_page(html_writer& w) {
-    std::set<std::string> currencies;
+    std::set<std::string, std::less<>> currencies;
 
     for (const auto& asset : w.cache.user_assets()) {
         if (asset.portfolio) {
@@ -892,7 +892,7 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     // Collect the amounts per asset
 
-    std::map<size_t, budget::money> asset_amounts;
+    std::map<size_t, budget::money, std::less<>> asset_amounts;
 
     for (const auto& asset : w.cache.user_assets() | is_portfolio) {
         if (nocash && asset.is_cash()) {
@@ -904,7 +904,7 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     // Compute the colors for each asset that will be displayed
 
-    std::map<size_t, size_t> colors;
+    std::map<size_t, size_t, std::less<>> colors;
 
     for (const auto& asset : w.cache.user_assets()) {
         if (nocash && asset.is_cash()) {

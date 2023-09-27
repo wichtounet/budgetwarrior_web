@@ -46,7 +46,7 @@ void budget::month_breakdown_income_graph(
     ss << "colorByPoint: true,";
     ss << "data: [";
 
-    std::map<size_t, budget::money> account_sum;
+    std::map<size_t, budget::money, std::less<>> account_sum;
 
     for (auto& earning : all_earnings_month(w.cache, year, month)) {
         account_sum[earning.account] += earning.amount;
@@ -246,7 +246,7 @@ void budget::add_earnings_page(html_writer& w) {
     static constexpr size_t quick_actions = 5;
 
     if (w.cache.earnings().size() > quick_actions) {
-        std::map<std::string, size_t>                    counts;
+        std::map<std::string, size_t, std::less<>>                    counts;
         std::unordered_map<std::string, budget::earning> last_earnings;
         std::vector<std::pair<std::string, size_t>>      order;
 
