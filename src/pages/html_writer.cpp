@@ -111,8 +111,6 @@ std::vector<budget::year> active_years(budget::year extra) {
 
 } // end of anonymous namespace
 
-budget::html_writer::html_writer(std::stringstream& os) : os(os) {}
-
 budget::writer& budget::html_writer::operator<<(std::string_view value) {
     os << html_format(*this, value);
 
@@ -120,6 +118,12 @@ budget::writer& budget::html_writer::operator<<(std::string_view value) {
 }
 
 budget::writer& budget::html_writer::operator<<(double value) {
+    os << value;
+
+    return *this;
+}
+
+budget::writer& budget::html_writer::operator<<(long value) {
     os << value;
 
     return *this;

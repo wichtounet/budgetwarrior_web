@@ -16,10 +16,13 @@ namespace budget {
 struct html_writer : writer {
     std::stringstream& os;
 
-    html_writer(std::stringstream& os);
+    explicit html_writer(std::stringstream& os) : os(os){}
+
+    virtual ~html_writer() = default;
 
     writer& operator<<(std::string_view value) override;
     writer& operator<<(double value) override;
+    writer& operator<<(long value);
 
     writer& operator<<(const budget::money& m) override;
     writer& operator<<(const budget::month& m) override;
