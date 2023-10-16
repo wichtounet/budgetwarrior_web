@@ -1378,7 +1378,7 @@ void budget::add_money_picker(budget::writer&  w,
 
 unsigned short budget::last_month(unsigned short year) {
     if (year == budget::local_day().year()) {
-        return budget::local_day().month() + 1;
+        return budget::local_day().month() + date_type(1);
     }
 
     return 13;
