@@ -7,6 +7,7 @@
 
 #include <numeric>
 
+#include "date.hpp"
 #include "pages/html_writer.hpp"
 #include "pages/expenses_pages.hpp"
 #include "http.hpp"
@@ -201,7 +202,7 @@ void budget::month_breakdown_expenses_graph(
 
 void budget::expenses_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
-        show_expenses(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
+        show_expenses(month_from_string(req.matches[2]), year_from_string(req.matches[1]), w);
     } else {
         show_expenses(w);
     }
@@ -242,15 +243,11 @@ void budget::time_graph_expenses_page(html_writer& w) {
 
     auto sy = start_year(w.cache);
 
-    for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-        budget::year const year = j;
-
+    for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
         const auto sm   = start_month(w.cache, year);
         const auto last = last_month(year);
 
-        for (unsigned short i = sm; i < last; ++i) {
-            budget::month const month = i;
-
+        for (budget::month month = sm; month < last; ++month) {
             budget::money const sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
 
             const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
@@ -290,15 +287,11 @@ void budget::time_graph_expenses_page(html_writer& w) {
         std::vector<budget::money> serie;
         std::vector<std::string>   dates;
 
-        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-            budget::year const year = j;
-
+        for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
             const auto sm   = start_month(w.cache, year);
             const auto last = last_month(year);
 
-            for (unsigned short i = sm; i < last; ++i) {
-                budget::month const month = i;
-
+            for (budget::month month =  sm; month < last; ++month) {
                 budget::money sum;
 
                 for (auto& expense : all_expenses_month(w.cache, year, month)) {
@@ -340,8 +333,8 @@ void budget::month_breakdown_expenses_page(html_writer& w, const httplib::Reques
     auto year  = today.year();
 
     if (req.matches.size() == 3) {
-        year  = to_number<size_t>(req.matches[1]);
-        month = to_number<size_t>(req.matches[2]);
+        year  = year_from_string(req.matches[1]);
+        month = month_from_string(req.matches[2]);
     }
 
     w << title_begin << "Expenses Breakdown of " << month << " " << year << budget::year_month_selector{"expenses/breakdown/month", year, month} << title_end;
@@ -355,7 +348,7 @@ void budget::year_breakdown_expenses_page(html_writer& w, const httplib::Request
     auto year = today.year();
 
     if (req.matches.size() == 2) {
-        year = to_number<size_t>(req.matches[1]);
+        year = year_from_string(req.matches[1]);
     }
 
     w << title_begin << "Expense Categories Breakdown of " << year << budget::year_selector{"expenses/breakdown/year", year} << title_end;

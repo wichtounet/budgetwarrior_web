@@ -20,7 +20,7 @@ using namespace budget;
 
 void budget::overview_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
-        display_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
+        display_month_overview(month_from_string(req.matches[2]), year_from_string(req.matches[1]), w);
     } else {
         auto today = budget::local_day();
         display_month_overview(today.month(), today.year(), w);
@@ -43,7 +43,7 @@ void budget::overview_aggregate_year_page(html_writer& w, const httplib::Request
     std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 2) {
-        aggregate_year_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[1]));
+        aggregate_year_overview(w, full, disable_groups, separator, year_from_string(req.matches[1]));
     } else {
         auto today = budget::local_day();
         aggregate_year_overview(w, full, disable_groups, separator, today.year());
@@ -57,7 +57,7 @@ void budget::overview_aggregate_year_fv_page(html_writer& w, const httplib::Requ
     std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 2) {
-        aggregate_year_fv_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[1]));
+        aggregate_year_fv_overview(w, full, disable_groups, separator, year_from_string(req.matches[1]));
     } else {
         auto today = budget::local_day();
         aggregate_year_fv_overview(w, full, disable_groups, separator, today.year());
@@ -71,7 +71,7 @@ void budget::overview_aggregate_year_month_page(html_writer& w, const httplib::R
     std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 2) {
-        aggregate_year_month_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[1]));
+        aggregate_year_month_overview(w, full, disable_groups, separator, year_from_string(req.matches[1]));
     } else {
         auto today = budget::local_day();
         aggregate_year_month_overview(w, full, disable_groups, separator, today.year());
@@ -85,7 +85,7 @@ void budget::overview_aggregate_month_page(html_writer& w, const httplib::Reques
     std::string const separator      = config_value("aggregate_separator", "/");
 
     if (req.matches.size() == 3) {
-        aggregate_month_overview(w, full, disable_groups, separator, to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]));
+        aggregate_month_overview(w, full, disable_groups, separator, month_from_string(req.matches[2]), year_from_string(req.matches[1]));
     } else {
         auto today = budget::local_day();
         aggregate_month_overview(w, full, disable_groups, separator, today.month(), today.year());
@@ -95,7 +95,7 @@ void budget::overview_aggregate_month_page(html_writer& w, const httplib::Reques
 void budget::overview_year_page(html_writer& w, const httplib::Request& req) {
     budget::year year = budget::local_day().year();
     if (req.matches.size() == 2) {
-        year = to_number<size_t>(req.matches[1]);
+        year = year_from_string(req.matches[1]);
     }
 
     // Display the Summary Yearly Overview
@@ -126,14 +126,14 @@ void budget::overview_year_page(html_writer& w, const httplib::Request& req) {
 
         ss << "]},";
 
-        if (year - 1 >= start_year(w.cache)) {
-            ss << "{ name: '" << year - 1 << " Expenses',";
+        if (year - date_type(1) >= start_year(w.cache)) {
+            ss << "{ name: '" << year - date_type(1) << " Expenses',";
             ss << "data: [";
 
-            for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
-                auto sum = fold_left_auto(all_expenses_month(w.cache, year - 1, month) | to_amount);
+            for (budget::month month = start_month(w.cache, year - date_type(1)); month.is_valid(); ++month) {
+                auto sum = fold_left_auto(all_expenses_month(w.cache, year - date_type(1), month) | to_amount);
 
-                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - date_type(1));
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
             }
 
@@ -168,15 +168,15 @@ void budget::overview_year_page(html_writer& w, const httplib::Request& req) {
 
         ss << "]},";
 
-        if (year - 1 >= start_year(w.cache)) {
-            ss << "{ name: '" << year - 1 << " Expenses',";
+        if (year - date_type(1) >= start_year(w.cache)) {
+            ss << "{ name: '" << year - date_type(1) << " Expenses',";
             ss << "data: [";
 
-            for (budget::month month = start_month(w.cache, year - 1); month < 13; ++month) {
+            for (budget::month month = start_month(w.cache, year - date_type(1)); month.is_valid(); ++month) {
                 auto sum =
-                        get_base_income(w.cache, budget::date(year - 1, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year - 1, month) | to_amount);
+                        get_base_income(w.cache, budget::date(year - date_type(1), month, 2)) + fold_left_auto(all_earnings_month(w.cache, year - date_type(1), month) | to_amount);
 
-                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - date_type(1));
                 ss << "[" << date << "," << budget::money_to_string(sum) << "],";
             }
 
@@ -209,15 +209,11 @@ void budget::time_graph_savings_rate_page(html_writer& w) {
 
     auto sy = start_year(w.cache);
 
-    for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-        budget::year const year = j;
-
+    for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
         const auto sm   = start_month(w.cache, year);
         const auto last = last_month(year);
 
-        for (unsigned short i = sm; i < last; ++i) {
-            budget::month const month = i;
-
+        for (budget::month month = sm; month < last; ++month) {
             auto status = budget::compute_month_status(w.cache, year, month);
 
             auto savings      = status.income - status.expenses;
@@ -286,15 +282,11 @@ void budget::time_graph_tax_rate_page(html_writer& w) {
 
         double max = 1.0;
 
-        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-            budget::year const year = j;
-
+        for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
             const auto sm   = start_month(w.cache, year);
             const auto last = last_month(year);
 
-            for (unsigned short i = sm; i < last; ++i) {
-                budget::month const month = i;
-
+            for (budget::month month = sm; month < last; ++month) {
                 auto status = budget::compute_month_status(w.cache, year, month);
 
                 double tax_rate = status.taxes / status.income;
@@ -428,7 +420,7 @@ void budget::side_overview_page(html_writer& w, const httplib::Request& req) {
     }
 
     if (req.matches.size() == 3) {
-        display_side_month_overview(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
+        display_side_month_overview(month_from_string(req.matches[2]), year_from_string(req.matches[1]), w);
     } else {
         auto today = budget::local_day();
         display_side_month_overview(today.month(), today.year(), w);

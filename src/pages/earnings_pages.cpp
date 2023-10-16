@@ -10,6 +10,7 @@
 
 #include "data_cache.hpp"
 
+#include "date.hpp"
 #include "pages/html_writer.hpp"
 #include "pages/earnings_pages.hpp"
 #include "http.hpp"
@@ -112,15 +113,11 @@ void budget::time_graph_income_page(html_writer& w) {
 
         auto sy = start_year(w.cache);
 
-        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-            budget::year const year = j;
-
+        for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
             const auto sm   = start_month(w.cache, year);
             const auto last = last_month(year);
 
-            for (unsigned short i = sm; i < last; ++i) {
-                budget::month const month = i;
-
+            for (budget::month month = sm; month < last; ++month) {
                 auto sum = get_base_income(w.cache, budget::date(year, month, 2)) + fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
 
                 const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
@@ -159,16 +156,14 @@ void budget::time_graph_income_page(html_writer& w) {
 
         auto sy = start_year(w.cache);
 
-        for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-            budget::year const year = j;
-
+        for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
             const auto sm   = start_month(w.cache, year);
             const auto last = last_month(year);
 
             budget::money sum;
 
-            for (unsigned short i = sm; i < last; ++i) {
-                sum += get_base_income(w.cache, budget::date(year, i, 2)) + fold_left_auto(all_earnings_month(w.cache, year, i) | to_amount);
+            for (budget::month m = sm; m < last; ++m) {
+                sum += get_base_income(w.cache, budget::date(year, m, 2)) + fold_left_auto(all_earnings_month(w.cache, year, m) | to_amount);
             }
 
             const std::string date = std::format("Date.UTC({},1,1)", year.value);
@@ -203,15 +198,11 @@ void budget::time_graph_earnings_page(html_writer& w) {
 
     auto sy = start_year(w.cache);
 
-    for (unsigned short j = sy; j <= budget::local_day().year(); ++j) {
-        budget::year const year = j;
-
+    for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
         const auto sm   = start_month(w.cache, year);
         const auto last = last_month(year);
 
-        for (unsigned short i = sm; i < last; ++i) {
-            budget::month const month = i;
-
+        for (budget::month month = sm; month < last; ++month) {
             const auto sum = fold_left_auto(all_earnings_month(w.cache, year, month) | to_amount);
 
             ss << "[Date.UTC(" << year << "," << month.value - 1 << ", 1) ," << budget::money_to_string(sum) << "],";
@@ -314,7 +305,7 @@ void budget::edit_earnings_page(html_writer& w, const httplib::Request& req) {
 
 void budget::earnings_page(html_writer& w, const httplib::Request& req) {
     if (req.matches.size() == 3) {
-        show_earnings(to_number<size_t>(req.matches[2]), to_number<size_t>(req.matches[1]), w);
+        show_earnings(month_from_string(req.matches[2]), year_from_string(req.matches[1]), w);
     } else {
         show_earnings(w);
     }

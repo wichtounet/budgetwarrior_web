@@ -1007,13 +1007,13 @@ void budget::add_date_picker(budget::writer& w, std::string_view default_value, 
     if (default_value.empty()) {
         w << today.year() << "-";
 
-        if (today.month() < 10) {
+        if (today.month() < budget::month(10)) {
             w << "0" << today.month().value << "-";
         } else {
             w << today.month().value << "-";
         }
 
-        if (today.day() < 10) {
+        if (today.day() < budget::day(10)) {
             w << "0" << today.day();
         } else {
             w << today.day();

@@ -135,6 +135,12 @@ budget::writer& budget::html_writer::operator<<(const budget::money& m) {
     return *this;
 }
 
+budget::writer& budget::html_writer::operator<<(const budget::day& d) {
+    os << d.value;
+
+    return *this;
+}
+
 budget::writer& budget::html_writer::operator<<(const budget::month& m) {
     os << m.as_short_string();
 
@@ -204,17 +210,17 @@ budget::writer& budget::html_writer::operator<<(const budget::year_month_selecto
 
     if (m.current_month == 1) {
         previous_month = 12;
-        previous_year  = m.current_year - 1;
+        previous_year  = m.current_year - date_type(1);
     } else {
-        previous_month = m.current_month - 1;
+        previous_month = m.current_month - date_type(1);
         previous_year  = m.current_year;
     }
 
     if (m.current_month == 12) {
         next_month = 1;
-        next_year  = m.current_year + 1;
+        next_year  = m.current_year + date_type(1);
     } else {
-        next_month = m.current_month + 1;
+        next_month = m.current_month + date_type(1);
         next_year  = m.current_year;
     }
 
@@ -278,8 +284,8 @@ budget::writer& budget::html_writer::operator<<(const budget::year_selector& m) 
 
     os << R"======(<div class="col selector text-right">)======";
 
-    auto previous_year = m.current_year - 1;
-    auto next_year     = m.current_year + 1;
+    auto previous_year = m.current_year - date_type(1);
+    auto next_year     = m.current_year + date_type(1);
 
     os << R"(<a aria-label="Previous" href="/)" << m.page << "/" << previous_year << R"(/"><span class="oi oi-arrow-thick-left"></span></a>)";
     os << R"(<select aria-label="Year" id="year_selector">)";

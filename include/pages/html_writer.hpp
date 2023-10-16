@@ -9,6 +9,7 @@
 
 #include <regex>
 
+#include "date.hpp"
 #include "writer.hpp"
 
 namespace budget {
@@ -25,8 +26,9 @@ struct html_writer : writer {
     writer& operator<<(long value);
 
     writer& operator<<(const budget::money& m) override;
+    writer& operator<<(const budget::year& y) override;
     writer& operator<<(const budget::month& m) override;
-    writer& operator<<(const budget::year& m) override;
+    writer& operator<<(const budget::day& d) override;
 
     writer& operator<<(const end_of_line_t& m) override;
     writer& operator<<(const p_begin_t& m) override;
@@ -66,11 +68,26 @@ private:
     bool need_module(const std::string& module);
 };
 
-// Very small utility function necessary to convert regex matches (from httplib) to a number
+// Very small utility functions necessary to convert regex matches (from httplib) to a number
 
 template <typename T, typename It>
 T to_number(const std::sub_match<It>& sm) {
     return to_number<T>(sm.str());
+}
+
+template <typename It>
+year year_from_string(const std::sub_match<It>& sm) {
+    return year_from_string(sm.str());
+}
+
+template <typename It>
+month month_from_string(const std::sub_match<It>& sm) {
+    return month_from_string(sm.str());
+}
+
+template <typename It>
+day day_from_string(const std::sub_match<It>& sm) {
+    return day_from_string(sm.str());
 }
 
 } // end of namespace budget
