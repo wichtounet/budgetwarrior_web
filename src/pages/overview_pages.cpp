@@ -359,8 +359,8 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
     std::vector<money>                    total_expenses(1, budget::money());
     std::vector<money>                    total_earnings(1, budget::money());
 
-    std::vector<std::string>                columns = {side_category};
-    std::unordered_map<std::string, size_t> indexes = {{side_category, 0}};
+    std::vector<std::string>     columns = {side_category};
+    cpp::string_hash_map<size_t> indexes = {{side_category, 0}};
 
     std::vector<budget::expense> side_expenses;
     std::vector<budget::earning> side_earnings;
