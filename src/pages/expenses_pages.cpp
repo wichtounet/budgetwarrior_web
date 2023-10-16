@@ -13,6 +13,7 @@
 #include "http.hpp"
 #include "config.hpp"
 #include "views.hpp"
+#include "cpp_utils/hash.hpp"
 
 #include <array>
 
@@ -492,7 +493,7 @@ void budget::add_expenses_page(html_writer& w) {
 
     if (w.cache.expenses().size() > quick_actions) {
         std::map<std::string, size_t, std::less<>>                    counts;
-        std::unordered_map<std::string, budget::expense> last_expenses;
+        cpp::string_hash_map<budget::expense> last_expenses;
         std::vector<std::pair<std::string, size_t>>      order;
 
         for (auto& expense : w.cache.sorted_expenses()) {

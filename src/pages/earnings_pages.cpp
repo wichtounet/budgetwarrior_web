@@ -16,6 +16,7 @@
 #include "http.hpp"
 #include "config.hpp"
 #include "views.hpp"
+#include "cpp_utils/hash.hpp"
 
 using namespace budget;
 
@@ -238,7 +239,7 @@ void budget::add_earnings_page(html_writer& w) {
 
     if (w.cache.earnings().size() > quick_actions) {
         std::map<std::string, size_t, std::less<>>                    counts;
-        std::unordered_map<std::string, budget::earning> last_earnings;
+        cpp::string_hash_map<budget::earning> last_earnings;
         std::vector<std::pair<std::string, size_t>>      order;
 
         for (auto& earning : w.cache.sorted_earnings()) {
