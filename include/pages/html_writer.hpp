@@ -23,7 +23,10 @@ struct html_writer : writer {
 
     writer& operator<<(std::string_view value) override;
     writer& operator<<(double value) override;
-    writer& operator<<(long value);
+    writer& operator<<(size_t value) override;
+    writer& operator<<(long value) override;
+    writer& operator<<(int value) override;
+    writer& operator<<(unsigned value) override;
 
     writer& operator<<(const budget::money& m) override;
     writer& operator<<(const budget::year& y) override;

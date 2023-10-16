@@ -123,7 +123,22 @@ budget::writer& budget::html_writer::operator<<(double value) {
     return *this;
 }
 
+budget::writer& budget::html_writer::operator<<(size_t value) {
+    os << value;
+
+    return *this;
+}
 budget::writer& budget::html_writer::operator<<(long value) {
+    os << value;
+
+    return *this;
+}
+budget::writer& budget::html_writer::operator<<(int value) {
+    os << value;
+
+    return *this;
+}
+budget::writer& budget::html_writer::operator<<(unsigned value) {
     os << value;
 
     return *this;
