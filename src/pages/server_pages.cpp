@@ -724,9 +724,8 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
             auto sub_authorization = authorization.substr(7, authorization.size());
 
             std::map<std::string, std::string, std::less<>> dict;
-            auto                               parts = split(sub_authorization, ',');
 
-            for (auto& part : parts) {
+            for (auto parts = split(sub_authorization, ','); auto& part : parts) {
                 // Each part is supposed to be key=value
                 // Some of the values are in quotes
 

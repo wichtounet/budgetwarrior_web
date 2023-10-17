@@ -14,8 +14,7 @@ bool budget::is_side_hustle_enabled() {
 }
 
 budget::money budget::get_fi_expenses() {
-    auto config = user_config_value("fi_expenses", "");
-    if (!config.empty()) {
+    if (auto config = user_config_value("fi_expenses", ""); !config.empty()) {
         return budget::money_from_string(config);
     }
 
