@@ -242,7 +242,7 @@ void budget::add_earnings_page(html_writer& w) {
         cpp::string_hash_map<budget::earning> last_earnings;
         std::vector<std::pair<std::string, size_t>>      order;
 
-        for (auto& earning : w.cache.sorted_earnings()) {
+        for (const auto& earning : w.cache.sorted_earnings()) {
             ++counts[earning.name];
             last_earnings[earning.name] = earning;
         }

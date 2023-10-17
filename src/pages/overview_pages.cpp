@@ -365,7 +365,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
     std::vector<budget::expense> side_expenses;
     std::vector<budget::earning> side_earnings;
 
-    for (auto& expense : writer.cache.expenses()) {
+    for (const auto& expense : writer.cache.expenses()) {
         if (get_account(expense.account).name == side_category) {
             if (side_prefix.empty() || expense.name.find(side_prefix) == 0) {
                 side_expenses.push_back(expense);
@@ -373,7 +373,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
         }
     }
 
-    for (auto& earning : writer.cache.earnings()) {
+    for (const auto& earning : writer.cache.earnings()) {
         if (get_account(earning.account).name == side_category) {
             if (side_prefix.empty() || earning.name.find(side_prefix) == 0) {
                 side_earnings.push_back(earning);

@@ -1160,7 +1160,7 @@ void budget::add_account_picker(budget::writer& w, budget::date day, std::string
                 <select class="form-control" id="input_account" name="input_account">
     )=====";
 
-    for (auto& account : all_accounts(w.cache, day.year(), day.month())) {
+    for (const auto& account : all_accounts(w.cache, day.year(), day.month())) {
         if (budget::to_string(account.id) == default_value) {
             w << "<option selected value=\"" << account.id << "\">" << account.name << "</option>";
         } else {
@@ -1187,7 +1187,7 @@ void budget::add_account_picker_by_name(
         }
     }
 
-    for (auto& account : all_accounts(w.cache, day.year(), day.month())) {
+    for (const auto& account : all_accounts(w.cache, day.year(), day.month())) {
         if (account.name == default_value) {
             w << "<option selected value=\"" << account.name << "\">" << account.name << "</option>";
         } else {
@@ -1247,7 +1247,7 @@ void budget::add_active_share_asset_picker(budget::writer& w, std::string_view d
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& asset : w.cache.active_user_assets() | share_based_only) {
+    for (const auto& asset : w.cache.active_user_assets() | share_based_only) {
         if (budget::to_string(asset.id) == default_value) {
             w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
         } else {
@@ -1268,7 +1268,7 @@ void budget::add_active_value_asset_picker(budget::writer& w, std::string_view d
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& asset : w.cache.active_user_assets() | not_share_based) {
+    for (const auto& asset : w.cache.active_user_assets() | not_share_based) {
         if (budget::to_string(asset.id) == default_value) {
             w << "<option selected value=\"" << asset.id << "\">" << asset.name << "</option>";
         } else {
@@ -1289,7 +1289,7 @@ void budget::add_liability_picker(budget::writer& w, std::string_view default_va
                 <select class="form-control" id="input_asset" name="input_asset">
     )=====";
 
-    for (auto& liability : all_liabilities()) {
+    for (const auto& liability : all_liabilities()) {
         if (budget::to_string(liability.id) == default_value) {
             w << "<option selected value=\"" << liability.id << "\">" << liability.name << "</option>";
         } else {

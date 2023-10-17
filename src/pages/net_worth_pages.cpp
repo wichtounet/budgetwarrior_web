@@ -57,7 +57,7 @@ void budget::assets_card(budget::html_writer& w) {
             }
         }
 
-        for (auto& group : groups) {
+        for (const auto& group : groups) {
             bool started = false;
 
             for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
@@ -528,7 +528,7 @@ budget::money get_class_sum(data_cache& cache, budget::asset_class& clas, budget
     }
 
     // Remove the value of the liabilities for this class
-    for (auto& liability : cache.liabilities()) {
+    for (const auto& liability : cache.liabilities()) {
         sum -= get_liability_value_conv(liability, date, cache) * (float(get_asset_class_allocation(liability, clas)) / 100.0f);
     }
 
