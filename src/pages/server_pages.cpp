@@ -712,7 +712,7 @@ bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
         if (req.has_header("Authorization")) {
             auto authorization = req.get_header_value("Authorization");
 
-            if (authorization.substr(0, 7) != "Digest ") {
+            if (authorization.starts_with("Digest ")) {
                 ask_for_digest(res);
 
                 LOG_F(INFO, "Unauthorized Access: Not digest realm ({})", req.path);

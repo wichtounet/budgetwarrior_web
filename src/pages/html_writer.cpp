@@ -57,25 +57,25 @@ std::string edit_to_string(std::string_view module, std::string_view id) {
 }
 
 std::string html_format(budget::html_writer& w, std::string_view v) {
-    if (v.substr(0, 5) == "::red") {
+    if (v.starts_with("::red")) {
         return std::format("<span style=\"color:red;\">{}</span>", v.substr(5));
     }
 
-    if (v.substr(0, 6) == "::blue") {
+    if (v.starts_with("::blue")) {
         return std::format("<span style=\"color:blue;\">{}</span>", v.substr(6));
     }
 
-    if (v.substr(0, 7) == "::green") {
+    if (v.starts_with("::green")) {
         return std::format("<span style=\"color:green;\">{}</span>", v.substr(7));
     }
 
-    if (v.substr(0, 9) == "::success") {
+    if (v.starts_with("::success")) {
         auto value   = v.substr(9);
         auto success = budget::to_number<unsigned long>(value);
         return success_to_string(success);
     }
 
-    if (v.substr(0, 8) == "::edit::") {
+    if (v.starts_with("::edit::")) {
         auto value = v.substr(8);
 
         if (value.find("::") == std::string::npos) {
