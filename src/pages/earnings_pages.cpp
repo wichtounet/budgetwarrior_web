@@ -8,15 +8,17 @@
 #include <numeric>
 #include <array>
 
-#include "data_cache.hpp"
+#include "cpp_utils/hash.hpp"
 
+#include "data_cache.hpp"
 #include "date.hpp"
-#include "pages/html_writer.hpp"
-#include "pages/earnings_pages.hpp"
 #include "http.hpp"
 #include "config.hpp"
 #include "views.hpp"
-#include "cpp_utils/hash.hpp"
+
+#include "pages/html_writer.hpp"
+#include "pages/earnings_pages.hpp"
+#include "pages/web_config.hpp"
 
 using namespace budget;
 
@@ -234,8 +236,6 @@ void add_quick_earning_action(budget::html_writer& w, size_t i, const budget::ea
 
 void budget::add_earnings_page(html_writer& w) {
     w << title_begin << "New earning" << title_end;
-
-    static constexpr size_t quick_actions = 5;
 
     if (w.cache.earnings().size() > quick_actions) {
         std::map<std::string, size_t, std::less<>>                    counts;

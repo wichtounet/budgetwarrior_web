@@ -6,16 +6,18 @@
 //=======================================================================
 
 #include <numeric>
+#include <array>
+
+#include "cpp_utils/hash.hpp"
 
 #include "date.hpp"
-#include "pages/html_writer.hpp"
-#include "pages/expenses_pages.hpp"
 #include "http.hpp"
 #include "config.hpp"
 #include "views.hpp"
-#include "cpp_utils/hash.hpp"
 
-#include <array>
+#include "pages/html_writer.hpp"
+#include "pages/expenses_pages.hpp"
+#include "pages/web_config.hpp"
 
 using namespace budget;
 
@@ -488,8 +490,6 @@ void add_quick_expense_action(budget::html_writer& w, size_t i, const budget::ex
 
 void budget::add_expenses_page(html_writer& w) {
     w << title_begin << "New Expense" << title_end;
-
-    static constexpr size_t quick_actions = 5;
 
     if (w.cache.expenses().size() > quick_actions) {
         std::map<std::string, size_t, std::less<>>                    counts;

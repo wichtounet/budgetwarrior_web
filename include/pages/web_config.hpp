@@ -12,6 +12,8 @@
 
 namespace budget {
 
+static constexpr size_t quick_actions = 5;
+
 bool          is_side_hustle_enabled();
 budget::money get_fi_expenses();
 
