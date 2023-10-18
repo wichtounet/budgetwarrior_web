@@ -19,9 +19,9 @@
 
 namespace {
 
-std::string success_to_string(int success) {
-    success = std::min(success, 100);
-    success = std::max(success, 0);
+std::string success_to_string(unsigned long success) {
+    success = std::min(success, 100UL);
+    success = std::max(success, 0UL);
 
     std::stringstream ss;
 

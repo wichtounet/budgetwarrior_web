@@ -217,7 +217,7 @@ void budget::time_graph_savings_rate_page(html_writer& w) {
             auto status = budget::compute_month_status(w.cache, year, month);
 
             auto savings      = status.income - status.expenses;
-            auto savings_rate = 0.0;
+            float savings_rate = 0.0;
 
             if (savings.dollars() > 0) {
                 savings_rate = savings / status.income;
@@ -289,7 +289,7 @@ void budget::time_graph_tax_rate_page(html_writer& w) {
             for (budget::month month = sm; month < last; ++month) {
                 auto status = budget::compute_month_status(w.cache, year, month);
 
-                double tax_rate = status.taxes / status.income;
+                float tax_rate = status.taxes / status.income;
 
                 const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 

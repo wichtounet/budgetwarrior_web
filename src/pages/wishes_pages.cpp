@@ -15,7 +15,7 @@ using namespace budget;
 
 namespace {
 
-void add_importance_picker(budget::writer& w, int importance) {
+void add_importance_picker(budget::writer& w, unsigned long importance) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_importance">Importance</label>
@@ -46,7 +46,7 @@ void add_importance_picker(budget::writer& w, int importance) {
     )=====";
 }
 
-void add_urgency_picker(budget::writer& w, int urgency) {
+void add_urgency_picker(budget::writer& w, unsigned long urgency) {
     w << R"=====(
             <div class="form-group">
                 <label for="input_urgency">Urgency</label>
