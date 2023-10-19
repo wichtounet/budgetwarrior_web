@@ -19,7 +19,7 @@ struct html_writer : writer {
 
     explicit html_writer(std::stringstream& os) : os(os){}
 
-    virtual ~html_writer() = default;
+    ~html_writer() override = default;
 
     writer& operator<<(std::string_view value) override;
     writer& operator<<(double value) override;

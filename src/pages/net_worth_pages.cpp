@@ -447,7 +447,7 @@ void budget::net_worth_accrual_graph(budget::html_writer& w) {
         auto start = get_net_worth(date.start_of_month(), w.cache);
         auto end   = get_net_worth(date.end_of_month(), w.cache);
 
-        std::string const date_str = "Date.UTC(" + std::to_string(date.year()) + "," + std::to_string(date.month().value - 1) + ", 1)";
+        std::string const date_str = std::format("Date.UTC({},{},1)", date.year().value, date.month().value - 1);
         ss << "[" << date_str << " ," << budget::money_to_string(end - start) << "],";
 
         serie.emplace_back(end - start);

@@ -34,7 +34,7 @@ using namespace budget;
 namespace {
 
 httplib::Server* server_ptr = nullptr;
-volatile bool    cron       = true;
+std::atomic<bool>    cron       = true;
 
 std::mutex              lock;
 std::condition_variable cv;
@@ -105,7 +105,7 @@ void start_cron_loop() {
         using namespace std::chrono_literals;
 
         {
-            std::unique_lock<std::mutex> lk(lock);
+            std::unique_lock lk(lock);
             cv.wait_for(lk, 1h);
 
             if (!cron) {
@@ -207,17 +207,19 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    volatile bool success = false;
-    std::thread   server_thread([&success]() { success = start_server(); });
-    std::thread   cron_thread([]() { start_cron_loop(); });
+    std::atomic<bool> success = false;
 
-    server_thread.join();
+    {
+        std::jthread cron_thread([]() { start_cron_loop(); });
 
-    if (!success) {
-        cron = false;
+        {
+            std::jthread server_thread([&success]() { success = start_server(); });
+        }
+
+        if (!success) {
+            cron = false;
+        }
     }
-
-    cron_thread.join();
 
     // Save the caches
     save_currency_cache();

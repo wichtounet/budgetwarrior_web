@@ -418,7 +418,6 @@ std::string header(std::string_view title, bool menu = true) {
     // The main component
 
     stream << R"=====(<main class="container-fluid">)=====" << new_line;
-    // stream << "<div>" << new_line;
 
     return stream.str();
 }
