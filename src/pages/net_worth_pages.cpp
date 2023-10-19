@@ -336,9 +336,9 @@ void net_worth_graph(budget::html_writer& w, std::string_view title, std::string
     }
 
     auto now               = budget::local_day();
-    auto current_net_worth = nw_func(now, w);
-    auto y_net_worth       = nw_func({now.year(), 1, 1}, w);
-    auto m_net_worth       = nw_func(now - days(now.day() - 1), w);
+    auto current_net_worth = nw_func(now, w.cache);
+    auto y_net_worth       = nw_func({now.year(), 1, 1}, w.cache);
+    auto m_net_worth       = nw_func(now - days(now.day() - 1), w.cache);
     auto ytd_growth        = 100.0 * ((1 / (y_net_worth / current_net_worth)) - 1);
     auto mtd_growth        = 100.0 * ((1 / (m_net_worth / current_net_worth)) - 1);
 
@@ -386,7 +386,7 @@ void net_worth_graph(budget::html_writer& w, std::string_view title, std::string
     auto end_date = budget::local_day();
 
     while (date <= end_date) {
-        auto sum = nw_func(date, w);
+        auto sum = nw_func(date, w.cache);
 
         ss << "[Date.UTC(" << date.year() << "," << date.month().value - 1 << "," << date.day() << ") ," << budget::money_to_string(sum) << "],";
 
@@ -408,11 +408,11 @@ void net_worth_graph(budget::html_writer& w, std::string_view title, std::string
 } // namespace
 
 void budget::net_worth_graph(budget::html_writer& w, std::string_view style, bool card) {
-    ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::html_writer& w) { return get_net_worth(d, w.cache); });
+    ::net_worth_graph(w, "Net Worth", style, card, [](budget::date d, budget::data_cache& cache) { return get_net_worth(d, cache); });
 }
 
 void budget::fi_net_worth_graph(budget::html_writer& w, std::string_view style, bool card) {
-    ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::html_writer& w) { return get_fi_net_worth(d, w.cache); });
+    ::net_worth_graph(w, "FI Net Worth", style, card, [](budget::date d, budget::data_cache& cache) { return get_fi_net_worth(d, cache); });
 }
 
 void budget::net_worth_accrual_graph(budget::html_writer& w) {

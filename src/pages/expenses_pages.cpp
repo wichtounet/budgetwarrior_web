@@ -230,46 +230,48 @@ void budget::search_expenses_page(html_writer& w, const httplib::Request& req) {
 }
 
 void budget::time_graph_expenses_page(html_writer& w) {
-    auto ss = start_time_chart(w, "Expenses over time", "line", "expenses_time_graph", "");
-
-    ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
-    ss << R"=====(yAxis: { min: 0, title: { text: 'Monthly Expenses' }},)=====";
-    ss << R"=====(legend: { enabled: false },)=====";
-
-    ss << "series: [";
-
-    ss << "{ name: 'Monthly expenses',";
-    ss << "data: [";
-
-    std::vector<budget::money> serie;
-    std::vector<std::string>   dates;
-
     auto sy = start_year(w.cache);
 
-    for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
-        const auto sm   = start_month(w.cache, year);
-        const auto last = last_month(year);
+    {
+        auto ss = start_time_chart(w, "Expenses over time", "line", "expenses_time_graph", "");
 
-        for (budget::month month = sm; month < last; ++month) {
-            budget::money const sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
+        ss << R"=====(xAxis: { type: 'datetime', title: { text: 'Date' }},)=====";
+        ss << R"=====(yAxis: { min: 0, title: { text: 'Monthly Expenses' }},)=====";
+        ss << R"=====(legend: { enabled: false },)=====";
 
-            const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
+        ss << "series: [";
 
-            serie.push_back(sum);
-            dates.push_back(date);
+        ss << "{ name: 'Monthly expenses',";
+        ss << "data: [";
 
-            ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+        std::vector<budget::money> serie;
+        std::vector<std::string>   dates;
+
+        for (budget::year year = sy; year <= budget::local_day().year(); ++year) {
+            const auto sm   = start_month(w.cache, year);
+            const auto last = last_month(year);
+
+            for (budget::month month = sm; month < last; ++month) {
+                budget::money const sum = fold_left_auto(all_expenses_month(w.cache, year, month) | to_amount);
+
+                const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
+
+                serie.push_back(sum);
+                dates.push_back(date);
+
+                ss << "[" << date << "," << budget::money_to_string(sum) << "],";
+            }
         }
+
+        ss << "]},";
+
+        add_average_12_serie(ss, serie, dates);
+        add_average_24_serie(ss, serie, dates);
+
+        ss << "]";
+
+        end_chart(w, ss);
     }
-
-    ss << "]},";
-
-    add_average_12_serie(ss, serie, dates);
-    add_average_24_serie(ss, serie, dates);
-
-    ss << "]";
-
-    end_chart(w, ss);
 
     // If configured as such, we create a second graph without taxes
 
