@@ -519,7 +519,7 @@ void budget::fi_net_worth_graph_page(html_writer& w) {
 
 namespace {
 
-budget::money get_class_sum(data_cache& cache, budget::asset_class& clas, budget::date date) {
+budget::money get_class_sum(data_cache& cache, const budget::asset_class& clas, budget::date date) {
     budget::money sum;
 
     // Add the value of the assets for this class

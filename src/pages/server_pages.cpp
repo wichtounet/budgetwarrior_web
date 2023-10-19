@@ -466,14 +466,12 @@ bool parameters_present(const httplib::Request& req, std::vector<const char*> pa
     return !std::ranges::any_of(parameters, [&req](const auto& param) { return req.has_param(param); });
 }
 
-void call_render_function(html_writer& w, const httplib::Request& req, httplib::Response& res, void (*render_function)(html_writer&, const httplib::Request&)) {
-    cpp_unused(res);
+void call_render_function(html_writer& w, const httplib::Request& req, void (*render_function)(html_writer&, const httplib::Request&)) {
     render_function(w, req);
 }
 
-void call_render_function(html_writer& w, const httplib::Request& req, httplib::Response& res, void (*render_function)(html_writer&)) {
+void call_render_function(html_writer& w, const httplib::Request& req, void (*render_function)(html_writer&)) {
     cpp_unused(req);
-    cpp_unused(res);
     render_function(w);
 }
 
@@ -489,7 +487,7 @@ auto render_wrapper(const char* title, T render_function) {
                 return;
             }
 
-            call_render_function(w, req, res, render_function);
+            call_render_function(w, req, render_function);
 
             page_end(w, req, res);
         } catch (const budget_exception& e) {
