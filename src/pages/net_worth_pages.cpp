@@ -906,16 +906,14 @@ void rebalance_page_base(html_writer& w, bool nocash) {
 
     std::map<size_t, size_t, std::less<>> colors;
 
-    for (const auto& asset : w.cache.user_assets()) {
+    for (const auto& asset : w.cache.user_assets() | is_portfolio) {
         if (nocash && asset.is_cash()) {
             continue;
         }
 
-        if (asset.portfolio && (asset_amounts[asset.id] || asset.portfolio_alloc)) {
-            if (!colors.contains(asset.id)) {
-                auto c           = colors.size();
-                colors[asset.id] = c;
-            }
+        if ((asset_amounts[asset.id] || asset.portfolio_alloc) && !colors.contains(asset.id)) {
+            auto c           = colors.size();
+            colors[asset.id] = c;
         }
     }
 

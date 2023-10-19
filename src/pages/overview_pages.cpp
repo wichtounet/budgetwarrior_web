@@ -15,6 +15,7 @@
 #include "http.hpp"
 #include "config.hpp"
 #include "compute.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -365,19 +366,15 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
     std::vector<budget::expense> side_expenses;
     std::vector<budget::earning> side_earnings;
 
-    for (const auto& expense : writer.cache.expenses()) {
-        if (get_account(expense.account).name == side_category) {
-            if (side_prefix.empty() || expense.name.find(side_prefix) == 0) {
-                side_expenses.push_back(expense);
-            }
+    for (const auto& expense : writer.cache.expenses() | filter_by_account_name(side_category)) {
+        if (side_prefix.empty() || expense.name.find(side_prefix) == 0) {
+            side_expenses.push_back(expense);
         }
     }
 
-    for (const auto& earning : writer.cache.earnings()) {
-        if (get_account(earning.account).name == side_category) {
-            if (side_prefix.empty() || earning.name.find(side_prefix) == 0) {
-                side_earnings.push_back(earning);
-            }
+    for (const auto& earning : writer.cache.earnings() | filter_by_account_name(side_category)) {
+        if (side_prefix.empty() || earning.name.find(side_prefix) == 0) {
+            side_earnings.push_back(earning);
         }
     }
 
