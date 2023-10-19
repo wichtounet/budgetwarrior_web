@@ -205,7 +205,7 @@ void budget::time_graph_savings_rate_page(html_writer& w) {
     ss << "{ name: 'Savings Rate',";
     ss << "data: [";
 
-    std::vector<float>       serie;
+    std::vector<double>       serie;
     std::vector<std::string> dates;
 
     auto sy = start_year(w.cache);
@@ -218,7 +218,7 @@ void budget::time_graph_savings_rate_page(html_writer& w) {
             auto status = budget::compute_month_status(w.cache, year, month);
 
             auto savings      = status.income - status.expenses;
-            float savings_rate = 0.0;
+            double savings_rate = 0.0;
 
             if (savings.dollars() > 0) {
                 savings_rate = savings / status.income;
@@ -238,18 +238,18 @@ void budget::time_graph_savings_rate_page(html_writer& w) {
     ss << "{ name: '12 months average',";
     ss << "data: [";
 
-    std::array<float, 12> average_12{};
-    average_12.fill(0.0f);
+    std::array<double, 12> average_12{};
+    average_12.fill(0.0);
 
     for (size_t i = 0; i < serie.size(); ++i) {
         average_12[i % 12] = serie[i];
 
-        auto average = std::accumulate(average_12.begin(), average_12.end(), 0.0f);
+        auto average = std::accumulate(average_12.begin(), average_12.end(), 0.0);
 
         if (i < 12) {
-            average = average / float(i + 1);
+            average = average / double(i + 1);
         } else {
-            average = average / 12.f;
+            average = average / 12.0;
         }
 
         ss << "[" << dates[i] << "," << 100.0 * average << "],";
@@ -276,7 +276,7 @@ void budget::time_graph_tax_rate_page(html_writer& w) {
         ss << "{ name: 'Tax Rate',";
         ss << "data: [";
 
-        std::vector<float>       serie;
+        std::vector<double>       serie;
         std::vector<std::string> dates;
 
         auto sy = start_year(w.cache);
@@ -290,7 +290,7 @@ void budget::time_graph_tax_rate_page(html_writer& w) {
             for (budget::month month = sm; month < last; ++month) {
                 auto status = budget::compute_month_status(w.cache, year, month);
 
-                float tax_rate = status.taxes / status.income;
+                double tax_rate = status.taxes / status.income;
 
                 const std::string date = std::format("Date.UTC({},{},1)", year.value, month.value - 1);
 
@@ -310,18 +310,18 @@ void budget::time_graph_tax_rate_page(html_writer& w) {
         ss << "{ name: '12 months average',";
         ss << "data: [";
 
-        std::array<float, 12> average_12{};
-        average_12.fill(0.0f);
+        std::array<double, 12> average_12{};
+        average_12.fill(0.0);
 
         for (size_t i = 0; i < serie.size(); ++i) {
             average_12[i % 12] = serie[i];
 
-            auto average = std::accumulate(average_12.begin(), average_12.end(), 0.0f);
+            auto average = std::accumulate(average_12.begin(), average_12.end(), 0.0);
 
             if (i < 12) {
-                average = average / float(i + 1);
+                average = average / double(i + 1);
             } else {
-                average = average / 12.f;
+                average = average / 12.0;
             }
 
             ss << "[" << dates[i] << "," << 100.0 * average << "],";
