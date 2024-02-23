@@ -29,7 +29,7 @@ void load_pages(httplib::Server& server);
 bool authenticate(const httplib::Request& req, httplib::Response& res);
 bool page_start(const httplib::Request& req, httplib::Response& res, std::stringstream& content_stream, std::string_view title);
 void page_end(budget::html_writer& w, const httplib::Request& req, httplib::Response& res);
-bool validate_parameters(html_writer& w, const httplib::Request& req, std::vector<const char*> parameters);
+bool validate_parameters(html_writer& w, const httplib::Request& req, const std::vector<const char*> & parameters);
 
 void display_error_message_string(budget::writer& w, std::string_view message);
 

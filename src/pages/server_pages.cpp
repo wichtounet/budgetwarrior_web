@@ -461,8 +461,8 @@ std::string footer() {
     return "</main></body></html>";
 }
 
-bool parameters_present(const httplib::Request& req, std::vector<const char*> parameters) {
-    return !std::ranges::any_of(parameters, [&req](const auto& param) { return req.has_param(param); });
+bool parameters_present(const httplib::Request& req, const std::vector<const char*> & parameters) {
+    return std::ranges::all_of(parameters, [&req](const auto& param) { return req.has_param(param); });
 }
 
 void call_render_function(html_writer& w, const httplib::Request& req, void (*render_function)(html_writer&, const httplib::Request&)) {
@@ -809,8 +809,8 @@ bool budget::page_start(const httplib::Request& req, httplib::Response& res, std
     return true;
 }
 
-bool budget::validate_parameters(html_writer& w, const httplib::Request& req, std::vector<const char*> parameters) {
-    if (!parameters_present(req, std::move(parameters))) {
+bool budget::validate_parameters(html_writer& w, const httplib::Request& req, const std::vector<const char*> & parameters) {
+    if (!parameters_present(req, parameters)) {
         display_error_message(w, "Invalid parameter for the request");
 
         return false;
