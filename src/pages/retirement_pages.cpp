@@ -88,7 +88,7 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
         while (date <= end_date) {
             const auto ratio = budget::fi_ratio(date, w.cache);
 
-            ss << std::format("[Date.UTC({},{},{}), {}]", date.year().value, date.month().value - 1, date.day().value, 100 * ratio);
+            ss << std::format("[Date.UTC({},{},{}), {}],", date.year().value, date.month().value - 1, date.day().value, 100 * ratio);
 
             date += days(1);
         }
@@ -108,7 +108,7 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
         while (date <= end_date) {
             const auto ratio = budget::fixed_fi_ratio(date, w.cache, fixed_expenses);
 
-            ss << std::format("[Date.UTC({},{},{}), {}]", date.year().value, date.month().value - 1, date.day().value, 100 * ratio);
+            ss << std::format("[Date.UTC({},{},{}), {}],", date.year().value, date.month().value - 1, date.day().value, 100 * ratio);
 
             date += days(1);
         }
