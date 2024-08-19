@@ -89,7 +89,7 @@ void budget::assets_card(budget::html_writer& w) {
     } else {
         bool first = true;
 
-        for (const auto& [asset, amount] : w.cache.user_assets() | expand_value_conv(w.cache) | not_zero) {
+        for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
             if (!first) {
                 w << R"=====(<hr />)=====";
             }
