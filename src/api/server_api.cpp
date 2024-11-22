@@ -159,6 +159,7 @@ void budget::load_api(httplib::Server& server) {
     server.Post("/api/expenses/edit/", api_wrapper(&edit_expenses_api));
     server.Get("/api/expenses/delete/", api_wrapper(&delete_expenses_api));
     server.Get("/api/expenses/list/", api_wrapper(&list_expenses_api));
+    server.Post("/api/expenses/import/neon/", api_wrapper(&import_neon_expenses_api));
 
     server.Post("/api/earnings/add/", api_wrapper(&add_earnings_api));
     server.Post("/api/earnings/edit/", api_wrapper(&edit_earnings_api));
