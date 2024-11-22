@@ -237,7 +237,7 @@ void budget::api_error(const httplib::Request& req, httplib::Response& res, std:
             url = std::format("{}&error=true&message={}", back_page, encode_url(message));
         }
 
-        res.set_redirect(url.c_str());
+        res.set_redirect(url);
     } else {
         res.set_content(std::format("Error: {}", message), "text/plain");
     }
@@ -254,7 +254,7 @@ void budget::api_success(const httplib::Request& req, httplib::Response& res, st
             url = std::format("{}&success=true&message={}", back_page, encode_url(message));
         }
 
-        res.set_redirect(url.c_str());
+        res.set_redirect(url);
     } else {
         res.set_content(std::format("Success: {}", message), "text/plain");
     }
@@ -271,7 +271,7 @@ void budget::api_success(const httplib::Request& req, httplib::Response& res, st
             url = std::format("{}&success=true&message={}", back_page, encode_url(message));
         }
 
-        res.set_redirect(url.c_str());
+        res.set_redirect(url);
     } else {
         res.set_content(content, "text/plain");
     }
