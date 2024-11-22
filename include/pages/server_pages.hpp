@@ -53,6 +53,7 @@ void add_title_picker(budget::writer& w, std::string_view default_value = "");
 void add_amount_picker(budget::writer& w, std::string_view default_value = "");
 void add_paid_amount_picker(budget::writer& w, std::string_view default_value = "");
 void add_yes_no_picker(budget::writer& w, std::string_view title, std::string_view name, bool default_value);
+void add_file_picker(budget::writer& w);
 void add_paid_picker(budget::writer& w, bool paid);
 void add_date_picker(budget::writer& w, std::string_view default_value = "", bool one_line = false);
 void add_account_picker(budget::writer& w, budget::date day, std::string_view default_value = "");

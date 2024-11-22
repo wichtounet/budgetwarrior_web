@@ -283,6 +283,7 @@ std::string header(std::string_view title, bool menu = true) {
                   <a class="dropdown-item" href="/expenses/breakdown/month/">Expenses Breakdown Month</a>
                   <a class="dropdown-item" href="/expenses/breakdown/year/">Expenses Breakdown Year</a>
                   <a class="dropdown-item" href="/expenses/time/">Expenses over time</a>
+                  <a class="dropdown-item" href="/expenses/import/">Import Expenses</a>
                 </div>
               </li>
         )=====";
@@ -557,6 +558,7 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/expenses/all/", render_wrapper("Expenses", &all_expenses_page));
     server.Get("/expenses/add/", render_wrapper("Expenses", &add_expenses_page));
     server.Get("/expenses/edit/", render_wrapper("Expenses", &edit_expenses_page));
+    server.Get("/expenses/import/", render_wrapper("Expenses", &import_expenses_page));
 
     server.Get(R"(/earnings/(\d+)/(\d+)/)", render_wrapper("Earnings", &earnings_page));
     server.Get("/earnings/", render_wrapper("Earnings", &earnings_page));
@@ -982,6 +984,15 @@ void budget::add_yes_no_picker(budget::writer& w, std::string_view title, std::s
 
 void budget::add_paid_picker(budget::writer& w, bool paid) {
     add_yes_no_picker(w, "Paid", "input_paid", paid);
+}
+
+void budget::add_file_picker(budget::writer& w) {
+    w << R"=====(<div class="form-group">)=====";
+    w << "<label for=\"" << "file" << "\">" << "File" << "</label>";
+    w << R"=====(<input type="file" name=")=====";
+    w << "file";
+    w << R"=====("/>)=====";
+    w << R"=====(</div>)=====";
 }
 
 void budget::add_date_picker(budget::writer& w, std::string_view default_value, bool one_line) {
