@@ -564,7 +564,13 @@ void budget::edit_expenses_page(html_writer& w, const httplib::Request& req) {
 void budget::import_expenses_page(html_writer& w) {
     w << title_begin << "Import expenses" << title_end;
 
-    form_begin(w, "/api/expenses/import/neon/", "/expenses/import/");
+    w << R"=====(<form enctype="multipart/form-data" method="POST" action=")=====";
+    w << "/api/expenses/import/neon/";
+    w << R"=====(">)=====";
+    w << R"=====(<input type="hidden" name="server" value="yes">)=====";
+    w << R"=====(<input type="hidden" name="back_page" value=")=====";
+    w << html_base64_encode("/expenses/import/");
+    w << R"=====(">)=====";
 
     add_file_picker(w);
 

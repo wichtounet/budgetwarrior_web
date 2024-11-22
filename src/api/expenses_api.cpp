@@ -85,13 +85,10 @@ void budget::list_expenses_api(const httplib::Request& req, httplib::Response& r
 }
 
 void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    if (!parameters_present(req, {"file"})) {
-        return api_error(req, res, "Invalid parameters");
-    }
+    // TODO VALIDATE
 
-    auto file_content = req.get_param_value("file");
+    const auto & file = req.get_file_value("file");
+    const auto & file_content = file.content;
 
-    std::stringstream ss;
-
-    api_success(req, res, std::format("Everything has been imported: {}" , file_content.size()));
+    api_success(req, res, std::format("Everything has been imported: {}" , file_content.length()));
 }
