@@ -260,5 +260,5 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         ++added;
     }
 
-    api_success(req, res, std::format("{} expenses have been temporarily imported", added));
+    api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
 }
