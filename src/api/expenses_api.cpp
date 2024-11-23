@@ -210,7 +210,8 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
     size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Amount"));
     size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"));
 
-    size_t added = 0;
+    size_t added   = 0;
+    size_t ignored = 0;
 
     data_cache cache;
 
@@ -231,9 +232,17 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
             continue;
         }
 
+        auto date = budget::date_from_string(date_value);
+        auto amount = budget::money_from_string(amount_value);
+
+        if (cache.expenses() | persistent | filter_by_amount(amount) | filter_by_date(date) | filter_by_original_name(desc_value)) {
+            ++ ignored;
+            continue;
+        }
+
         expense expense;
         expense.guid    = budget::generate_guid();
-        expense.date    = budget::date_from_string(date_value);
+        expense.date    = date;
 
         // TODO Do Beter with translation memory
         if (has_default_account()) {
@@ -243,7 +252,7 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         }
 
         expense.name    = desc_value; // TODO Do better using translation memory
-        expense.amount  = budget::money_from_string(amount_value);
+        expense.amount  = amount;
         expense.original_name = desc_value;
         expense.temporary = true;
 
