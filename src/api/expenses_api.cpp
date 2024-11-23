@@ -15,6 +15,7 @@
 #include "guid.hpp"
 #include "http.hpp"
 #include "data.hpp"
+#include "views.hpp"
 
 using namespace budget;
 
@@ -76,7 +77,7 @@ void budget::delete_expenses_api(const httplib::Request& req, httplib::Response&
 void budget::list_expenses_api(const httplib::Request& req, httplib::Response& res) {
     std::stringstream ss;
 
-    for (auto& expense : all_expenses()) {
+    for (auto& expense : all_expenses() | persistent) {
         data_writer writer;
         expense.save(writer);
         ss << writer.to_string() << std::endl;

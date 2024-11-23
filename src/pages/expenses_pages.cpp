@@ -498,7 +498,7 @@ void budget::add_expenses_page(html_writer& w) {
         cpp::string_hash_map<budget::expense> last_expenses;
         std::vector<std::pair<std::string, size_t>>      order;
 
-        for (const auto& expense : w.cache.sorted_expenses()) {
+        for (const auto& expense : w.cache.sorted_expenses() | persistent) {
             ++counts[expense.name];
             last_expenses[expense.name] = expense;
         }

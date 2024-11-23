@@ -26,7 +26,7 @@ budget::money monthly_income(data_cache& cache, budget::month month, budget::yea
 }
 
 budget::money monthly_spending(data_cache& cache, budget::month month, budget::year year) {
-    return fold_left_auto(cache.expenses() | filter_by_date(year, month) | to_amount);
+    return fold_left_auto(cache.expenses()  | persistent| filter_by_date(year, month) | to_amount);
 }
 
 void cash_flow_card(budget::html_writer& w) {

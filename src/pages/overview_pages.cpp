@@ -366,7 +366,7 @@ void display_side_month_overview(budget::month month, budget::year year, budget:
     std::vector<budget::expense> side_expenses;
     std::vector<budget::earning> side_earnings;
 
-    for (const auto& expense : writer.cache.expenses() | filter_by_account_name(side_category)) {
+    for (const auto& expense : writer.cache.expenses() | persistent | filter_by_account_name(side_category)) {
         if (side_prefix.empty() || expense.name.find(side_prefix) == 0) {
             side_expenses.push_back(expense);
         }

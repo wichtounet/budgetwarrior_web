@@ -98,7 +98,7 @@ std::vector<budget::year> active_years(budget::year extra) {
 
     std::unordered_set<budget::year> years;
 
-    std::ranges::copy(all_expenses() | not_template | to_date | to_year, std::inserter(years, years.begin()));
+    std::ranges::copy(all_expenses() | persistent | not_template | to_date | to_year, std::inserter(years, years.begin()));
     std::ranges::copy(all_earnings() | not_template | to_date | to_year, std::inserter(years, years.begin()));
 
     years.insert(extra);
