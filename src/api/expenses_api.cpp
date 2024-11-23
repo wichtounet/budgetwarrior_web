@@ -88,6 +88,44 @@ void budget::list_expenses_api(const httplib::Request& req, httplib::Response& r
     api_success_content(req, res, ss.str());
 }
 
+void budget::import_expenses_api(const httplib::Request& req, httplib::Response& res) {
+    if (!parameters_present(req, {"n_expenses"})) {
+        return api_error(req, res, "Invalid parameters");
+    }
+
+    const auto n_expenses = budget::to_number<size_t>(req.get_param_value("n_expenses"));
+
+    size_t imported = 0;
+    for (size_t n = 0; n < n_expenses; ++n) {
+        auto included_name = std::format("expense_{}_include", n);
+        auto id_name       = std::format("expense_{}_id", n);
+
+        if (!req.has_param(id_name)) {
+            return api_error(req, res, "Invalid parameters in the form");
+        }
+
+        auto id = budget::to_number<size_t>(req.get_param_value(id_name));
+        if (!budget::expense_exists(id)) {
+            return api_error(req, res, "Invalid expense in the form");
+        }
+
+        auto expense = budget::expense_get(id);
+
+        if (!expense.temporary) {
+            return api_error(req, res, "Invalid expense in the form");
+        }
+
+        if (!req.has_param(included_name)) {
+            // TODO Delete
+            continue;
+        }
+
+        ++imported;
+    }
+
+    api_success(req, res, std::format("{} expenses have been handled ({} imported)", n_expenses, imported));
+}
+
 namespace {
 
 std::string_view clean_string(std::string_view v) {

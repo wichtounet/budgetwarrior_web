@@ -18,6 +18,7 @@ void add_expenses_api(const httplib::Request& req, httplib::Response& res);
 void edit_expenses_api(const httplib::Request& req, httplib::Response& res);
 void delete_expenses_api(const httplib::Request& req, httplib::Response& res);
 void list_expenses_api(const httplib::Request& req, httplib::Response& res);
+void import_expenses_api(const httplib::Request& req, httplib::Response& res);
 void import_neon_expenses_api(const httplib::Request& req, httplib::Response& res);
 
 } // end of namespace budget
