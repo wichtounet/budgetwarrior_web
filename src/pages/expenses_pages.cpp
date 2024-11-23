@@ -565,10 +565,7 @@ void budget::import_expenses_page(html_writer& w) {
     w << title_begin << "Import expenses" << title_end;
 
     w << R"=====(<form enctype="multipart/form-data" method="POST" action=")=====";
-    w << "/api/expenses/import/neon/";
-    w << R"=====(">)=====";
-    w << R"=====(<input type="hidden" name="server" value="yes">)=====";
-    w << R"=====(<input type="hidden" name="back_page" value=")=====";
+    w << "/api/expenses/import/neon/?server=yes&back_page=";
     w << html_base64_encode("/expenses/import/");
     w << R"=====(">)=====";
 

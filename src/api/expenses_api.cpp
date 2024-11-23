@@ -5,6 +5,7 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
+#include <ranges>
 #include <set>
 
 #include "api/server_api.hpp"
@@ -84,11 +85,59 @@ void budget::list_expenses_api(const httplib::Request& req, httplib::Response& r
     api_success_content(req, res, ss.str());
 }
 
-void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    // TODO VALIDATE
+namespace {
 
+std::string_view clean_string(std::string_view v) {
+    if (v.size() < 3)  {
+        return v;
+    }
+
+    if (v.front() == '\"' && v.back() == '\"') {
+        return v.substr(1, v.size() - 2);
+    }
+
+    return v;
+}
+
+} // namespace
+
+void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Response& res) {
     const auto & file = req.get_file_value("file");
     const auto & file_content = file.content;
 
-    api_success(req, res, std::format("Everything has been imported: {}" , file_content.length()));
+    if (!file_content.length()) {
+        return api_error(req, res, "Invalid parameters");
+    }
+
+    std::vector<std::string_view> columns;
+    std::vector<std::vector<std::string_view>> values;
+
+    for (auto line : std::views::split(file_content, '\n')) {
+        if (columns.empty()) {
+            for (const auto & column : std::views::split(line, ';')) {
+                columns.emplace_back(clean_string(std::string_view(column)));
+            }
+
+            continue;
+        }
+
+        if (std::string_view(line).empty()) {
+            continue;
+        }
+
+        auto & v = values.emplace_back();
+        for (const auto & column : std::views::split(line, ';')) {
+            v.emplace_back(clean_string(std::string_view(column)));
+        }
+    }
+
+    if (columns.empty()) {
+        return api_error(req, res, "Invalid file, missing columns");
+    }
+
+    if (values.empty()) {
+        return api_error(req, res, "Invalid file, missing values");
+    }
+
+    api_success(req, res, std::format("Everything has been imported: {} expenses found", values.size()));
 }
