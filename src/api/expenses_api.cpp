@@ -97,14 +97,17 @@ void budget::import_expenses_api(const httplib::Request& req, httplib::Response&
 
     size_t imported = 0;
     for (size_t n = 0; n < n_expenses; ++n) {
-        auto included_name = std::format("expense_{}_include", n);
-        auto id_name       = std::format("expense_{}_id", n);
+        auto included_param = std::format("expense_{}_include", n);
+        auto id_param       = std::format("expense_{}_id", n);
+        auto amount_param   = std::format("expense_{}_amount", n);
+        auto name_param     = std::format("expense_{}_name", n);
+        auto account_param  = std::format("expense_{}_account", n);
 
-        if (!req.has_param(id_name)) {
+        if (!req.has_param(id_param)) {
             return api_error(req, res, "Invalid parameters in the form");
         }
 
-        auto id = budget::to_number<size_t>(req.get_param_value(id_name));
+        auto id = budget::to_number<size_t>(req.get_param_value(id_param));
         if (!budget::expense_exists(id)) {
             return api_error(req, res, "Invalid expense in the form");
         }
@@ -115,10 +118,29 @@ void budget::import_expenses_api(const httplib::Request& req, httplib::Response&
             return api_error(req, res, "Invalid expense in the form");
         }
 
-        if (!req.has_param(included_name)) {
-            // TODO Delete
+        if (!req.has_param(amount_param) || !req.has_param(name_param) || !req.has_param(account_param)) {
+            return api_error(req, res, "Invalid parameters in the form");
+        }
+
+        if (!req.has_param(included_param)) {
+            budget::expense_delete(id);
             continue;
         }
+
+        auto name    = req.get_param_value(name_param);
+        auto amount  = budget::money_from_string(req.get_param_value(amount_param));
+        auto account = budget::to_number<size_t>(req.get_param_value(account_param));
+
+        if (!account_exists(account)) {
+            return api_error(req, res, "Invalid account in the form");
+        }
+
+        expense.name      = name;
+        expense.amount    = amount;
+        expense.account   = account;
+        expense.temporary = false;
+
+        edit_expense(expense);
 
         ++imported;
     }
