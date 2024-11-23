@@ -889,10 +889,10 @@ void budget::form_end(budget::writer& w, std::string_view button) {
     w << "</form>";
 }
 
-void budget::add_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required) {
-    w << R"=====(<div class="form-group">)=====";
-
-    w << "<label for=\"" << name << "\">" << title << "</label>";
+void budget::add_raw_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required) {
+    if (!title.empty()) {
+        w << "<label for=\"" << name << "\">" << title << "</label>";
+    }
 
     if (required) {
         w << R"(<input required type="text" class="form-control" id=")" << name << "\" name=\"" << name << "\" ";
@@ -906,10 +906,15 @@ void budget::add_text_picker(budget::writer& w, std::string_view title, std::str
         w << " value=\"" << default_value << "\" ";
     }
 
-    w << R"=====(
-            >
-         </div>
-    )=====";
+    w << ">";
+}
+
+void budget::add_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required) {
+    w << R"=====(<div class="form-group">)=====";
+
+    add_raw_text_picker(w, title, name, default_value, required);
+
+    w << "</div>";
 }
 
 void budget::add_password_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required) {
@@ -1161,12 +1166,8 @@ void budget::add_average_5_serie(std::stringstream& ss, std::vector<budget::mone
     ss << "]},";
 }
 
-void budget::add_account_picker(budget::writer& w, budget::date day, std::string_view default_value) {
-    w << R"=====(
-            <div class="form-group">
-                <label for="input_account">Account</label>
-                <select class="form-control" id="input_account" name="input_account">
-    )=====";
+void budget::add_raw_account_picker(budget::writer& w, budget::date day, std::string_view default_value, std::string_view name) {
+    w << std::format(R"=====(<select class="form-control" id="{}" name="{}">)=====", name, name);
 
     for (const auto& account : all_accounts(w.cache, day.year(), day.month())) {
         if (budget::to_string(account.id) == default_value) {
@@ -1176,8 +1177,18 @@ void budget::add_account_picker(budget::writer& w, budget::date day, std::string
         }
     }
 
+    w << "</select>";
+}
+
+void budget::add_account_picker(budget::writer& w, budget::date day, std::string_view default_value) {
     w << R"=====(
-                </select>
+            <div class="form-group">
+                <label for="input_account">Account</label>
+    )=====";
+
+    add_raw_account_picker(w, day, default_value);
+
+    w << R"=====(
             </div>
     )=====";
 }

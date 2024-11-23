@@ -46,7 +46,9 @@ void page_form_begin(budget::writer& w, std::string_view action);
 void form_begin_edit(budget::writer& w, std::string_view action, std::string_view back_page, std::string_view input_id);
 void form_end(budget::writer& w, std::string_view button = "");
 
+void add_raw_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required = true);
 void add_text_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required = true);
+
 void add_password_picker(budget::writer& w, std::string_view title, std::string_view name, std::string_view default_value, bool required = true);
 void add_name_picker(budget::writer& w, std::string_view default_value = "");
 void add_title_picker(budget::writer& w, std::string_view default_value = "");
@@ -56,7 +58,10 @@ void add_yes_no_picker(budget::writer& w, std::string_view title, std::string_vi
 void add_file_picker(budget::writer& w);
 void add_paid_picker(budget::writer& w, bool paid);
 void add_date_picker(budget::writer& w, std::string_view default_value = "", bool one_line = false);
+
+void add_raw_account_picker(budget::writer& w, budget::date day, std::string_view default_value = "", std::string_view name = "input_account");
 void add_account_picker(budget::writer& w, budget::date day, std::string_view default_value = "");
+
 void add_account_picker_by_name(
         budget::writer& w, budget::date day, std::string_view title, std::string_view default_value, std::string_view input, bool allow_empty = false);
 void add_share_asset_picker(budget::writer& w, std::string_view default_value = "");

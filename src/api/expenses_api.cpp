@@ -8,6 +8,7 @@
 #include <ranges>
 #include <set>
 
+#include "accounts.hpp"
 #include "api/server_api.hpp"
 #include "api/expenses_api.hpp"
 
@@ -16,6 +17,7 @@
 #include "http.hpp"
 #include "data.hpp"
 #include "views.hpp"
+#include "data_cache.hpp"
 
 using namespace budget;
 
@@ -140,5 +142,54 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         return api_error(req, res, "Invalid file, missing values");
     }
 
-    api_success(req, res, std::format("Everything has been imported: {} expenses found", values.size()));
+    if (!std::ranges::contains(columns, "Date") || !std::ranges::contains(columns, "Amount")|| !std::ranges::contains(columns, "Description")) {
+        return api_error(req, res, "Invalid file, missing columns");
+    }
+
+    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date"));
+    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Amount"));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"));
+
+    size_t added = 0;
+
+    data_cache cache;
+
+    for (const auto & value : values) {
+        // Skip uncomplete lines
+        if (value.size() != columns.size()) {
+            continue;
+        }
+
+        auto date_value = clean_string(value[date_index]);
+        auto amount_value = clean_string(value[amount_index]);
+        auto desc_value = clean_string(value[desc_index]);
+
+        // Only handle expenses for now
+        if (amount_value.front() == '-') {
+            amount_value = amount_value.substr(1);
+        } else {
+            continue;
+        }
+
+        expense expense;
+        expense.guid    = budget::generate_guid();
+        expense.date    = budget::date_from_string(date_value);
+
+        // TODO Do Beter with translation memory
+        if (has_default_account()) {
+            expense.account = default_account().id;
+        } else {
+            expense.account = cache.accounts().front().id;
+        }
+
+        expense.name    = desc_value; // TODO Do better using translation memory
+        expense.amount  = budget::money_from_string(amount_value);
+        expense.original_name = desc_value;
+        expense.temporary = true;
+
+        add_expense(std::move(expense));
+        ++added;
+    }
+
+    api_success(req, res, std::format("{} expenses have been temporarily imported", added));
 }

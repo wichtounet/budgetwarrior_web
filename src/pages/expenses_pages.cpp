@@ -8,11 +8,13 @@
 #include <numeric>
 #include <array>
 
+#include "accounts.hpp"
 #include "cpp_utils/hash.hpp"
 
 #include "date.hpp"
 #include "http.hpp"
 #include "config.hpp"
+#include "pages/server_pages.hpp"
 #include "views.hpp"
 
 #include "pages/html_writer.hpp"
@@ -570,6 +572,81 @@ void budget::import_expenses_page(html_writer& w) {
     w << R"=====(">)=====";
 
     add_file_picker(w);
+
+    form_end(w);
+
+    if (std::ranges::empty(w.cache.expenses() | temporary)) {
+        return;
+    }
+
+    form_begin(w, "/api/expenses/import/", "/expenses/import/");
+
+    w << "<div class=\"table-responsive\">";
+    w << "<table class=\"table table-sm small-text\">";
+
+    {
+        w << "<thead>";
+        w << "<tr>";
+
+        std::string style = " class=\"not-sortable\"";
+
+        w << "<th" << style << ">Include?</th>";
+        w << "<th" << style << ">Date</th>";
+        w << "<th" << style << ">Name</th>";
+        w << "<th" << style << ">Original Name</th>";
+        w << "<th" << style << ">Account</th>";
+        w << "<th" << style << ">Amount</th>";
+
+        w << "</tr>";
+        w << "</thead>";
+    }
+
+    w << "<tbody>";
+
+    size_t n_expenses = 0;
+    for (auto & expense : w.cache.expenses() | temporary) {
+        w << "<tr>";
+
+        // The id in the DB
+        w << std::format(R"=====(<input type="hidden" name="expense_{}_id" value="{}">)=====", n_expenses, expense.id);
+
+        // The checkbox to add or not
+        w << "<td>";
+        w << std::format(R"=====(<input type="checkbox" name="expense_{}_include" checked>)=====", n_expenses);
+        w << "</td>";
+
+        // The date (cannot be changed)
+        w << "<td>" << budget::to_string(expense.date) << "</td>";
+
+        // The new name
+        w << "<td>";
+        add_raw_text_picker(w, {}, std::format("expense_{}_name", n_expenses), expense.name, true);
+        w << "</td>";
+
+        // The original name (cannot be changed)
+        w << "<td>" << expense.original_name << "</td>";
+
+        // The acount
+        w << "<td>";
+        add_raw_account_picker(w, budget::local_day(), std::to_string(expense.account), std::format("expense_{}_account", n_expenses));
+        w << "</td>";
+
+        // The amount
+        w << "<td>";
+        w << std::format(R"=====(<input required type="number" step="0.01" id="expense_{}_amount" name="expense_{}_amount" value="{}">)=====", n_expenses, n_expenses, expense.amount);
+        w << "</td>";
+
+        w << "</tr>";
+
+        ++n_expenses;
+    }
+
+    w << "</tbody>";
+
+    w << "</table>";
+    w << "</div>"; // table-responsive
+    
+    w << std::format(R"=====(<input type="hidden" name="n_expenses" value="{}">)=====", n_expenses);
 
     form_end(w);
 }
