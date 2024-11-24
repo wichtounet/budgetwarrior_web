@@ -221,19 +221,19 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
             continue;
         }
 
-        auto date_value = clean_string(value[date_index]);
-        auto amount_value = clean_string(value[amount_index]);
-        auto desc_value = clean_string(value[desc_index]);
+        const auto date_value = clean_string(value[date_index]);
+        const auto desc_value = clean_string(value[desc_index]);
 
         // Only handle expenses for now
+        auto amount_value = clean_string(value[amount_index]);
         if (amount_value.front() == '-') {
             amount_value = amount_value.substr(1);
         } else {
             continue;
         }
 
-        auto date = budget::date_from_string(date_value);
-        auto amount = budget::money_from_string(amount_value);
+        const auto date = budget::date_from_string(date_value);
+        const auto amount = budget::money_from_string(amount_value);
 
         if (cache.expenses() | persistent | filter_by_amount(amount) | filter_by_date(date) | filter_by_original_name(desc_value)) {
             ++ ignored;
@@ -244,14 +244,45 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         expense.guid    = budget::generate_guid();
         expense.date    = date;
 
-        // TODO Do Beter with translation memory
+        // By default, we use either the default account or the first account
         if (has_default_account()) {
             expense.account = default_account().id;
         } else {
             expense.account = cache.accounts().front().id;
         }
 
-        expense.name    = desc_value; // TODO Do better using translation memory
+        // By default, we guess the name as the description value
+        expense.name = desc_value;
+
+        // Then, we use the translation memory to do better for names and accounts
+
+        auto same_original_name        = cache.expenses() | filter_by_original_name(desc_value);
+        auto same_original_name_amount = cache.expenses() | filter_by_original_name(desc_value) | filter_by_amount(amount);
+
+        if (same_original_name) {
+            std::string guessed_name    = std::begin(same_original_name)->name;
+            size_t      guessed_account = std::begin(same_original_name)->account;
+
+            if (std::ranges::all_of(same_original_name, [&guessed_name](const auto& expense) { return expense.name == guessed_name; })) {
+                // If they were always translate the same way, we can reuse the name directly
+                expense.name    = guessed_name;
+                expense.account = get_account(get_account_name(guessed_account), date.year(), date.month()).id;
+            } else if (same_original_name_amount) {
+                // Otherwise, we also filter by amount
+
+                guessed_name    = std::begin(same_original_name_amount)->name;
+                guessed_account = std::begin(same_original_name)->account;
+
+                if (std::ranges::all_of(same_original_name_amount, [&guessed_name](const auto& expense) { return expense.name == guessed_name; })) {
+                    expense.name    = guessed_name;
+                    expense.account = get_account(get_account_name(guessed_account), date.year(), date.month()).id;
+                }
+            }
+
+            // Note: We could try to be even smarter and recognize the days in the month of imported expenses
+            // Or, we could even use the most recent translation as the source of truth, but this can come later
+        }
+
         expense.amount  = amount;
         expense.original_name = desc_value;
         expense.temporary = true;
