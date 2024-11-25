@@ -283,7 +283,7 @@ std::string header(std::string_view title, bool menu = true) {
                   <a class="dropdown-item" href="/expenses/breakdown/month/">Expenses Breakdown Month</a>
                   <a class="dropdown-item" href="/expenses/breakdown/year/">Expenses Breakdown Year</a>
                   <a class="dropdown-item" href="/expenses/time/">Expenses over time</a>
-                  <a class="dropdown-item" href="/expenses/import/">Import Expenses</a>
+                  <a class="dropdown-item" href="/expenses/import/">Import Expenses from Neon</a>
                 </div>
               </li>
         )=====";
