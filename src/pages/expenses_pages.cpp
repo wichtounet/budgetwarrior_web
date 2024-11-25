@@ -563,7 +563,7 @@ void budget::edit_expenses_page(html_writer& w, const httplib::Request& req) {
     form_end(w);
 }
 
-void budget::import_expenses_page(html_writer& w) {
+void budget::import_expenses_neon_page(html_writer& w) {
     w << title_begin << "Import expenses" << title_end;
 
     w << R"=====(<form enctype="multipart/form-data" method="POST" action=")=====";
