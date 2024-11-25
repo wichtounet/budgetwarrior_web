@@ -19,6 +19,7 @@ void month_breakdown_expenses_page(html_writer& w, const httplib::Request& req);
 void year_breakdown_expenses_page(html_writer& w, const httplib::Request& req);
 void add_expenses_page(html_writer& w);
 void edit_expenses_page(html_writer& w, const httplib::Request& req);
+void import_expenses_cembra_page(html_writer& w);
 void import_expenses_neon_page(html_writer& w);
 
 void month_breakdown_expenses_graph(

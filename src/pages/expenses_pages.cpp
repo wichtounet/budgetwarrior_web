@@ -563,12 +563,14 @@ void budget::edit_expenses_page(html_writer& w, const httplib::Request& req) {
     form_end(w);
 }
 
-void budget::import_expenses_neon_page(html_writer& w) {
+namespace {
+
+void import_expenses_page(html_writer& w, std::string_view name) {
     w << title_begin << "Import expenses" << title_end;
 
     w << R"=====(<form enctype="multipart/form-data" method="POST" action=")=====";
-    w << "/api/expenses/import/neon/?server=yes&back_page=";
-    w << html_base64_encode("/expenses/import/");
+    w << std::format("/api/expenses/import/{}/?server=yes&back_page=", name);
+    w << html_base64_encode(std::format("/expenses/import/{}/", name));
     w << R"=====(">)=====";
 
     add_file_picker(w);
@@ -649,4 +651,16 @@ void budget::import_expenses_neon_page(html_writer& w) {
     w << std::format(R"=====(<input type="hidden" name="n_expenses" value="{}">)=====", n_expenses);
 
     form_end(w);
+}
+
+}
+
+using namespace std::literals;
+
+void budget::import_expenses_neon_page(html_writer& w) {
+    import_expenses_page(w, "neon"sv);
+}
+
+void budget::import_expenses_cembra_page(html_writer& w) {
+    import_expenses_page(w, "cembra"sv);
 }
