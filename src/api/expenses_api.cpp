@@ -167,7 +167,11 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
     std::vector<std::vector<std::string_view>> values;
 
     for (auto line : std::views::split(file_content, '\n')) {
-        // TODO This is not robust if  there is a ; or , within quotes
+        // Skip empty lines
+        if (std::string_view(line).empty()) {
+            continue;
+        }
+
         if (columns.empty()) {
             for (const auto& column : std::views::split(line, sep)) {
                 columns.emplace_back(clean_string(std::string_view(column)));
@@ -176,13 +180,27 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
             continue;
         }
 
-        if (std::string_view(line).empty()) {
-            continue;
-        }
+        auto & v = values.emplace_back();
 
-        auto& v = values.emplace_back();
+        std::string_view column_acc;
+        bool acc = false;
+
         for (const auto& column : std::views::split(line, sep)) {
-            v.emplace_back(clean_string(std::string_view(column)));
+            std::string_view column_sv(column);
+
+            // Very simple algorithm to handle separators in between quotes
+            if (column_sv.front() == '\"' && column_sv.back() != '\"') {
+                column_acc = column_sv;
+                acc = true;
+            } else if (acc && column_sv.back() != '\"') {
+                column_acc = std::string_view(column_acc.data(), column_acc.size() + column_sv.size() + 1);
+            } else if (acc && column_sv.back() == '\"') {
+                column_acc = std::string_view(column_acc.data(), column_acc.size() + column_sv.size() + 1);
+                acc = false;
+                v.emplace_back(clean_string(column_acc));
+            } else {
+                v.emplace_back(clean_string(column_sv));
+            }
         }
     }
 
@@ -299,7 +317,7 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         const auto date = budget::date_from_string(date_value);
         const auto amount = budget::money_from_string(amount_value);
 
-        import_expense(cache, desc, amount, date, ignored, added);
+        import_expense(cache, desc_value, amount, date, ignored, added);
     }
 
     api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
