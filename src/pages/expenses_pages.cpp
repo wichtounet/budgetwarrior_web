@@ -581,7 +581,7 @@ void import_expenses_page(html_writer& w, std::string_view name) {
         return;
     }
 
-    form_begin(w, "/api/expenses/import/", "/expenses/import/");
+    form_begin(w, "/api/expenses/import/", std::format("/expenses/import/{}/", name));
 
     w << "<div class=\"table-responsive\">";
     w << "<table class=\"table table-sm small-text\">";

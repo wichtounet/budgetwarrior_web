@@ -162,22 +162,14 @@ std::string_view clean_string(std::string_view v) {
     return v;
 }
 
-} // namespace
-
-void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Response& res) {
-    const auto & file = req.get_file_value("file");
-    const auto & file_content = file.content;
-
-    if (!file_content.length()) {
-        return api_error(req, res, "Invalid parameters");
-    }
-
-    std::vector<std::string_view> columns;
+std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_view>>> parse_csv(std::string_view file_content, char sep) {
+    std::vector<std::string_view>              columns;
     std::vector<std::vector<std::string_view>> values;
 
     for (auto line : std::views::split(file_content, '\n')) {
+        // TODO This is not robust if  there is a ; or , within quotes
         if (columns.empty()) {
-            for (const auto & column : std::views::split(line, ';')) {
+            for (const auto& column : std::views::split(line, sep)) {
                 columns.emplace_back(clean_string(std::string_view(column)));
             }
 
@@ -188,11 +180,83 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
             continue;
         }
 
-        auto & v = values.emplace_back();
-        for (const auto & column : std::views::split(line, ';')) {
+        auto& v = values.emplace_back();
+        for (const auto& column : std::views::split(line, sep)) {
             v.emplace_back(clean_string(std::string_view(column)));
         }
     }
+
+    return {columns, values};
+}
+
+void import_expense(data_cache & cache, std::string_view desc_value, budget::money amount, budget::date date, size_t & ignored, size_t & added) {
+    if (cache.expenses() | persistent | filter_by_amount(amount) | filter_by_date(date) | filter_by_original_name(desc_value)) {
+        ++ ignored;
+        return;
+    }
+
+    expense expense;
+    expense.guid    = budget::generate_guid();
+    expense.date    = date;
+
+    // By default, we use either the default account or the first account
+    if (has_default_account()) {
+        expense.account = default_account().id;
+    } else {
+        expense.account = cache.accounts().front().id;
+    }
+
+    // By default, we guess the name as the description value
+    expense.name = desc_value;
+
+    // Then, we use the translation memory to do better for names and accounts
+
+    auto same_original_name        = cache.expenses() | filter_by_original_name(desc_value);
+    auto same_original_name_amount = cache.expenses() | filter_by_original_name(desc_value) | filter_by_amount(amount);
+
+    if (same_original_name) {
+        std::string guessed_name    = std::begin(same_original_name)->name;
+        size_t      guessed_account = std::begin(same_original_name)->account;
+
+        if (std::ranges::all_of(same_original_name, [&guessed_name](const auto& expense) { return expense.name == guessed_name; })) {
+            // If they were always translate the same way, we can reuse the name directly
+            expense.name    = guessed_name;
+            expense.account = get_account(get_account_name(guessed_account), date.year(), date.month()).id;
+        } else if (same_original_name_amount) {
+            // Otherwise, we also filter by amount
+
+            guessed_name    = std::begin(same_original_name_amount)->name;
+            guessed_account = std::begin(same_original_name)->account;
+
+            if (std::ranges::all_of(same_original_name_amount, [&guessed_name](const auto& expense) { return expense.name == guessed_name; })) {
+                expense.name    = guessed_name;
+                expense.account = get_account(get_account_name(guessed_account), date.year(), date.month()).id;
+            }
+        }
+
+        // Note: We could try to be even smarter and recognize the days in the month of imported expenses
+        // Or, we could even use the most recent translation as the source of truth, but this can come later
+    }
+
+    expense.amount  = amount;
+    expense.original_name = desc_value;
+    expense.temporary = true;
+
+    add_expense(std::move(expense));
+    ++added;
+}
+
+} // namespace
+
+void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Response& res) {
+    const auto & file = req.get_file_value("file");
+    const auto & file_content = file.content;
+
+    if (!file_content.length()) {
+        return api_error(req, res, "Invalid parameters");
+    }
+
+    auto [columns, values] = parse_csv(file_content, ';');
 
     if (columns.empty()) {
         return api_error(req, res, "Invalid file, missing columns");
@@ -235,60 +299,59 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         const auto date = budget::date_from_string(date_value);
         const auto amount = budget::money_from_string(amount_value);
 
-        if (cache.expenses() | persistent | filter_by_amount(amount) | filter_by_date(date) | filter_by_original_name(desc_value)) {
-            ++ ignored;
+        import_expense(cache, desc, amount, date, ignored, added);
+    }
+
+    api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
+}
+
+// Assume the CSV comes from Zamzar
+void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Response& res) {
+    const auto & file = req.get_file_value("file");
+    const auto & file_content = file.content;
+
+    if (!file_content.length()) {
+        return api_error(req, res, "Invalid parameters");
+    }
+
+    auto [columns, values] = parse_csv(file_content, ',');
+
+    if (columns.empty()) {
+        return api_error(req, res, "Invalid file, missing columns");
+    }
+
+    if (values.empty()) {
+        return api_error(req, res, "Invalid file, missing values");
+    }
+
+    if (!std::ranges::contains(columns, "Date de trans.") || !std::ranges::contains(columns, "Crédit CHF")|| !std::ranges::contains(columns, "Description")) {
+        return api_error(req, res, "Invalid file, missing columns");
+    }
+
+    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date de trans."));
+    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Crédit CHF"));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"));
+
+    size_t added   = 0;
+    size_t ignored = 0;
+
+    data_cache cache;
+
+    for (const auto & value : values) {
+        // Skip uncomplete lines
+        if (value.size() != columns.size()) {
             continue;
         }
 
-        expense expense;
-        expense.guid    = budget::generate_guid();
-        expense.date    = date;
+        const auto desc = clean_string(value[desc_index]);
 
-        // By default, we use either the default account or the first account
-        if (has_default_account()) {
-            expense.account = default_account().id;
-        } else {
-            expense.account = cache.accounts().front().id;
-        }
+        const auto date_value = clean_string(value[date_index]);
+        const auto date       = budget::dmy_date_from_string(date_value);
 
-        // By default, we guess the name as the description value
-        expense.name = desc_value;
+        const auto amount_value = clean_string(value[amount_index]);
+        const auto amount       = budget::single_money_from_string(amount_value);
 
-        // Then, we use the translation memory to do better for names and accounts
-
-        auto same_original_name        = cache.expenses() | filter_by_original_name(desc_value);
-        auto same_original_name_amount = cache.expenses() | filter_by_original_name(desc_value) | filter_by_amount(amount);
-
-        if (same_original_name) {
-            std::string guessed_name    = std::begin(same_original_name)->name;
-            size_t      guessed_account = std::begin(same_original_name)->account;
-
-            if (std::ranges::all_of(same_original_name, [&guessed_name](const auto& expense) { return expense.name == guessed_name; })) {
-                // If they were always translate the same way, we can reuse the name directly
-                expense.name    = guessed_name;
-                expense.account = get_account(get_account_name(guessed_account), date.year(), date.month()).id;
-            } else if (same_original_name_amount) {
-                // Otherwise, we also filter by amount
-
-                guessed_name    = std::begin(same_original_name_amount)->name;
-                guessed_account = std::begin(same_original_name)->account;
-
-                if (std::ranges::all_of(same_original_name_amount, [&guessed_name](const auto& expense) { return expense.name == guessed_name; })) {
-                    expense.name    = guessed_name;
-                    expense.account = get_account(get_account_name(guessed_account), date.year(), date.month()).id;
-                }
-            }
-
-            // Note: We could try to be even smarter and recognize the days in the month of imported expenses
-            // Or, we could even use the most recent translation as the source of truth, but this can come later
-        }
-
-        expense.amount  = amount;
-        expense.original_name = desc_value;
-        expense.temporary = true;
-
-        add_expense(std::move(expense));
-        ++added;
+        import_expense(cache, desc, amount, date, ignored, added);
     }
 
     api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
