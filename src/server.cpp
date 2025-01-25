@@ -115,10 +115,12 @@ void start_cron_loop() {
 
         ++hours;
 
+        LOG_F(INFO, "Check for recurrings");
         check_for_recurrings();
 
         // We save the cache once per day
         if (hours % 24 == 0) {
+            LOG_F(INFO, "Save the caches");
             save_currency_cache();
             save_share_price_cache();
         }
@@ -126,12 +128,12 @@ void start_cron_loop() {
         // Every four hours, we refresh the currency cache
         // Only current day rates are refreshed
         if (hours % 4 == 0) {
-            std::cout << "Refresh the currency cache" << std::endl;
+            LOG_F(INFO, "Refresh the currency cache");
             budget::refresh_currency_cache();
         }
 
         // Every hour, we try to prefetch value for new days
-        std::cout << "Prefetch the share cache" << std::endl;
+        LOG_F(INFO, "Prefetch the share cache");
         budget::prefetch_share_price_cache();
     }
 
