@@ -96,9 +96,7 @@ void budget::retirement_fi_ratio_over_time(html_writer& w) {
         ss << "]},";
     }
 
-    auto fixed_expenses = budget::get_fi_expenses();
-
-    if (fixed_expenses) {
+    if (auto fixed_expenses = budget::get_fi_expenses(); fixed_expenses) {
         ss << "{ name: 'FI Ratio (" << fixed_expenses.dollars() << ' ' << get_default_currency() << " yearly expenses)',";
         ss << "data: [";
 
