@@ -75,6 +75,8 @@ auto api_wrapper(void (*api_function)(const httplib::Request&, httplib::Response
                 return;
             }
 
+            LOG_F(INFO, "server: API access to {} by ", req.path, req.get_header_value("User-Agent"));
+
             api_function(req, res);
         } catch (const budget_exception& e) {
             api_error(req, res, std::format("Exception occurred: ", e.message()));
