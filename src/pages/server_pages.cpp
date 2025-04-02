@@ -709,6 +709,24 @@ void ask_for_digest(httplib::Response& res) {
 } // end of anonymous namespace
 
 bool budget::authenticate(const httplib::Request& req, httplib::Response& res) {
+    // Before any possible authentication, we do some filtering
+
+    // Drop everything without a User-Agent
+    if (!req.has_header("User-Agent")) {
+        LOG_F(INFO, "Unauthorized Access: No User-Agent set ({})", req.path);
+        res.status = 403;
+        return false;
+    }
+
+    auto user_agent = req.get_header_value("User-Agent");
+
+    // Drop obvious bots
+    if (user_agent.find("Bot") != std::string::npos || user_agent.find("bot") != std::string::npos) {
+        LOG_F(INFO, "Unauthorized Access: Blocked bot \"{}\" ({})", user_agent, req.path);
+        res.status = 403;
+        return false;
+    }
+
     if (is_secure()) {
         if (req.has_header("Authorization")) {
             auto authorization = req.get_header_value("Authorization");
