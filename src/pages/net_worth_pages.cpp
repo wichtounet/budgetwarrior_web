@@ -48,12 +48,17 @@ void budget::assets_card(budget::html_writer& w) {
 
     if (group_style) {
         std::vector<std::string> groups;
+        std::unordered_map<std::string, budget::money> group_sums;
 
         for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
             std::string group = asset.name.substr(0, asset.name.find(separator));
 
             if (!std::ranges::contains(groups, group)) {
                 groups.emplace_back(std::move(group));
+            }
+
+            if (amount) {
+                group_sums[group] += amount * exchange_rate(asset.currency, budget::local_day());
             }
         }
 
@@ -66,7 +71,7 @@ void budget::assets_card(budget::html_writer& w) {
 
                     if (!started) {
                         w << "<div class=\"asset_group\">";
-                        w << group;
+                        w << group << " (" << group_sums[group] << " " << get_default_currency() << ")";
                         w << "</div>";
 
                         started = true;
