@@ -37,7 +37,7 @@ void budget::assets_card(budget::html_writer& w) {
 
     // If one asset has no group, we disable grouping
     if (group_style) {
-        for (const auto& asset : w.cache.user_assets()) {
+        for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
             auto pos = asset.name.find(separator);
             if (pos == 0 || pos == std::string::npos) {
                 group_style = false;
@@ -49,7 +49,7 @@ void budget::assets_card(budget::html_writer& w) {
     if (group_style) {
         std::vector<std::string> groups;
 
-        for (const auto& asset : w.cache.user_assets()) {
+        for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
             std::string group = asset.name.substr(0, asset.name.find(separator));
 
             if (!std::ranges::contains(groups, group)) {
