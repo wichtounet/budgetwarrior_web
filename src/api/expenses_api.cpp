@@ -342,7 +342,7 @@ void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Re
         return api_error(req, res, "Invalid file, missing values");
     }
 
-    if (!std::ranges::contains(columns, "Date de trans.") || !std::ranges::contains(columns, "Crédit CHF")|| !std::ranges::contains(columns, "Description")) {
+    if (!range_contains(columns, "Date de trans.") || !range_contains(columns, "Crédit CHF")|| !range_contains(columns, "Description")) {
         return api_error(req, res, "Invalid file, missing columns");
     }
 
