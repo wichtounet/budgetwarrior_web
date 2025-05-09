@@ -166,15 +166,15 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
     std::vector<std::string_view>              columns;
     std::vector<std::vector<std::string_view>> values;
 
-    for (auto line : std::views::split(file_content, '\n')) {
+    for (auto line : budget::splitv(file_content, '\n')) {
         // Skip empty lines
-        if (std::string_view(line).empty()) {
+        if (line.empty()) {
             continue;
         }
 
         if (columns.empty()) {
-            for (const auto& column : std::views::split(line, sep)) {
-                columns.emplace_back(clean_string(std::string_view(column)));
+            for (const auto& column : budget::splitv(line, sep)) {
+                columns.emplace_back(clean_string(column));
             }
 
             continue;
@@ -185,9 +185,7 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
         std::string_view column_acc;
         bool acc = false;
 
-        for (const auto& column : std::views::split(line, sep)) {
-            std::string_view column_sv(column);
-
+        for (const auto& column_sv : budget::splitv(line, sep)) {
             // Very simple algorithm to handle separators in between quotes
             if (column_sv.front() == '\"' && column_sv.back() != '\"') {
                 column_acc = column_sv;
