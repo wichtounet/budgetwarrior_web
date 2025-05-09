@@ -53,12 +53,12 @@ void budget::assets_card(budget::html_writer& w) {
         for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
             std::string group = asset.name.substr(0, asset.name.find(separator));
 
-            if (!range_contains(groups, group)) {
-                groups.emplace_back(std::move(group));
-            }
-
             if (amount) {
                 group_sums[group] += amount * exchange_rate(asset.currency, budget::local_day());
+            }
+
+            if (!range_contains(groups, group)) {
+                groups.emplace_back(std::move(group));
             }
         }
 
