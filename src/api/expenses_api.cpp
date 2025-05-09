@@ -284,7 +284,7 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         return api_error(req, res, "Invalid file, missing values");
     }
 
-    if (!std::ranges::contains(columns, "Date") || !std::ranges::contains(columns, "Amount")|| !std::ranges::contains(columns, "Description")) {
+    if (!range_contains(columns, "Date") || !range_contains(columns, "Amount")|| !range_contains(columns, "Description")) {
         return api_error(req, res, "Invalid file, missing columns");
     }
 

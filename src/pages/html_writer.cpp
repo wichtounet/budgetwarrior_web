@@ -739,11 +739,11 @@ void budget::html_writer::load_deferred_scripts() {
 }
 
 void budget::html_writer::use_module(const std::string& module) {
-    if (!std::ranges::contains(modules, module)) {
+    if (!range_contains(modules, module)) {
         modules.push_back(module);
     }
 }
 
 bool budget::html_writer::need_module(const std::string& module) {
-    return std::ranges::contains(modules, module);
+    return range_contains(modules, module);
 }

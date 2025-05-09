@@ -53,7 +53,7 @@ void budget::assets_card(budget::html_writer& w) {
         for (const auto& [asset, amount] : w.cache.user_assets() | expand_value(w.cache) | not_zero) {
             std::string group = asset.name.substr(0, asset.name.find(separator));
 
-            if (!std::ranges::contains(groups, group)) {
+            if (!range_contains(groups, group)) {
                 groups.emplace_back(std::move(group));
             }
 
