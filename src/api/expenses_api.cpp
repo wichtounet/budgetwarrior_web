@@ -265,6 +265,8 @@ void import_expense(data_cache & cache, std::string_view desc_value, budget::mon
 } // namespace
 
 void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Response& res) {
+    using namespace std::literals;
+
     const auto & file = req.get_file_value("file");
     const auto & file_content = file.content;
 
@@ -286,9 +288,9 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         return api_error(req, res, "Invalid file, missing columns");
     }
 
-    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date"));
-    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Amount"));
-    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"));
+    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date"sv));
+    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Amount"sv));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"sv));
 
     size_t added   = 0;
     size_t ignored = 0;
@@ -323,6 +325,8 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
 
 // Assume the CSV comes from Zamzar
 void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Response& res) {
+    using namespace std::literals;
+
     const auto & file = req.get_file_value("file");
     const auto & file_content = file.content;
 
@@ -344,9 +348,9 @@ void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Re
         return api_error(req, res, "Invalid file, missing columns");
     }
 
-    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date de trans."));
-    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Crédit CHF"));
-    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"));
+    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date de trans."sv));
+    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Crédit CHF"sv));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"sv));
 
     size_t added   = 0;
     size_t ignored = 0;
