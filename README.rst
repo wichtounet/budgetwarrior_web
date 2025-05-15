@@ -5,10 +5,6 @@ budgetwarrior_web
    :target: https://github.com/wichtounet/budgetwarrior_web/actions/workflows/make.yml
    :alt: Linux Build
 
-.. image:: https://github.com/wichtounet/budgetwarrior_web/actions/workflows/sonar.yml/badge.svg
-   :target: https://github.com/wichtounet/budgetwarrior_web/actions/workflows/sonar.yml
-   :alt: Sonar Build
-
 .. image:: https://sonarcloud.io/api/project_badges/measure?project=wichtounet_budgetwarrior_web&metric=alert_status
    :target: https://sonarcloud.io/summary/new_code?id=wichtounet_budgetwarrior_web
    :alt: SonarSource analysis
