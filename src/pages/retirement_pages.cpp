@@ -42,7 +42,7 @@ void budget::retirement_status_page(html_writer& w) {
         return display_error_message(w, "Not enough information, please configure Retirement Options first");
     }
 
-    budget::retirement_status(w);
+    budget::retirement_status(w, budget::get_fi_expenses());
 }
 
 void budget::retirement_configure_page(html_writer& w) {
