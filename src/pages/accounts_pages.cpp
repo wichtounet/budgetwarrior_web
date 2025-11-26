@@ -13,6 +13,14 @@
 
 using namespace budget;
 
+namespace {
+
+void add_hide_if_empty_picker(budget::writer& w, bool hide_if_empty) {
+    add_yes_no_picker(w, "Hide if empty?", "input_hide_if_empty", hide_if_empty);
+}
+
+}
+
 void budget::accounts_page(html_writer& w) {
     budget::show_accounts(w);
 
@@ -32,6 +40,7 @@ void budget::add_accounts_page(html_writer& w) {
 
     add_name_picker(w);
     add_amount_picker(w);
+    add_hide_if_empty_picker(w, false);
 
     form_end(w);
 }
@@ -57,6 +66,7 @@ void budget::edit_accounts_page(html_writer& w, const httplib::Request& req) {
 
     add_name_picker(w, account.name);
     add_amount_picker(w, budget::money_to_string(account.amount));
+    add_hide_if_empty_picker(w, account.hide_if_empty);
 
     form_end(w);
 }
