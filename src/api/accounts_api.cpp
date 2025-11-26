@@ -21,11 +21,11 @@ void budget::add_accounts_api(const httplib::Request& req, httplib::Response& re
     }
 
     account account;
-    account.guid   = budget::generate_guid();
-    account.name   = req.get_param_value("input_name");
-    account.amount = budget::money_from_string(req.get_param_value("input_amount"));
-    account.since  = find_new_since();
-    account.until  = budget::date(2099, 12, 31);
+    account.guid          = budget::generate_guid();
+    account.name          = req.get_param_value("input_name");
+    account.amount        = budget::money_from_string(req.get_param_value("input_amount"));
+    account.since         = find_new_since();
+    account.until         = budget::date(2099, 12, 31);
     account.hide_if_empty = req.get_param_value("input_hide_if_empty") == "yes";
 
     auto id = add_account(std::move(account));
@@ -44,9 +44,9 @@ void budget::edit_accounts_api(const httplib::Request& req, httplib::Response& r
         return api_error(req, res, "account " + id + " does not exist");
     }
 
-    account account = get_account(budget::to_number<size_t>(id));
-    account.name    = req.get_param_value("input_name");
-    account.amount  = budget::money_from_string(req.get_param_value("input_amount"));
+    account account       = get_account(budget::to_number<size_t>(id));
+    account.name          = req.get_param_value("input_name");
+    account.amount        = budget::money_from_string(req.get_param_value("input_amount"));
     account.hide_if_empty = req.get_param_value("input_hide_if_empty") == "yes";
 
     edit_account(account);
