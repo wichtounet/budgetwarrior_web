@@ -5,8 +5,6 @@
 //  http://opensource.org/licenses/MIT)
 //=======================================================================
 
-#include <set>
-
 #include "api/server_api.hpp"
 #include "api/earnings_api.hpp"
 #include "api/expenses_api.hpp"
@@ -19,6 +17,7 @@
 #include "api/fortunes_api.hpp"
 #include "api/assets_api.hpp"
 #include "api/user_api.hpp"
+#include "api/retirement_api.hpp"
 
 #include "pages/server_pages.hpp"
 
@@ -194,6 +193,8 @@ void budget::load_api(httplib::Server& server) {
     server.Post("/api/assets/edit/", api_wrapper(&edit_assets_api));
     server.Get("/api/assets/delete/", api_wrapper(&delete_assets_api));
     server.Get("/api/assets/list/", api_wrapper(&list_assets_api));
+
+    server.Get("/api/retirement/countdown/", api_wrapper(&retirement_countdown_api));
 
     server.Post("/api/asset_values/add/", api_wrapper(&add_asset_values_api));
     server.Post("/api/asset_values/edit/", api_wrapper(&edit_asset_values_api));
