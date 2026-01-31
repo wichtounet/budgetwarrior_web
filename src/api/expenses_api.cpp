@@ -344,13 +344,13 @@ void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Re
         return api_error(req, res, "Invalid file, missing values");
     }
 
-    if (!range_contains(columns, "Date de trans.") || !range_contains(columns, "Crédit CHF")|| !range_contains(columns, "Description")) {
+    if (!range_contains(columns, "Booking date"sv) || !range_contains(columns, "Merchant"sv)|| !range_contains(columns, "Amount (CHF)"sv)) {
         return api_error(req, res, "Invalid file, missing columns");
     }
 
-    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date de trans."sv));
-    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Crédit CHF"sv));
-    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Description"sv));
+    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Booking date"sv));
+    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Amount (CHF)"sv));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Merchant"sv));
 
     size_t added   = 0;
     size_t ignored = 0;
