@@ -115,11 +115,11 @@ void budget::import_expenses_api(const httplib::Request& req, httplib::Response&
         auto expense = budget::expense_get(id);
 
         if (!expense.temporary) {
-            return api_error(req, res, "Invalid expense in the form");
+            return api_error(req, res, "Invalid expense in the form (not temporary)");
         }
 
         if (!req.has_param(amount_param) || !req.has_param(name_param) || !req.has_param(account_param)) {
-            return api_error(req, res, "Invalid parameters in the form");
+            return api_error(req, res, "Invalid parameters in the form (missing some parameters)");
         }
 
         if (!req.has_param(included_param)) {
@@ -271,21 +271,21 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
     const auto & file_content = file.content;
 
     if (!file_content.length()) {
-        return api_error(req, res, "Invalid parameters");
+        return api_error(req, res, "Invalid parameters (missing CSV file)");
     }
 
     auto [columns, values] = parse_csv(file_content, ';');
 
     if (columns.empty()) {
-        return api_error(req, res, "Invalid file, missing columns");
+        return api_error(req, res, "Invalid CSV file (missing columns)");
     }
 
     if (values.empty()) {
-        return api_error(req, res, "Invalid file, missing values");
+        return api_error(req, res, "Invalid CSV file (missing values)");
     }
 
     if (!range_contains(columns, "Date"sv) || !range_contains(columns, "Amount"sv)|| !range_contains(columns, "Description"sv)) {
-        return api_error(req, res, "Invalid file, missing columns");
+        return api_error(req, res, "Invalid CSV file (missing mandatory columns)");
     }
 
     size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date"sv));
@@ -330,21 +330,21 @@ void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Re
     const auto & file_content = file.content;
 
     if (!file_content.length()) {
-        return api_error(req, res, "Invalid parameters");
+        return api_error(req, res, "Invalid parameters (missing CSV file)");
     }
 
     auto [columns, values] = parse_csv(file_content, ',');
 
     if (columns.empty()) {
-        return api_error(req, res, "Invalid file, missing columns");
+        return api_error(req, res, "Invalid CSV file (missing columns)");
     }
 
     if (values.empty()) {
-        return api_error(req, res, "Invalid file, missing values");
+        return api_error(req, res, "Invalid CSV file (missing values)");
     }
 
     if (!range_contains(columns, "Booking date"sv) || !range_contains(columns, "Merchant"sv)|| !range_contains(columns, "Amount (CHF)"sv)) {
-        return api_error(req, res, "Invalid file, missing columns");
+        return api_error(req, res, "Invalid CSV file (missing mandatory columns)");
     }
 
     size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Booking date"sv));
