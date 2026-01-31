@@ -284,7 +284,7 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         return api_error(req, res, "Invalid file, missing values");
     }
 
-    if (!range_contains(columns, "Date") || !range_contains(columns, "Amount")|| !range_contains(columns, "Description")) {
+    if (!range_contains(columns, "Date"sv) || !range_contains(columns, "Amount"sv)|| !range_contains(columns, "Description"sv)) {
         return api_error(req, res, "Invalid file, missing columns");
     }
 
@@ -323,7 +323,6 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
     api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
 }
 
-// Assume the CSV comes from Zamzar
 void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Response& res) {
     using namespace std::literals;
 
