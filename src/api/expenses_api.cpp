@@ -375,3 +375,60 @@ void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Re
 
     api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
 }
+
+void budget::import_migros_expenses_api(const httplib::Request& req, httplib::Response& res) {
+    using namespace std::literals;
+
+    const auto & file = req.get_file_value("file");
+    const auto & file_content = file.content;
+
+    if (!file_content.length()) {
+        return api_error(req, res, "Invalid parameters (missing CSV file)");
+    }
+
+    if (file_content.find("Date;Libellé;Montant;Valeur") == std::string::npos) {
+        return api_error(req, res, "Invalid parameters (missing columns line)");
+    }
+
+    auto [columns, values] = parse_csv(std::string_view(file_content).substr(file_content.find("Date;Libellé;Montant;Valeur")), ',');
+
+    if (columns.empty()) {
+        return api_error(req, res, "Invalid CSV file (missing columns)");
+    }
+
+    if (values.empty()) {
+        return api_error(req, res, "Invalid CSV file (missing values)");
+    }
+
+    if (!range_contains(columns, "Date"sv) || !range_contains(columns, "Libellé"sv)|| !range_contains(columns, "Montant"sv)) {
+        return api_error(req, res, "Invalid CSV file (missing mandatory columns)");
+    }
+
+    size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date"sv));
+    size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Montant"sv));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Libellé"sv));
+
+    size_t added   = 0;
+    size_t ignored = 0;
+
+    data_cache cache;
+
+    for (const auto & value : values) {
+        // Skip uncomplete lines
+        if (value.size() != columns.size()) {
+            continue;
+        }
+
+        const auto desc = clean_string(value[desc_index]);
+
+        const auto date_value = clean_string(value[date_index]);
+        const auto date       = budget::dmy_date_from_string(date_value);
+
+        const auto amount_value = clean_string(value[amount_index]);
+        const auto amount       = budget::single_money_from_string(amount_value);
+
+        import_expense(cache, desc, amount, date, ignored, added);
+    }
+
+    api_success(req, res, std::format("{} expenses have been temporarily imported ({} ignored)", added, ignored));
+}
