@@ -390,7 +390,7 @@ void budget::import_migros_expenses_api(const httplib::Request& req, httplib::Re
         return api_error(req, res, "Invalid parameters (missing columns line)");
     }
 
-    auto [columns, values] = parse_csv(std::string_view(file_content).substr(file_content.find("Date;Libellé;Montant;Valeur")), ',');
+    auto [columns, values] = parse_csv(std::string_view(file_content).substr(file_content.find("Date;Libellé;Montant;Valeur")), ';');
 
     if (columns.empty()) {
         return api_error(req, res, "Invalid CSV file (missing columns)");
@@ -422,7 +422,7 @@ void budget::import_migros_expenses_api(const httplib::Request& req, httplib::Re
         const auto desc = clean_string(value[desc_index]);
 
         const auto date_value = clean_string(value[date_index]);
-        const auto date       = budget::dmy_date_from_string(date_value);
+        const auto date       = budget::dmy8_date_from_string(date_value);
 
         const auto amount_value = clean_string(value[amount_index]);
         const auto amount       = budget::single_money_from_string(amount_value);
