@@ -170,8 +170,11 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
     std::vector<std::string> lines;
 
     bool open = false;
+    size_t orig_lines = 0;
 
     for (auto line : budget::splitv(file_content, '\n')) {
+        ++orig_lines;
+
         // Skip empty lines
         if (line.empty()) {
             continue;
@@ -195,6 +198,8 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
             }
         }
     }
+
+    LOG_F(INFO, "csv: Reconciled {} clean lines out of {} input lines", lines.size(), orig_lines);
 
     for (const auto & line : lines) {
         if (columns.empty()) {
@@ -226,6 +231,8 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
             }
         }
     }
+
+    LOG_F(INFO, "csv: Found {} columns and {} values", columns.size(), values.size());
 
     return {columns, values};
 }
