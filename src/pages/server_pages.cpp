@@ -286,6 +286,7 @@ std::string header(std::string_view title, bool menu = true) {
                   <a class="dropdown-item" href="/expenses/import/cembra/">Import Expenses from Cembra</a>
                   <a class="dropdown-item" href="/expenses/import/migros/">Import Expenses from Migros Bank</a>
                   <a class="dropdown-item" href="/expenses/import/neon/">Import Expenses from Neon</a>
+                  <a class="dropdown-item" href="/expenses/import/wir/">Import Expenses from WIR</a>
                 </div>
               </li>
         )=====";
@@ -563,6 +564,7 @@ void budget::load_pages(httplib::Server& server) {
     server.Get("/expenses/import/cembra/", render_wrapper("Expenses", &import_expenses_cembra_page));
     server.Get("/expenses/import/migros/", render_wrapper("Expenses", &import_expenses_migros_page));
     server.Get("/expenses/import/neon/", render_wrapper("Expenses", &import_expenses_neon_page));
+    server.Get("/expenses/import/wir/", render_wrapper("Expenses", &import_expenses_wir_page));
 
     server.Get(R"(/earnings/(\d+)/(\d+)/)", render_wrapper("Earnings", &earnings_page));
     server.Get("/earnings/", render_wrapper("Earnings", &earnings_page));

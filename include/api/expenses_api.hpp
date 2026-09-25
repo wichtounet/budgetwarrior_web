@@ -22,5 +22,6 @@ void import_expenses_api(const httplib::Request& req, httplib::Response& res);
 void import_neon_expenses_api(const httplib::Request& req, httplib::Response& res);
 void import_cembra_expenses_api(const httplib::Request& req, httplib::Response& res);
 void import_migros_expenses_api(const httplib::Request& req, httplib::Response& res);
+void import_wir_expenses_api(const httplib::Request& req, httplib::Response& res);
 
 } // end of namespace budget

@@ -668,3 +668,7 @@ void budget::import_expenses_cembra_page(html_writer& w) {
 void budget::import_expenses_migros_page(html_writer& w) {
     import_expenses_page(w, "migros"sv);
 }
+
+void budget::import_expenses_wir_page(html_writer& w) {
+    import_expenses_page(w, "wir"sv);
+}
