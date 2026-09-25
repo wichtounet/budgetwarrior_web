@@ -162,11 +162,7 @@ std::string_view clean_string(std::string_view v) {
     return v;
 }
 
-std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_view>>> parse_csv(std::string_view file_content, char sep) {
-    std::vector<std::string_view>              columns;
-    std::vector<std::vector<std::string_view>> values;
-
-
+std::vector<std::string> prepare_csv_lines(std::string_view file_content) {
     std::vector<std::string> lines;
 
     bool open = false;
@@ -200,6 +196,13 @@ std::pair<std::vector<std::string_view>, std::vector<std::vector<std::string_vie
     }
 
     LOG_F(INFO, "csv: Reconciled {} clean lines out of {} input lines", lines.size(), orig_lines);
+
+    return lines;
+}
+
+std::tuple<std::vector<std::string_view>, std::vector<std::vector<std::string_view>>> parse_csv(const std::vector<std::string>& lines, char sep) {
+    std::vector<std::string_view>              columns;
+    std::vector<std::vector<std::string_view>> values;
 
     for (const auto & line : lines) {
         if (columns.empty()) {
@@ -306,7 +309,8 @@ void budget::import_neon_expenses_api(const httplib::Request& req, httplib::Resp
         return api_error(req, res, "Invalid parameters (missing CSV file)");
     }
 
-    auto [columns, values] = parse_csv(file_content, ';');
+    auto lines = prepare_csv_lines(file_content);
+    auto [columns, values] = parse_csv(lines, ';');
 
     if (columns.empty()) {
         return api_error(req, res, "Invalid CSV file (missing columns)");
@@ -365,7 +369,8 @@ void budget::import_wir_expenses_api(const httplib::Request& req, httplib::Respo
         return api_error(req, res, "Invalid parameters (missing CSV file)");
     }
 
-    auto [columns, values] = parse_csv(file_content, ';');
+    auto lines = prepare_csv_lines(file_content);
+    auto [columns, values] = parse_csv(lines, ',');
 
     if (columns.empty()) {
         return api_error(req, res, "Invalid CSV file (missing columns)");
@@ -381,7 +386,7 @@ void budget::import_wir_expenses_api(const httplib::Request& req, httplib::Respo
 
     size_t date_index = std::distance(columns.begin(), std::ranges::find(columns, "Date valeur"sv));
     size_t amount_index = std::distance(columns.begin(), std::ranges::find(columns, "Débit"sv));
-    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Text comptable"sv));
+    size_t desc_index = std::distance(columns.begin(), std::ranges::find(columns, "Texte comptable"sv));
 
     size_t added   = 0;
     size_t ignored = 0;
@@ -397,16 +402,21 @@ void budget::import_wir_expenses_api(const httplib::Request& req, httplib::Respo
         const auto date_value = clean_string(value[date_index]);
         const auto desc_value = clean_string(value[desc_index]);
 
+        // Skip compound lines
+        if (desc_value.starts_with("Ordre permanent ("sv)) {
+            continue;
+        }
+
         // Only handle expenses for now
         auto amount_value = clean_string(value[amount_index]);
-        if (amount_value.front() == '-') {
-            amount_value = amount_value.substr(1);
-        }
         if (amount_value.find("CHF ") != std::string::npos) {
             amount_value = amount_value.substr(4);
         }
+        if (amount_value.front() == '-') {
+            amount_value = amount_value.substr(1);
+        }
 
-        const auto date = budget::date_from_string(date_value);
+        const auto date = budget::dmy_date_from_string(date_value);
         const auto amount = budget::money_from_string(amount_value);
 
         import_expense(cache, desc_value, amount, date, ignored, added);
@@ -425,7 +435,8 @@ void budget::import_cembra_expenses_api(const httplib::Request& req, httplib::Re
         return api_error(req, res, "Invalid parameters (missing CSV file)");
     }
 
-    auto [columns, values] = parse_csv(file_content, ',');
+    auto lines = prepare_csv_lines(file_content);
+    auto [columns, values] = parse_csv(lines, ',');
 
     if (columns.empty()) {
         return api_error(req, res, "Invalid CSV file (missing columns)");
@@ -490,7 +501,8 @@ void budget::import_migros_expenses_api(const httplib::Request& req, httplib::Re
 
     const std::string header = version1 ? header1 : header2;
 
-    auto [columns, values] = parse_csv(std::string_view(file_content).substr(file_content.find(header)), ';');
+    auto lines = prepare_csv_lines(std::string_view(file_content).substr(file_content.find(header)));
+    auto [columns, values] = parse_csv(lines, ';');
 
     if (columns.empty()) {
         return api_error(req, res, "Invalid CSV file (missing columns)");
